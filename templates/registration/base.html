@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title-content %}Starting page{% endblock title-content %}
+
+{% block head-content %}
+<link rel="stylesheet" href="{% static '/registration/css/style.css' %}">
+{% endblock head-content %}
+
+{% block body-content %}
+
+<body class="start-body">
+    <nav>
+        <div class="nav-wrapper container">
+            <a href="/" class="brand-logo">PepegaHR</a>
+            <a href="#" data-target="mobile-demo" class="sidenav-trigger">
+                <i class="material-icons">menu</i>
+            </a>
+            <ul class="right hide-on-med-and-down">
+                <li><a href="#">GitHub</a></li>
+            </ul>
+            <ul class="sidenav" id="mobile-demo">
+                <li><a href="#">GitHub</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container section">
+        {% block main-content %}
+        <div class="row">
+            <div class="col s12 m6 l6 xl6">
+                <div class="card">
+                    {% if user.is_authenticated %}
+                    <div class="card-content">
+                        <div class="card-title">Добро пожаловать, {{ user.get_full_name }}</div>
+                    </div>
+                    <div class="card-action">
+                        <a class="btn" href="{% url 'home-page' %}">Продолжить работу</a>
+                    </div>
+                    {% else %}
+                    <div class="card-content">
+                        <div class="card-title">Начни тестирование прямо сейчас!</div>
+                    </div>
+                    <div class="card-action">
+                        <a class="btn" href="{% url 'login' %}">Войти в систему</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col s12 m6 l6 xl6">
+                <div class="card">
+                    <div class="card-content">
+                        <div class="card-title">Возможности</div>
+                        Lorem ipsum dolor sit, amet consectetur adipisicing elit. Ea doloremque, praesentium totam
+                        ipsa deleniti accusamus numquam quod mollitia reiciendis, deserunt dolorem earum
+                        reprehenderit possimus voluptatibus repellendus provident cum hic magni.
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endblock main-content %}
+    </main>
+
+
+    <footer class="page-footer" style="padding-top: 0;">
+        <div class="footer-copyright">
+            <div class="container">
+                © 2020 Copyright
+                <div class="right">
+                    Николай Верещагин, Юрий Шкляев 
+                </div>
+            </div>
+        </div>
+    </footer>
+
+</body>
+{% endblock body-content %}
+
+{% block script-content %}
+<script>
+    $(document).ready(function () {
+        $(".sidenav").sidenav();
+    });
+
+</script>
+{% endblock script-content %}

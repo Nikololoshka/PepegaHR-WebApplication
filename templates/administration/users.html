@@ -1,0 +1,45 @@
+{% extends 'workbase.html' %}
+{% load static %}
+
+{% block title-content %}Users{% endblock title-content %}
+
+{% block admin-nav %}
+<li class="bold active">
+{% endblock admin-nav %}
+
+
+{% block admin-body-nav %}
+<div class="collapsible-body" style="display: block;">
+{% endblock admin-body-nav %}
+
+{% block admin-users-nav %}
+<li class="active">
+{% endblock admin-users-nav %}
+
+{% block main-content %}
+
+<div class="section" style="padding-left: 20px; padding-right: 20px;">
+    <h3>Список пользователей</h3>
+    <a class="waves-effect waves-light btn">
+        <i class="material-icons right">add</i>Добавить отдел
+    </a>
+    <a class="waves-effect waves-light btn">
+        <i class="material-icons right">add</i>Добавить пользователя
+    </a>
+    <nav>
+        <div class="nav-wrapper">
+            <div class="col s12" style="padding-left: 20px;">
+                <a href="#" class="breadcrumb">First</a>
+                <a href="#" class="breadcrumb">Second</a>
+                <a href="#" class="breadcrumb">Third</a>
+            </div>
+        </div>
+    </nav>
+    <ul class="collection">
+        {% for i in count %}
+        <li class="collection-item">Ибатулин {{ i }}</li>
+        {% endfor %}
+    </ul>
+</div>
+
+{% endblock main-content %}
