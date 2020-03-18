@@ -5,11 +5,15 @@
 
 {% block head-content %}
 <link rel="stylesheet" href="{% static '/home/css/style.css' %}">
+
+{% block head-page-content %}
+{% endblock head-page-content %}
+
 {% endblock head-content %}
 
 {% block body-content %}
 
-<body>
+<body class="workbase-body">
     <header>
         <nav>
             <div class="nav-wrapper">
@@ -22,9 +26,9 @@
                             <div class="background">
                                 <img src="{% static '/registration/img/bg.png' %}" alt="">
                             </div>
-                            <img class="circle white" src="{% static '/home/img/default-user.png' %}">
-                            <span class="black-text name">{{ user.get_username }}</span>
-                            <span class="black-text email">{{ user.get_email }}</span>
+                            <img class="circle white" src="{{ user.photo.url }}">
+                            <span class="black-text name">{{ user.get_full_name }}</span>
+                            <span class="black-text email">{{ user.email }}</span>
                         </div>
                     </li>
                     <ul>
@@ -75,7 +79,7 @@
         </nav>
     </header>
 
-    <main class="main-container">
+    <main class="workbase-container container">
         {% block main-content %}
         {% endblock main-content %}
     </main>
@@ -83,11 +87,20 @@
 </body>
 {% endblock body-content %}
 
+<!-- Script common -->
 {% block script-content %}
 <script>
     $(document).ready(function () {
         $(".sidenav").sidenav();
-        $('.collapsible').collapsible();
+        $('.collapsible').collapsible({
+            inDuration: 300,
+            outDuration: 300
+        });
     });
 </script>
+
+<!-- Script page -->
+{% block script-page-content %}
+{% endblock script-page-content %}
+
 {% endblock script-content %}

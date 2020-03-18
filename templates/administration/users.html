@@ -1,12 +1,15 @@
 {% extends 'workbase.html' %}
 {% load static %}
 
-{% block title-content %}Users{% endblock title-content %}
+{% block title-content %}PepegaHR: Users{% endblock title-content %}
+
+{% block head-page-content %}
+<link rel="stylesheet" href="{% static '/administration/css/users.css' %}">
+{% endblock head-page-content %}
 
 {% block admin-nav %}
 <li class="bold active">
 {% endblock admin-nav %}
-
 
 {% block admin-body-nav %}
 <div class="collapsible-body" style="display: block;">
@@ -18,28 +21,131 @@
 
 {% block main-content %}
 
-<div class="section" style="padding-left: 20px; padding-right: 20px;">
-    <h3>Список пользователей</h3>
-    <a class="waves-effect waves-light btn">
-        <i class="material-icons right">add</i>Добавить отдел
-    </a>
-    <a class="waves-effect waves-light btn">
-        <i class="material-icons right">add</i>Добавить пользователя
-    </a>
-    <nav>
-        <div class="nav-wrapper">
-            <div class="col s12" style="padding-left: 20px;">
-                <a href="#" class="breadcrumb">First</a>
-                <a href="#" class="breadcrumb">Second</a>
-                <a href="#" class="breadcrumb">Third</a>
+<div class="card">
+    <div class="card-content">
+        <div class="card-title">
+            <div class="row">
+                <div class="col s12 xl6 no-padding">
+                    Список пользователей
+                </div>
+                <div class="col s12 xl6 no-padding">
+                    <button class="waves-effect waves-light btn right modal-trigger" data-target="modal-create-user">
+                        <i class="material-icons right">add</i>Добавить пользователя
+                    </button>
+                    <!-- Modal create user -->
+                    <div id="modal-create-user" class="modal">
+                        <div class="modal-content">
+                            <h4>Создание пользователя</h4>
+                            <form method="POST" action="{% url 'admin-create-user-page' %}" id="create-user-form">
+                                {% csrf_token %}
+                                <div class="row">
+                                    <div class="input-field col s6">
+                                        <i class="material-icons prefix">person</i>
+                                        <input id="first_name" name="first_name" type="text" class="validate" autocomplete="name" required>
+                                        <label for="first_name">Имя</label>
+                                    </div>
+                                    <div class="input-field col s6">
+                                        <i class="material-icons prefix">person</i>
+                                        <input id="last_name" name="last_name" type="text" class="validate" autocomplete="family-name" required>
+                                        <label for="last_name">Фамилия</label>
+                                     </div>
+                                </div>
+                                <div class="row">
+                                    <div class="input-field col s12">
+                                        <i class="material-icons prefix">email</i>
+                                        <input id="email" name="email" type="email" class="validate" autocomplete="email" required>
+                                        <label for="email">Email</label>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="input-field col s6">
+                                        <i class="material-icons prefix">lock</i>
+                                        <input id="password" name="password" type="password" class="validate" autocomplete="new-password" required>
+                                        <label for="password">Пароль</label>
+                                    </div>
+                                    <div class="input-field col s6">
+                                        <i class="material-icons prefix">lock</i>
+                                        <input id="confirm_password" type="password" class="validate" required>
+                                        <label for="confirm_password">Подтвердите пароль</label>
+                                     </div>
+                                </div>
+                                <div class="row">
+                                    <div class="input-field col s12">
+                                        <i class="material-icons prefix">perm_identity</i>
+                                        <select id="role" name="role">
+                                            <option value="admin">Администратор</option>
+                                            <option value="moderator">Модератор</option>
+                                            <option value="user">Пользователь</option>
+                                        </select>
+                                        <label>Роль</label>
+                                      </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <a class="modal-action modal-close waves-effect waves-light btn-flat">Отмена</a>
+                            <input form="create-user-form" class="modal-action waves-effect waves-light btn-flat" type="submit" value="Создать" />
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-    </nav>
-    <ul class="collection">
-        {% for i in count %}
-        <li class="collection-item">Ибатулин {{ i }}</li>
-        {% endfor %}
-    </ul>
+
+        {% if hr_users %}
+        <ul class="collapsible">
+            {% for hr_user in hr_users %}
+            <li>
+                <div class="collapsible-header row" style="margin-bottom: 0em;">    
+                    <div class="col s1 valign-wrapper">
+                        <img src="{{ hr_user.photo.url }}" alt="" class="circle responsive-img" style="max-width: 80%;">
+                    </div>
+                    <div class="col s10">
+                        <p style="font-size: large;">{{ hr_user.get_full_name }}</p>
+                        <p>{{ hr_user.get_role_display }}</p>
+                    </div>
+                    <div class="col s1 valign-wrapper right">
+                        {% if hr_user.is_superuser %}
+                        <i class="material-icons amber-text right tooltipped" data-position="bottom" data-tooltip="Администратор">stars</i>
+                        {% elif hr_user.is_moderator %}
+                        <i class="material-icons grey-text right tooltipped" data-position="bottom" data-tooltip="Модератор">stars</i>
+                        {% else %}
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="collapsible-body list-body">
+                    <div class="row" style="margin-bottom: 0em;">
+                        <div class="col s12 m6">
+                            <p>Email: {{ hr_user.email }}</p>
+                        </div>
+                        <div class="col s12 m6">
+                            <p>Последняя авторизация:
+                                {% if hr_user.last_login %}
+                                {{ hr_user.last_login }}
+                                {% else %}
+                                не было
+                                {% endif %}
+                            </p>
+                        </div>  
+                    </div>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>   
+        {% else %}
+            <div class="center empty-list">Список пуст</div>
+        {% endif %}
+    </div>
 </div>
 
 {% endblock main-content %}
+
+{% block script-page-content %}
+<script>
+    $(document).ready(function(){
+        $('.tooltipped').tooltip();
+        $('.modal').modal();
+        $('select').formSelect();
+    });
+</script>
+
+{% endblock script-page-content %}
