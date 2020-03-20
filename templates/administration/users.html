@@ -25,68 +25,13 @@
     <div class="card-content">
         <div class="card-title">
             <div class="row">
-                <div class="col s12 xl6 no-padding">
+                <div class="col m12 xl6 no-padding">
                     Список пользователей
                 </div>
-                <div class="col s12 xl6 no-padding">
-                    <button class="waves-effect waves-light btn right modal-trigger" data-target="modal-create-user">
+                <div class="col m12 xl6 no-padding">
+                    <a href="{% url 'admin-create-user-page' %}" class="btn waves-effect waves-light right">
                         <i class="material-icons right">add</i>Добавить пользователя
-                    </button>
-                    <!-- Modal create user -->
-                    <div id="modal-create-user" class="modal">
-                        <div class="modal-content">
-                            <h4>Создание пользователя</h4>
-                            <form method="POST" action="{% url 'admin-create-user-page' %}" id="create-user-form">
-                                {% csrf_token %}
-                                <div class="row">
-                                    <div class="input-field col s6">
-                                        <i class="material-icons prefix">person</i>
-                                        <input id="first_name" name="first_name" type="text" class="validate" autocomplete="name" required>
-                                        <label for="first_name">Имя</label>
-                                    </div>
-                                    <div class="input-field col s6">
-                                        <i class="material-icons prefix">person</i>
-                                        <input id="last_name" name="last_name" type="text" class="validate" autocomplete="family-name" required>
-                                        <label for="last_name">Фамилия</label>
-                                     </div>
-                                </div>
-                                <div class="row">
-                                    <div class="input-field col s12">
-                                        <i class="material-icons prefix">email</i>
-                                        <input id="email" name="email" type="email" class="validate" autocomplete="email" required>
-                                        <label for="email">Email</label>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="input-field col s6">
-                                        <i class="material-icons prefix">lock</i>
-                                        <input id="password" name="password" type="password" class="validate" autocomplete="new-password" required>
-                                        <label for="password">Пароль</label>
-                                    </div>
-                                    <div class="input-field col s6">
-                                        <i class="material-icons prefix">lock</i>
-                                        <input id="confirm_password" type="password" class="validate" required>
-                                        <label for="confirm_password">Подтвердите пароль</label>
-                                     </div>
-                                </div>
-                                <div class="row">
-                                    <div class="input-field col s12">
-                                        <i class="material-icons prefix">perm_identity</i>
-                                        <select id="role" name="role">
-                                            <option value="admin">Администратор</option>
-                                            <option value="moderator">Модератор</option>
-                                            <option value="user">Пользователь</option>
-                                        </select>
-                                        <label>Роль</label>
-                                      </div>
-                                </div>
-                            </form>
-                        </div>
-                        <div class="modal-footer">
-                            <a class="modal-action modal-close waves-effect waves-light btn-flat">Отмена</a>
-                            <input form="create-user-form" class="modal-action waves-effect waves-light btn-flat" type="submit" value="Создать" />
-                        </div>
-                    </div>
+                    </a>
                 </div>
             </div>
         </div>
@@ -97,7 +42,7 @@
             <li>
                 <div class="collapsible-header row" style="margin-bottom: 0em;">    
                     <div class="col s1 valign-wrapper">
-                        <img src="{{ hr_user.photo.url }}" alt="" class="circle responsive-img" style="max-width: 80%;">
+                        <img src="{{ hr_user.photo.url }}" alt="" class="circle" style="max-width: 40px;">
                     </div>
                     <div class="col s10">
                         <p style="font-size: large;">{{ hr_user.get_full_name }}</p>
@@ -108,14 +53,14 @@
                         <i class="material-icons amber-text right tooltipped" data-position="bottom" data-tooltip="Администратор">stars</i>
                         {% elif hr_user.is_moderator %}
                         <i class="material-icons grey-text right tooltipped" data-position="bottom" data-tooltip="Модератор">stars</i>
-                        {% else %}
+                        {% else %}                        
                         {% endif %}
                     </div>
                 </div>
                 <div class="collapsible-body list-body">
-                    <div class="row" style="margin-bottom: 0em;">
+                    <div class="row">
                         <div class="col s12 m6">
-                            <p>Email: {{ hr_user.email }}</p>
+                            <p>Nickname: {{ hr_user.username }}</p>
                         </div>
                         <div class="col s12 m6">
                             <p>Последняя авторизация:
@@ -126,6 +71,24 @@
                                 {% endif %}
                             </p>
                         </div>  
+                    </div>
+                    <div class="row">
+                        <div class="col s12 m6">
+                            <p>Email: {{ hr_user.email }}</p>
+                        </div>
+                        <div class="col s12 m6">
+                            <p>Последняя активность: 
+                                {% if hr_user.last_visit %}
+                                {{ hr_user.last_visit }}
+                                {% else %}
+                                не было
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row right-align top-sep" style="margin-bottom: 0em;">
+                        <a href="#" class="btn-flat waves-effect waves-light">Изменить</a>
+                        <a href="#" class="btn-flat red-text waves-effect waves-light">Удалить</a>
                     </div>
                 </div>
             </li>
@@ -144,8 +107,6 @@
     $(document).ready(function(){
         $('.tooltipped').tooltip();
         $('.modal').modal();
-        $('select').formSelect();
     });
 </script>
-
 {% endblock script-page-content %}

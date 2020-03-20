@@ -1,9 +1,10 @@
 from django.urls import path
 
-from .views import users, create_user
+from . import views
 
 
 urlpatterns = [
-    path('users', users, name='admin-users-page'),
-    path('users/create-user', create_user, name='admin-create-user-page')
+    path('users', views.users_page, name='admin-users-page'),
+    path('users/create-user', views.create_user_page, name='admin-create-user-page'),
+    path('users/create-user-model', views.create_user, name='admin-create-user'),
 ]
