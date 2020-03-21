@@ -1,0 +1,79 @@
+{% extends 'administration/users.html' %}
+{% load static %}
+
+{% block title-content %}PepegaHR: Create user{% endblock title-content %}
+
+{% block main-content %}
+<div class="card">
+    <div class="card-content">
+        <span class="card-title">Создание пользователя</span>
+
+        <form method="POST" action="{% url 'admin-create-user' %}" id="create-user-form">
+            {% csrf_token %}
+            <div class="row">
+                <div class="input-field col s12 l6">
+                    <i class="material-icons prefix">person</i>
+                    <input id="first_name" name="first_name" type="text" class="validate" autocomplete="name" required>
+                    <label for="first_name">Имя</label>
+                </div>
+                <div class="input-field col s12 l6">
+                    <i class="material-icons prefix">person</i>
+                    <input id="last_name" name="last_name" type="text" class="validate" autocomplete="family-name" required>
+                    <label for="last_name">Фамилия</label>
+                 </div>
+            </div>
+            <div class="row">
+                <div class="input-field col s12 l6">
+                    <i class="material-icons prefix">assignment_ind</i>
+                    <input id="nickname" name="nickname" type="text" class="validate" autocomplete="nickname" required>
+                    <label for="nickname">Nickname</label>
+                </div>
+                <div class="input-field col s12 l6">
+                    <i class="material-icons prefix">email</i>
+                    <input id="email" name="email" type="email" class="validate" autocomplete="email" required>
+                    <label for="email">Email</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="input-field col s12 l6">
+                    <i class="material-icons prefix">lock</i>
+                    <input id="password" name="password" type="password" class="validate" autocomplete="new-password" required>
+                    <label for="password">Пароль</label>
+                </div>
+                <div class="input-field col s12 l6">
+                    <i class="material-icons prefix">lock</i>
+                    <input id="confirm_password" type="password" class="validate" required>
+                    <label for="confirm_password">Подтвердите пароль</label>
+                 </div>
+            </div>
+            <div class="row">
+                <div class="input-field col s12">
+                    <i class="material-icons prefix">perm_identity</i>
+                    <select id="role" name="role">
+                        <option value="adm">Администратор</option>
+                        <option value="mod">Модератор</option>
+                        <option value="usr">Пользователь</option>
+                    </select>
+                    <label>Роль</label>
+                  </div>
+            </div>
+        </form>
+    </div>
+    <div class="card-action">
+        <div>
+            <a href="{% url 'admin-users-page' %}" class=" btn-flat waves-effect waves-light">Отмена</a>
+            <button form="create-user-form" class="btn waves-effect waves-light" type="submit" >Создать</button>
+        </div>
+    </div>
+</div>
+
+{% endblock main-content %}
+
+{% block script-page-content %}
+<script>
+    $(document).ready(function(){
+        $('.tooltipped').tooltip();
+        $('select').formSelect();
+    });
+</script>
+{% endblock script-page-content %}

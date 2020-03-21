@@ -28,6 +28,9 @@ def create_user_page(request: WSGIRequest):
 
 @login_required
 def create_user(request: WSGIRequest):
+    """
+    Создает пользователя в системе.
+    """
     if request.method == 'POST':
         # получение формы
         first_name: str = request.POST['first_name']
@@ -41,9 +44,27 @@ def create_user(request: WSGIRequest):
                          last_name=last_name,
                          username=nickname,
                          email=email,
-                         password=password,
                          role=role)
+        hr_user.set_password(password)
         hr_user.save()
+        
         return redirect('admin-users-page')
+
+    return HttpResponse('Method not allowed')
+
+
+@login_required
+def remove_user(request: WSGIRequest):
+    """
+    Удаляет пользователя из системы.
+    """
+    if request.method == 'POST':
+        user_id = request.POST['id']
+        hr_user = HRUser.objects.get(pk=user_id)
+        if hr_user is not None:
+            hr_user.delete()
+            return redirect('admin-users-page')
+
+        return HttpResponse('Cannot remove user')
 
     return HttpResponse('Method not allowed')

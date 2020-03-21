@@ -88,7 +88,8 @@
                     </div>
                     <div class="row right-align top-sep" style="margin-bottom: 0em;">
                         <a href="#" class="btn-flat waves-effect waves-light">Изменить</a>
-                        <a href="#" class="btn-flat red-text waves-effect waves-light">Удалить</a>
+                        <a href="#remove-modal" data-id='{{ hr_user.id }}' data-username='{{ hr_user.get_full_name }}'
+                        class="btn-flat red-text waves-effect waves-light modal-trigger">Удалить</a>
                     </div>
                 </div>
             </li>
@@ -100,13 +101,36 @@
     </div>
 </div>
 
+<div id="remove-modal" class="modal">
+    <div class="modal-content">
+        <h4>Удаление пользователя</h4>
+        <p>
+            Вы действительно хотите удалить пользователя <b class="modal-username"></b>?
+            При удалении будет потеряны все данные связанные с этим пользователем.
+        </p>
+    </div>
+    <div class="modal-footer right-align">
+        <form action="{% url 'admin-remove-user' %}" method="POST" >
+            {% csrf_token %}
+            <a class="modal-close btn-flat waves-effect waves-green">Отмена</a>
+            <input type="hidden" name="id" value="-1" class="modal-id">
+            <button class="modal-close btn-flat red-text waves-effect waves-green" type="submit">Удалить</button>
+        </form>
+    </div>
+</div>
+
 {% endblock main-content %}
 
 {% block script-page-content %}
 <script>
     $(document).ready(function(){
         $('.tooltipped').tooltip();
-        $('.modal').modal();
+        $('.modal').modal({
+            onOpenStart: function(modal, trigger) {
+                $('.modal-id').attr('value', trigger.dataset['id']);
+                $('.modal-username').text(trigger.dataset['username']);
+            }
+        });
     });
 </script>
 {% endblock script-page-content %}
