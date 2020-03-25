@@ -6,8 +6,20 @@
 	padding-left: 300px;
 }
 
+.workbase-header {
+	padding-left: 320px;    
+	position: absolute;
+    color: white;
+    display: inline-block;
+    font-size: 2.1rem;
+	text-align: start;
+}
+
 @media only screen and (max-width: 992px) {
 	.workbase-container {
 		padding-left: 0px;
+	}
+	.workbase-header {
+		padding-left: 20px;
 	}
 }

@@ -1,25 +1,27 @@
 {% extends 'base.html' %}
 {% load static %}
 
+<!-- header content -->
 {% block title-content %}Home page{% endblock title-content %}
 
 {% block head-content %}
 <link rel="stylesheet" href="{% static '/home/css/style.css' %}">
 
-{% block head-page-content %}
-{% endblock head-page-content %}
+{% block head-page %}
+{% endblock head-page %}
 
 {% endblock head-content %}
 
+<!-- main content -->
 {% block body-content %}
-
 <body class="workbase-body">
     <header>
         <nav>
             <div class="nav-wrapper">
-                <a href="#" data-target="nav-mobile" class="top-nav sidenav-trigger circle hide-on-large-only">
+                <a href="#" data-target="nav-mobile" class="top-nav sidenav-trigger full hide-on-large-only">
                     <i class="material-icons">menu</i>
                 </a>
+                <a href="/" class="workbase-header">PepegaHR</a>
                 <ul class="sidenav sidenav-fixed" id="nav-mobile" style="transform: translateX(0px);">
                     <li>
                         <div class="user-view">
@@ -41,35 +43,50 @@
                         </li>
                         <li class="no-padding">
                             <ul class="collapsible collapsible-accordion">
+                                {% block profile-nav %}
                                 <li class="bold">
+                                {% endblock profile-nav %}
                                     <a class="collapsible-header waves-effect waves-teal">
                                         <i class="material-icons">account_box</i>Профиль
                                     </a>
+                                    {% block profile-body-nav %}
                                     <div class="collapsible-body">
+                                    {% endblock profile-body-nav %}
                                         <ul>
-                                            <li><a href="#">Мой профиль</a></li>
-                                            <li><a href="{% url 'logout' %}">Выйти из системы</a></li>
+                                            {% block profile-myprofile-nav %}
+                                            <li>
+                                            {% endblock profile-myprofile-nav %}
+                                                <a href="{% url 'profile-page' %}">Мой профиль</a>
+                                            </li>
+                                            <li>
+                                                <a href="{% url 'logout' %}">Выйти из системы</a>
+                                            </li>
                                         </ul>
                                     </div>
                                 </li>
                                 {% block admin-nav %}
                                 <li class="bold">
-                                    {% endblock admin-nav %}
+                                {% endblock admin-nav %}
                                     <a class="collapsible-header waves-effect waves-teal">
                                         <i class="material-icons">people</i>Администрирование
                                     </a>
 
                                     {% block admin-body-nav %}
                                     <div class="collapsible-body">
-                                        {% endblock admin-body-nav %}
+                                    {% endblock admin-body-nav %}
                                         <ul>
                                             {% block admin-users-nav %}
                                             <li>
-                                                {% endblock admin-users-nav %}
+                                            {% endblock admin-users-nav %}
                                                 <a href="{% url 'admin-users-page' %}">Список пользователей</a>
                                             </li>
                                         </ul>
                                     </div>
+                                </li>
+                                <li>
+                                    <a href="" class="collapsible-header">
+                                        <i class="material-icons">poll</i>Тестирование
+                                    </a>
                                 </li>
                             </ul>
                         </li>
@@ -87,20 +104,16 @@
 </body>
 {% endblock body-content %}
 
-<!-- Script common -->
+<!-- script content -->
 {% block script-content %}
 <script>
     $(document).ready(function () {
         $(".sidenav").sidenav();
-        $('.collapsible').collapsible({
-            inDuration: 300,
-            outDuration: 300
-        });
+        $('.collapsible').collapsible();
     });
 </script>
 
-<!-- Script page -->
-{% block script-page-content %}
-{% endblock script-page-content %}
+{% block script-page %}
+{% endblock script-page %}
 
 {% endblock script-content %}

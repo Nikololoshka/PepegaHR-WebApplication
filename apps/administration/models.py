@@ -8,7 +8,7 @@ def user_photo_path(instance, filename) -> str:
     """
     Путь для сохранения фотографии профиля.
     """
-    return f'user-photos/profile_{instance.id}.{path.splitext(filename)[1]}'
+    return f'user-photos/profile_{instance.id}{path.splitext(filename)[1]}'
 
 
 class HRUser(AbstractUser):

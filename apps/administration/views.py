@@ -33,21 +33,29 @@ def create_user(request: WSGIRequest):
     """
     if request.method == 'POST':
         # получение формы
-        first_name: str = request.POST['first_name']
-        last_name: str = request.POST['last_name']
-        nickname: str = request.POST['nickname']
-        email: str = request.POST['email']
-        password: str = request.POST['password']
-        role: str = request.POST['role']
+        first_name = request.POST['first_name']
+        last_name = request.POST['last_name']
+        nickname = request.POST['nickname']
+        email = request.POST['email']
+        password = request.POST['password']
+        role = request.POST['role']
+        photo = request.FILES.get('profile_image', None)
 
-        hr_user = HRUser(first_name=first_name,
-                         last_name=last_name,
-                         username=nickname,
-                         email=email,
-                         role=role)
+        params = {
+            'first_name': first_name,
+            'last_name': last_name,
+            'username': nickname,
+            'email': email,
+            'role': role,
+        }
+
+        if photo is not None:
+            params['photo'] = photo
+
+        hr_user = HRUser(**params)
         hr_user.set_password(password)
         hr_user.save()
-        
+
         return redirect('admin-users-page')
 
     return HttpResponse('Method not allowed')

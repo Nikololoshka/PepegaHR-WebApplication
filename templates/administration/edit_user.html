@@ -1,8 +1,14 @@
 {% extends 'administration/users.html' %}
 {% load static %}
 
+<!-- header content -->
 {% block title-content %}PepegaHR: Create user{% endblock title-content %}
 
+{% block head-page %}
+<script src="{% static '/home/js/edit_user.js' %}"></script>
+{% endblock head-page %}
+
+<!-- main content -->
 {% block main-content %}
 <div class="card">
     <div class="card-content">
@@ -66,14 +72,4 @@
         </div>
     </div>
 </div>
-
 {% endblock main-content %}
-
-{% block script-page-content %}
-<script>
-    $(document).ready(function(){
-        $('.tooltipped').tooltip();
-        $('select').formSelect();
-    });
-</script>
-{% endblock script-page-content %}

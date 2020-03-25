@@ -1,16 +1,23 @@
 $(document).ready(function () {
-    $('.tooltipped').tooltip();
-    $('select').formSelect();
 
-    $("#profile_image").change(function() {
-        readURL(this);
+    var editable = false;
+    var edit_row = $('.edit-row');
+
+    $('.edit-button').click(function() {
+        editable = !editable;
+        console.log(editable);
+        if (editable) {
+            edit_row.collapsible('open', 0);   
+        } else {
+            edit_row.collapsible('close', 0);  
+        }
     });
 
     $('#password, #confirm_password').on('keyup', function () {
         correctPassword();
     });
 
-    $('#create-user-form').on('submit', function () { 
+    $('#profile-edit-form').on('submit', function () { 
         return correctPassword();
     });
 });
@@ -27,14 +34,4 @@ function correctPassword() {
     } 
     second_el.removeClass('valid').addClass('invalid');
     return false;
-};
-
-function readURL(input) {
-    if (input.files && input.files[0]) {
-      var reader = new FileReader();
-      reader.onload = function(e) {
-        $('.image-preview').attr('src', e.target.result);
-      }
-      reader.readAsDataURL(input.files[0]); 
-    }
 };

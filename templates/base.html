@@ -2,39 +2,25 @@
 <html lang="en">
 
     <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-
         <title>{% block title-content %}{% endblock title-content %}</title>
 
         {% load static %}
-        <script src="{% static 'material/js/jquery.js' %}"></script>
-        <script src="{% static 'material/js/turbolinks.js' %}"></script>
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <link type="text/css" rel="stylesheet" href="{% static '/material/css/materialize.min.css' %}"  media="screen, projection"/>
+        <script type="text/javascript" src="{% static '/jquery/jquery-3.4.1.min.js' %}"></script>
 
-        <!-- Materialize css files -->        
-        <!-- {% load static %} -->
-        <!-- {% load material_form %} -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="shortcut icon" type="image/png" href="{% static 'favicon.ico' %}"/>
 
-        <script src="{% static 'material/js/custom-elements.min.js' %}"></script>
-        <script src="{% static 'material/js/materialize.components.js' %}"></script>
-        <script src="{% static 'material/js/jquery.datetimepicker.full.js' %}"></script>
-        <script src="{% static 'material/js/jquery.formset.js' %}"></script>
-        <script src="{% static 'material/js/materialize.js' %}"></script>
-
-        <link href="{% static 'material/fonts/material-design-icons/material-icons.css' %}" rel="stylesheet">
-        <link href="{% static 'material/fonts/roboto/style.css' %}" rel="stylesheet">
-        <link href="{% static 'material/css/materialize.css' %}" rel="stylesheet">
-        <link href="{% static 'material/css/materialize.forms.css' %}" rel="stylesheet">
-        <link href="{% static 'material/css/jquery.datetimepicker.css' %}" rel="stylesheet">
-            
         {% block head-content %}
         {% endblock head-content %}
-    
     </head>
 
     {% block body-content %}
     {% endblock body-content %}
 
+    <script type="text/javascript" src="{% static '/material/js/materialize.min.js' %}"></script>
     {% block script-content %}
     {% endblock script-content %}
 

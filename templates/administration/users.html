@@ -1,12 +1,14 @@
 {% extends 'workbase.html' %}
 {% load static %}
 
+<!-- header content -->
 {% block title-content %}PepegaHR: Users{% endblock title-content %}
 
-{% block head-page-content %}
+{% block head-page %}
 <link rel="stylesheet" href="{% static '/administration/css/users.css' %}">
-{% endblock head-page-content %}
+{% endblock head-page %}
 
+<!-- nav content -->
 {% block admin-nav %}
 <li class="bold active">
 {% endblock admin-nav %}
@@ -19,16 +21,16 @@
 <li class="active">
 {% endblock admin-users-nav %}
 
+<!-- main content -->
 {% block main-content %}
-
 <div class="card">
     <div class="card-content">
         <div class="card-title">
             <div class="row">
-                <div class="col m12 xl6 no-padding">
+                <div class="col s12 xl6 no-padding">
                     Список пользователей
                 </div>
-                <div class="col m12 xl6 no-padding">
+                <div class="col s12 xl6 no-padding">
                     <a href="{% url 'admin-create-user-page' %}" class="btn waves-effect waves-light right">
                         <i class="material-icons right">add</i>Добавить пользователя
                     </a>
@@ -37,12 +39,12 @@
         </div>
 
         {% if hr_users %}
-        <ul class="collapsible">
+        <ul class="collapsible z-depth-0">
             {% for hr_user in hr_users %}
             <li>
                 <div class="collapsible-header row" style="margin-bottom: 0em;">    
                     <div class="col s1 valign-wrapper">
-                        <img src="{{ hr_user.photo.url }}" alt="" class="circle" style="max-width: 40px;">
+                        <img src="{{ hr_user.photo.url }}" alt="" class="circle" style="max-width: 48px;">
                     </div>
                     <div class="col s10">
                         <p style="font-size: large;">{{ hr_user.get_full_name }}</p>
@@ -65,7 +67,7 @@
                         <div class="col s12 m6">
                             <p>Последняя авторизация:
                                 {% if hr_user.last_login %}
-                                {{ hr_user.last_login }}
+                                {{ hr_user.last_login|date:"H:i:s, d/m/Y" }}
                                 {% else %}
                                 не было
                                 {% endif %}
@@ -79,7 +81,7 @@
                         <div class="col s12 m6">
                             <p>Последняя активность: 
                                 {% if hr_user.last_visit %}
-                                {{ hr_user.last_visit }}
+                                {{ hr_user.last_visit|date:"H:i:s, d/m/Y" }}
                                 {% else %}
                                 не было
                                 {% endif %}
@@ -121,16 +123,6 @@
 
 {% endblock main-content %}
 
-{% block script-page-content %}
-<script>
-    $(document).ready(function(){
-        $('.tooltipped').tooltip();
-        $('.modal').modal({
-            onOpenStart: function(modal, trigger) {
-                $('.modal-id').attr('value', trigger.dataset['id']);
-                $('.modal-username').text(trigger.dataset['username']);
-            }
-        });
-    });
-</script>
-{% endblock script-page-content %}
+{% block script-page %}
+<script src="{% static '/administration/js/users.js' %}"></script>
+{% endblock script-page %}
