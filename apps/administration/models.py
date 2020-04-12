@@ -22,7 +22,7 @@ class HRUser(AbstractUser):
         ('usr', 'Пользователь')
     )
 
-    photo = models.ImageField(upload_to=user_photo_path, default='user-photos/default.png')
+    photo = models.ImageField(upload_to=user_photo_path, default='user-photos/default.png', blank=True)
     role = models.CharField(max_length=3, choices=USER_ROLES, default='usr')
     last_visit = models.DateTimeField(blank=True, null=True)
 
@@ -43,9 +43,15 @@ class Departament(models.Model):
     Объект отдела для пользователей.
     """
     name = models.CharField(max_length=128)
-    parent = models.ForeignKey('Departament', on_delete=models.CASCADE, blank=True, null=True)
 
     class Meta:
         managed = True
         verbose_name = 'Department'
         verbose_name_plural = 'Departments'
+
+
+# DEBUG
+# us = HRUser.objects.get(id=1)
+# print(us.username)
+# print("Password", us.set_password("admin12345"))
+# us.save()

@@ -61,13 +61,15 @@
                             <div class="row">
                                 <div class="input-field col s12 xl6">
                                     <i class="material-icons prefix">assignment_ind</i>
-                                    <input value="{{ user.username }}" id="nickname" type="text" class="validate" required>
+                                    <input value="{{ user.username }}" id="nickname" type="text" name=nickname
+                                           pattern="[A-Za-z\._]+[0-9]*" class="validate" required maxlength="50">
                                     <label for="nickname">Nickname</label>
                                     <span class="helper-text" data-error="Не правильный формат поля"></span>
                                 </div>
                                 <div class="input-field col s12 xl6">
                                     <i class="material-icons prefix">email</i>
-                                    <input value="{{ user.email }}" id="email" type="email" class="validate" required>
+                                    <input value="{{ user.email }}" id="email" type="email" name="email"
+                                           class="validate" required autocomplete="email">
                                     <label for="email">Email</label>
                                     <span class="helper-text" data-error="Не правильный формат поля"></span>
                                 </div>
@@ -76,12 +78,13 @@
                                 <div class="input-field col s12 xl6">
                                     <i class="material-icons prefix">lock</i>
                                     <input id="password" name="password" type="password" class="validate" 
-                                           autocomplete="new-password">
+                                           autocomplete="new-password" minlength="8">
                                     <label for="password">Новый пароль</label>
                                 </div>
                                 <div class="input-field col s12 xl6">
                                     <i class="material-icons prefix">lock</i>
-                                    <input id="confirm_password" type="password" class="validate">
+                                    <input id="confirm_password" type="password" class="validate"
+                                           name="confirm_password" minlength="8">
                                     <label for="confirm_password">Подтвердите пароль</label>
                                     <span class="helper-text" data-error="Пароли не совпадают"></span>
                                  </div>

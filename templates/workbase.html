@@ -16,84 +16,87 @@
 {% block body-content %}
 <body class="workbase-body">
     <header>
-        <nav>
-            <div class="nav-wrapper">
-                <a href="#" data-target="nav-mobile" class="top-nav sidenav-trigger full hide-on-large-only">
-                    <i class="material-icons">menu</i>
-                </a>
-                <a href="/" class="workbase-header">PepegaHR</a>
-                <ul class="sidenav sidenav-fixed" id="nav-mobile" style="transform: translateX(0px);">
-                    <li>
-                        <div class="user-view">
-                            <div class="background">
-                                <img src="{% static '/registration/img/bg.png' %}" alt="">
-                            </div>
-                            <img class="circle white" src="{{ user.photo.url }}">
-                            <span class="black-text name">{{ user.get_full_name }}</span>
-                            <span class="black-text email">{{ user.email }}</span>
-                        </div>
-                    </li>
-                    <ul>
-                        {% block home-nav %}
+        <div class="navbar-fixed">
+            <nav>
+                <div class="nav-wrapper">
+                    <a href="#" data-target="nav-mobile" class="top-nav sidenav-trigger full hide-on-large-only">
+                        <i class="material-icons">menu</i>
+                    </a>
+                    <a href="{% url 'home-page' %}" class="workbase-header">PepegaHR</a>
+
+                </div>
+            </nav>
+        </div>
+        <ul id="nav-mobile" class="sidenav sidenav-fixed">
+            <li>
+                <div class="user-view">
+                    <div class="background">
+                        <img src="{% static '/registration/img/bg.png' %}" alt="">
+                    </div>
+                    <img class="circle white" src="{{ user.photo.url }}">
+                    <span class="black-text name">{{ user.get_full_name }}</span>
+                    <span class="black-text email">{{ user.email }}</span>
+                </div>
+            </li>
+            <ul>
+                {% block home-nav %}
+                <li class="bold">
+                    {% endblock home-nav %}
+                    <a href="{% url 'home-page' %}" class="collapsible-header waves-effect waves-teal">
+                        <i class="material-icons">home</i>Главная
+                    </a>
+                </li>
+                <li class="no-padding">
+                    <ul class="collapsible collapsible-accordion">
+                        {% block profile-nav %}
                         <li class="bold">
-                            {% endblock home-nav %}
-                            <a href="{% url 'home-page' %}" class="collapsible-header waves-effect waves-teal">
-                                <i class="material-icons">home</i>Главная
+                        {% endblock profile-nav %}
+                            <a class="collapsible-header waves-effect waves-teal">
+                                <i class="material-icons">account_box</i>Профиль
+                            </a>
+                            {% block profile-body-nav %}
+                            <div class="collapsible-body">
+                            {% endblock profile-body-nav %}
+                                <ul>
+                                    {% block profile-myprofile-nav %}
+                                    <li>
+                                    {% endblock profile-myprofile-nav %}
+                                        <a href="{% url 'profile-page' %}">Мой профиль</a>
+                                    </li>
+                                    <li>
+                                        <a href="{% url 'logout' %}">Выйти из системы</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+                        {% block admin-nav %}
+                        <li class="bold">
+                        {% endblock admin-nav %}
+                            <a class="collapsible-header waves-effect waves-teal">
+                                <i class="material-icons">people</i>Администрирование
+                            </a>
+
+                            {% block admin-body-nav %}
+                            <div class="collapsible-body">
+                            {% endblock admin-body-nav %}
+                                <ul>
+                                    {% block admin-users-nav %}
+                                    <li>
+                                    {% endblock admin-users-nav %}
+                                        <a href="{% url 'admin-users-page' %}">Список пользователей</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+                        <li>
+                            <a href="" class="collapsible-header">
+                                <i class="material-icons">poll</i>Тестирование
                             </a>
                         </li>
-                        <li class="no-padding">
-                            <ul class="collapsible collapsible-accordion">
-                                {% block profile-nav %}
-                                <li class="bold">
-                                {% endblock profile-nav %}
-                                    <a class="collapsible-header waves-effect waves-teal">
-                                        <i class="material-icons">account_box</i>Профиль
-                                    </a>
-                                    {% block profile-body-nav %}
-                                    <div class="collapsible-body">
-                                    {% endblock profile-body-nav %}
-                                        <ul>
-                                            {% block profile-myprofile-nav %}
-                                            <li>
-                                            {% endblock profile-myprofile-nav %}
-                                                <a href="{% url 'profile-page' %}">Мой профиль</a>
-                                            </li>
-                                            <li>
-                                                <a href="{% url 'logout' %}">Выйти из системы</a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </li>
-                                {% block admin-nav %}
-                                <li class="bold">
-                                {% endblock admin-nav %}
-                                    <a class="collapsible-header waves-effect waves-teal">
-                                        <i class="material-icons">people</i>Администрирование
-                                    </a>
-
-                                    {% block admin-body-nav %}
-                                    <div class="collapsible-body">
-                                    {% endblock admin-body-nav %}
-                                        <ul>
-                                            {% block admin-users-nav %}
-                                            <li>
-                                            {% endblock admin-users-nav %}
-                                                <a href="{% url 'admin-users-page' %}">Список пользователей</a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </li>
-                                <li>
-                                    <a href="" class="collapsible-header">
-                                        <i class="material-icons">poll</i>Тестирование
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
                     </ul>
-                </ul>
-            </div>
-        </nav>
+                </li>
+            </ul>
+        </ul>
     </header>
 
     <main class="workbase-container container">

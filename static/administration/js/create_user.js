@@ -1,7 +1,7 @@
 $(document).ready(function () {
     $('.tooltipped').tooltip();
     $('select').formSelect();
-
+    
     $("#profile_image").change(function() {
         readURL(this);
     });
@@ -12,6 +12,13 @@ $(document).ready(function () {
 
     $('#create-user-form').on('submit', function () { 
         return correctPassword();
+    });
+
+    $('.remove-photo').on('click', function (e) {
+         e.preventDefault();
+         $('#profile_image').val('');
+         $('.file-path').val('').removeClass('valid');
+         $('.image-preview').attr('src', this.dataset['default']);
     });
 });
 

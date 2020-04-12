@@ -5,7 +5,6 @@ $(document).ready(function () {
 
     $('.edit-button').click(function() {
         editable = !editable;
-        console.log(editable);
         if (editable) {
             edit_row.collapsible('open', 0);   
         } else {
@@ -18,7 +17,7 @@ $(document).ready(function () {
     });
 
     $('#profile-edit-form').on('submit', function () { 
-        return correctPassword();
+        return validPassword();
     });
 });
 
@@ -28,10 +27,24 @@ function correctPassword() {
     var first = first_el.val();
     var second = second_el.val();
 
-    if (first == second && !(first === "" || second === "")) {
+    if (first === second && !(first === "" || second === "")) {
         second_el.removeClass('invalid').addClass('valid');
         return true;
     } 
     second_el.removeClass('valid').addClass('invalid');
     return false;
 };
+
+function validPassword() {
+    var first_el = $('#password');
+    var second_el = $('#confirm_password');
+    var first = first_el.val();
+    var second = second_el.val();
+
+    if (first === second) {
+        second_el.removeClass('invalid').addClass('valid');
+        return true;
+    } 
+    second_el.removeClass('valid').addClass('invalid');
+    return false;
+}

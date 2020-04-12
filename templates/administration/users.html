@@ -26,14 +26,36 @@
 <div class="card">
     <div class="card-content">
         <div class="card-title">
-            <div class="row">
-                <div class="col s12 xl6 no-padding">
+            <div class="row" >
+                <div class="col s12 m7 no-padding">
                     Список пользователей
                 </div>
-                <div class="col s12 xl6 no-padding">
-                    <a href="{% url 'admin-create-user-page' %}" class="btn waves-effect waves-light right">
+                <div class="col s12 m5 no-padding right-align">
+                    <a href="{% url 'admin-create-user-page' %}" class="btn waves-effect waves-light">
                         <i class="material-icons right">add</i>Добавить пользователя
                     </a>
+                </div>
+            </div>
+            <div class="row valign-wrapper">
+                <div class="col s12 no-padding">
+                    <form class="valign-wrapper" style="display: flex;">
+                        <div class="input-field" style="width: 100%; flex-grow: 1; margin: 0px;">
+                            <input  disabled type="text" placeholder="Поиск">
+                        </div>
+                        <button class="btn-flat disabled" type="submit">
+                            <i class="material-icons">search</i>
+                        </button>
+                        <!-- dropdown trigger -->
+                        <a href="#" class="dropdown-trigger btn waves-effect waves-light disabled" style="min-width: 10rem;" data-target="dropdownfilter">
+                            <i class="material-icons right">filter_list</i>Фильтр
+                        </a>
+                        <!-- dropdown structure -->
+                        <ul id='dropdownfilter' class='dropdown-content'>
+                            <li><a href="#!">one</a></li>
+                            <li><a href="#!">two</a></li>
+                            <li class="divider" tabindex="-1"></li>
+                        </ul>
+                    </form>
                 </div>
             </div>
         </div>
@@ -42,19 +64,23 @@
         <ul class="collapsible z-depth-0">
             {% for hr_user in hr_users %}
             <li>
-                <div class="collapsible-header row" style="margin-bottom: 0em;">    
-                    <div class="col s1 valign-wrapper">
-                        <img src="{{ hr_user.photo.url }}" alt="" class="circle" style="max-width: 48px;">
-                    </div>
-                    <div class="col s10">
-                        <p style="font-size: large;">{{ hr_user.get_full_name }}</p>
-                        <p>{{ hr_user.get_role_display }}</p>
-                    </div>
-                    <div class="col s1 valign-wrapper right">
+                <div class="collapsible-header row" style="margin-bottom: 0em;">
+                    <div class="col s10 m11 valign-wrapper">          
+                        <div style="display: inline-block; margin-right: 1rem;">
+                            <img src="{{ hr_user.photo.url }}" alt="" class="circle" style="max-width: 48px;">
+                        </div>
+                        <div style="display: inline-block;">
+                            <p style="font-size: large;">{{ hr_user.get_full_name }}</p>
+                            <p>{{ hr_user.get_role_display }}</p>
+                        </div>
+                    </div>   
+                    <div class="col s2 m1 valign-wrapper">
                         {% if hr_user.is_superuser %}
-                        <i class="material-icons amber-text right tooltipped" data-position="bottom" data-tooltip="Администратор">stars</i>
+                        <i class="material-icons amber-text right tooltipped" 
+                        data-position="bottom" data-tooltip="Администратор">stars</i>
                         {% elif hr_user.is_moderator %}
-                        <i class="material-icons grey-text right tooltipped" data-position="bottom" data-tooltip="Модератор">stars</i>
+                        <i class="material-icons grey-text right tooltipped" 
+                        data-position="bottom" data-tooltip="Модератор">stars</i>
                         {% else %}                        
                         {% endif %}
                     </div>
@@ -89,7 +115,7 @@
                         </div>
                     </div>
                     <div class="row right-align top-sep" style="margin-bottom: 0em;">
-                        <a href="#" class="btn-flat waves-effect waves-light">Изменить</a>
+                        <a href="{% url 'admin-edit-user-page' hr_user.id %}" class="btn-flat waves-effect waves-light">Изменить</a>
                         <a href="#remove-modal" data-id='{{ hr_user.id }}' data-username='{{ hr_user.get_full_name }}'
                         class="btn-flat red-text waves-effect waves-light modal-trigger">Удалить</a>
                     </div>
@@ -97,12 +123,40 @@
             </li>
             {% endfor %}
         </ul>   
+        <!-- pagination -->
+        <ul class="pagination right-align">
+            {% if page.has_previous %}
+            <li class="waves-effect">
+                <a href="?page={{ page.previous_page_number }}">
+                    <i class="material-icons">chevron_left</i>
+                </a>
+            </li>
+            <li class="waves-effect"><a href="#!">{{ page.previous_page_number }}</a></li>
+            {% else %}
+            <li class="disabled"><a href="#"><i class="material-icons">chevron_left</i></a></li>
+            {% endif %}
+            
+            <li class="waves-effect active"><a href="{% url 'admin-users-page'%}?page={{ page.number }}">{{ page.number }}</a></li>
+
+            {% if page.has_next %}
+            <li class="waves-effect">
+                <a href="###############">
+                    <i class="material-icons">chevron_right</i>
+                </a>
+            </li>
+            <li class="waves-effect"><a href="#!">{{ page.next_page_number }}</a></li>
+            {% else %}
+            <li class="disabled"><a href="#!"><i class="material-icons">chevron_right</i></a></li>
+            {% endif %}
+        </ul> 
+
         {% else %}
             <div class="center empty-list">Список пуст</div>
         {% endif %}
     </div>
 </div>
 
+<!-- remove modal window -->
 <div id="remove-modal" class="modal">
     <div class="modal-content">
         <h4>Удаление пользователя</h4>
