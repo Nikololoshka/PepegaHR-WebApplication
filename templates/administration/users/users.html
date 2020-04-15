@@ -2,7 +2,7 @@
 {% load static %}
 
 <!-- header content -->
-{% block title-content %}PepegaHR: Users{% endblock title-content %}
+{% block title-content %}PepegaHR: Пользователи{% endblock title-content %}
 
 {% block head-page %}
 <link rel="stylesheet" href="{% static '/administration/css/users.css' %}">
@@ -31,7 +31,7 @@
                     Список пользователей
                 </div>
                 <div class="col s12 m5 no-padding right-align">
-                    <a href="{% url 'admin-create-user-page' %}" class="btn waves-effect waves-light">
+                    <a href="{% url 'admin-user-create' %}" class="btn waves-effect waves-light">
                         <i class="material-icons right">add</i>Добавить пользователя
                     </a>
                 </div>
@@ -115,7 +115,7 @@
                         </div>
                     </div>
                     <div class="row right-align top-sep" style="margin-bottom: 0em;">
-                        <a href="{% url 'admin-edit-user-page' hr_user.id %}" class="btn-flat waves-effect waves-light">Изменить</a>
+                        <a href="{% url 'admin-user-edit' hr_user.id %}" class="btn-flat waves-effect waves-light">Изменить</a>
                         <a href="#remove-modal" data-id='{{ hr_user.id }}' data-username='{{ hr_user.get_full_name }}'
                         class="btn-flat red-text waves-effect waves-light modal-trigger">Удалить</a>
                     </div>
@@ -136,7 +136,7 @@
             <li class="disabled"><a href="#"><i class="material-icons">chevron_left</i></a></li>
             {% endif %}
             
-            <li class="waves-effect active"><a href="{% url 'admin-users-page'%}?page={{ page.number }}">{{ page.number }}</a></li>
+            <li class="waves-effect active"><a href="{% url 'admin-users-page' %}?page={{ page.number }}">{{ page.number }}</a></li>
 
             {% if page.has_next %}
             <li class="waves-effect">
@@ -166,7 +166,7 @@
         </p>
     </div>
     <div class="modal-footer right-align">
-        <form action="{% url 'admin-remove-user' %}" method="POST" >
+        <form action="{% url 'admin-user-remove' %}" method="POST" >
             {% csrf_token %}
             <a class="modal-close btn-flat waves-effect waves-green">Отмена</a>
             <input type="hidden" name="id" value="-1" class="modal-id">

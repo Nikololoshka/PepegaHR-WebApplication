@@ -61,7 +61,7 @@
                                     {% block profile-myprofile-nav %}
                                     <li>
                                     {% endblock profile-myprofile-nav %}
-                                        <a href="{% url 'profile-page' %}">Мой профиль</a>
+                                        <a href="{% url 'my-profile' %}">Мой профиль</a>
                                     </li>
                                     <li>
                                         <a href="{% url 'logout' %}">Выйти из системы</a>
@@ -80,6 +80,16 @@
                             <div class="collapsible-body">
                             {% endblock admin-body-nav %}
                                 <ul>
+                                    {% block admin-information-nav %}
+                                    <li class="disabled">
+                                    {% endblock admin-information-nav %}
+                                        <a href="{% url 'admin-information-page' %}">Сведения</a>
+                                    </li>
+                                    {% block admin-departaments-nav %}
+                                    <li>
+                                    {% endblock admin-departaments-nav %}
+                                        <a href="{% url 'admin-departaments-page' %}">Список групп</a>
+                                    </li>
                                     {% block admin-users-nav %}
                                     <li>
                                     {% endblock admin-users-nav %}

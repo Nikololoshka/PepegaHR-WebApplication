@@ -1,0 +1,82 @@
+{% extends 'workbase.html' %}
+{% load static %}
+
+<!-- header content -->
+{% block title-content %}PepegaHR: Группы{% endblock title-content %}
+
+{% block head-page %}
+<link rel="stylesheet" href="{% static '/administration/css/departaments.css' %}">
+{% endblock head-page %}
+
+<!-- nav content -->
+{% block admin-nav %}
+<li class="bold active">
+{% endblock admin-nav %}
+
+{% block admin-body-nav %}
+<div class="collapsible-body" style="display: block;">
+{% endblock admin-body-nav %}
+
+{% block admin-departaments-nav %}
+<li class="active">
+{% endblock admin-departaments-nav %}
+
+<!-- main content -->
+{% block main-content %}
+<div class="card">
+    <div class="card-content">
+        <div class="card-title">
+            <div class="row" >
+                <div class="col s12 m7 no-padding">
+                    Список групп
+                </div>
+                <div class="col s12 m5 no-padding right-align">
+                    
+                </div>
+            </div>
+        </div>
+        <div class="row">
+        {% if departaments %}
+        
+
+            <!-- pagination -->
+            <ul class="pagination right-align">
+                {% if page.has_previous %}
+                <li class="waves-effect">
+                    <a href="?page={{ page.previous_page_number }}">
+                        <i class="material-icons">chevron_left</i>
+                    </a>
+                </li>
+                <li class="waves-effect"><a href="#!">{{ page.previous_page_number }}</a></li>
+                {% else %}
+                <li class="disabled"><a href="#"><i class="material-icons">chevron_left</i></a></li>
+                {% endif %}
+                
+                <li class="waves-effect active"><a href="{% url 'admin-users-page' %}?page={{ page.number }}">{{ page.number }}</a></li>
+    
+                {% if page.has_next %}
+                <li class="waves-effect">
+                    <a href="###############">
+                        <i class="material-icons">chevron_right</i>
+                    </a>
+                </li>
+                <li class="waves-effect"><a href="#!">{{ page.next_page_number }}</a></li>
+                {% else %}
+                <li class="disabled"><a href="#!"><i class="material-icons">chevron_right</i></a></li>
+                {% endif %}
+            </ul> 
+        {% else %}
+            <div class="divider"></div>
+            <div class="center empty-list">Список пуст</div>
+            <div class="divider"></div>
+        {% endif %}
+        </div>
+    </div>
+</div>
+
+
+{% endblock main-content %}
+
+{% block script-page %}
+
+{% endblock script-page %}

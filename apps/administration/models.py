@@ -1,6 +1,7 @@
 from os import path
 
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import AbstractUser
 
 
@@ -25,6 +26,7 @@ class HRUser(AbstractUser):
     photo = models.ImageField(upload_to=user_photo_path, default='user-photos/default.png', blank=True)
     role = models.CharField(max_length=3, choices=USER_ROLES, default='usr')
     last_visit = models.DateTimeField(blank=True, null=True)
+    departments = models.ManyToManyField('Departament')
 
     def is_moderator(self) -> bool:
         """
@@ -36,6 +38,7 @@ class HRUser(AbstractUser):
         managed = True
         verbose_name = 'HRUser'
         verbose_name_plural = 'HRUsers'
+        ordering = ['last_name', 'first_name']
 
 
 class Departament(models.Model):

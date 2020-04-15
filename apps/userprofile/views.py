@@ -4,36 +4,46 @@ from django.contrib.auth.decorators import login_required
 from django.core.handlers.wsgi import WSGIRequest
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth import get_user_model
+from django.views.decorators.http import require_http_methods, require_GET
+
+from .forms import ProfileEditForm
 
 
 @login_required
-def profile_page(request: WSGIRequest):
+@require_http_methods(['GET', 'POST'])
+def my_profile_page(request: WSGIRequest):
     """
-    Показывает страницу профиля текущего пользователя. 
+    Отображает профиль текущего пользователя.
+    GET: Показывает страницу профиля текущего пользователя. 
+    POST: Изменяет данные пользователя в профиле.
     """
-    return render(request, 'userprofile/profile.html')
+    HRUser = get_user_model()
 
-@login_required
-def profile_edit(request: WSGIRequest):
-    """
-    Изменяет данные пользователя в профиле.
-    """
     if request.method == 'POST':
-        nickname: str = request.POST.get('nickname', None)
-        email: str = request.POST.get('email', None)
-        password: str = request.POST.get('password', None)
+        form = ProfileEditForm(request.POST, instance=HRUser.objects.get(id=request.user.id))
+        if form.is_valid():
+            hr_user = form.save()
+            update_session_auth_hash(request, hr_user)
 
-        HRUser = get_user_model()
-        hr_user = HRUser.objects.get(id=request.user.id)
-        hr_user.username = nickname
-        hr_user.email = email
+            return redirect('my-profile')
+    else:
+        form = ProfileEditForm(instance=HRUser.objects.get(id=request.user.id))
 
-        if password is not None and len(password) >= 8:
-            hr_user.set_password(password)
+    return render(request, 'userprofile/myprofile.html', {
+        'profile_form': form
+    })
 
-        hr_user.save()
-        update_session_auth_hash(request, hr_user)
 
-        return redirect('profile-page')
+@login_required
+@require_GET
+def profile_page(request: WSGIRequest, user_id: int):
+    """
+    Отображает страницу "чужого" профиля.
+    """
+    if request.user.id == user_id:
+        return redirect('my-profile')
 
-    return HttpResponse('Method not allowed')
+    HRUser = get_user_model()
+    return render(request, 'userprofile/profile.html', {
+        'hr_user': HRUser.objects.get(id=user_id)
+    })

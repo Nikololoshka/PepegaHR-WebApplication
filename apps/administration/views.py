@@ -3,12 +3,13 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.core.handlers.wsgi import WSGIRequest
 from django.core.paginator import Paginator
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_http_methods, require_GET, require_POST
 
-from .models import HRUser
-from .forms import HRUserForm
+from .models import HRUser, Departament
+from .forms import HRUserCreateForm, HRUserEditForm
 
 @login_required
+@require_GET
 def users_page(request: WSGIRequest):
     """
     Отображает страцу с пользователями, которые зарегистрированы в системе.
@@ -20,119 +21,107 @@ def users_page(request: WSGIRequest):
     paginator = Paginator(hr_users, 30)
     page = paginator.get_page(page_num)
 
-    return render(request, 'administration/users.html', {
+    return render(request, 'administration/users/users.html', {
         'hr_users': hr_users,
         'page': page
     })
 
 
 @login_required
+@require_http_methods(['GET', 'POST'])
 def create_user_page(request: WSGIRequest):
     """
-    Отображает страницу для создания пользователя в HR системе.
-    """
-    return render(request, 'administration/create_user.html')
+    Осуществляет взамодействие с созданием пользователя.
 
-
-@login_required
-def create_user_model(request: WSGIRequest):
-    """
-    Создает пользователя в системе.
+    GET: Отображает страницу для создания пользователя в HR системе.
+    POST: Создает пользователя в системе.
     """
     if request.method == 'POST':
         # получение формы
-        first_name = request.POST['first_name']
-        last_name = request.POST['last_name']
-        nickname = request.POST['nickname']
-        email = request.POST['email']
-        password = request.POST['password']
-        role = request.POST['role']
-        photo = request.FILES.get('profile_image', None)
+        form = HRUserCreateForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('admin-users-page')
 
-        params = {
-            'first_name': first_name,
-            'last_name': last_name,
-            'username': nickname,
-            'email': email,
-            'role': role,
-        }
+    else:
+        form = HRUserCreateForm()
 
-        if photo is not None:
-            params['photo'] = photo
+    return render(request, 'administration/users/create_user.html', {
+            'hr_form': form
+        })
+    
 
-        hr_user = HRUser(**params)
-        hr_user.set_password(password)
-        hr_user.save()
+@login_required
+@require_http_methods(['GET', 'POST'])
+def edit_user_page(request: WSGIRequest, user_id: int):
+    """
+    Осуществляет взамодействие с созданием пользователя.
 
+    GET: Отображает страницу для редактирования пользователя в HR системе.
+    POST: Редактирует пользователя в системе.
+    """
+    if request.method == 'POST':
+        # получение формы
+        form = HRUserEditForm(request.POST, request.FILES, instance=HRUser.objects.get(id=user_id))
+
+        if form.is_valid():
+            form.save()
+            return redirect('admin-users-page')
+
+        # TODO: изменение фото пользователя
+        # без изменений: None, old_photo
+        # к default: None, ""
+        # с изменениями new_photo, old_photo
+
+        # if photo is not None:
+        #     # есть новая
+        #     hr_user.photo = photo
+
+        # elif photo_old is None or not photo_old:
+        #     # нет старого, т.е. default состоянию
+        #     hr_user.photo.delete()
+
+    else:
+        hr_user = HRUser.objects.get(id=user_id)
+        form = HRUserEditForm(instance=hr_user)
+    
+    return render(request, 'administration/users/edit_user.html', {
+            'hr_form': form
+        })
+
+@login_required
+@require_POST
+def remove_user(request: WSGIRequest):
+    """
+    Удаляет пользователя из системы.
+    """
+    user_id = request.POST['id']
+    hr_user = HRUser.objects.get(pk=user_id)
+    if hr_user is not None:
+        hr_user.delete()
         return redirect('admin-users-page')
 
-    return HttpResponse('Method not allowed')
+    return HttpResponse('Cannot remove user')
 
 
 @login_required
-def edit_user_page(request: WSGIRequest, user_id: int):
-    """
-    Отображает страницу для редактирования пользователя в HR системе.
-    """
-    hr_user = HRUser.objects.get(id=user_id)
-    return render(request, 'administration/edit_user.html', {
-        'hr_user': hr_user,
-        'roles': HRUser.USER_ROLES,
-        'hr_form': HRUserForm(instance=hr_user)
+@require_GET
+def departaments_page(request: WSGIRequest):
+    departaments = Departament.objects.all()
+
+    page_num = request.GET.get('page', 1)
+
+    paginator = Paginator(departaments, 30)
+    page = paginator.get_page(page_num)
+
+    return render(request, 'administration/departaments/departaments.html', {
+        'departaments': departaments,
+        'page': page
     })
 
 
 @login_required
-@require_POST
-def edit_user_model(request: WSGIRequest, user_id: int):
-    # получение формы
-    # first_name = request.POST.get('first_name', None)
-    # last_name = request.POST.get('last_name', None)
-    # nickname = request.POST.get('nickname', None)
-    # email = request.POST.get('email', None)
-    # password = request.POST.get('password', None)
-    # role = request.POST.get('role', None)
-    # photo_old = request.POST.get('profile_image_old', None)
-    # photo = request.FILES.get('profile_image', None)
-
-    form = HRUserForm(request.POST, request.FILES, instance=HRUser.objects.get(id=user_id))
-    print(form.is_valid())
-    print(form.changed_data)
-    print(form.errors)
-
-    if form.is_valid():
-        form.save()
-        return redirect('admin-users-page')
-
-    return render(request, 'administration/edit_user.html', {
-        'hr_form': form
-        })
-
-    # без изменений: None, old_photo
-    # к default: None, ""
-    # с изменениями new_photo, old_photo
-
-    # if photo is not None:
-    #     # есть новая
-    #     hr_user.photo = photo
-
-    # elif photo_old is None or not photo_old:
-    #     # нет старого, т.е. default состоянию
-    #     hr_user.photo.delete()
-
-
-@login_required
-def remove_user_model(request: WSGIRequest):
-    """
-    Удаляет пользователя из системы.
-    """
-    if request.method == 'POST':
-        user_id = request.POST['id']
-        hr_user = HRUser.objects.get(pk=user_id)
-        if hr_user is not None:
-            hr_user.delete()
-            return redirect('admin-users-page')
-
-        return HttpResponse('Cannot remove user')
-
-    return HttpResponse('Method not allowed')
+@require_GET
+def information_page(request: WSGIRequest):
+    return render(request, 'administration/information.html')
+    

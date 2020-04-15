@@ -1,0 +1,35 @@
+{% extends 'administration/users.html' %}
+{% load static %}
+
+<!-- header content -->
+{% block title-content %}PepegaHR: Create user{% endblock title-content %}
+
+{% block head-page %}
+<link rel="stylesheet" href="{% static '/administration/css/create_user.css' %}">
+{% endblock head-page %}
+
+<!-- main content -->
+{% block main-content %}
+<div class="card">
+    <div class="card-content">
+        <span class="card-title">Создание пользователя</span>
+        {% for error in hr_form.errors %}
+        <p>{{ error }}</p>
+        {% endfor %}
+        <form method="POST" action="{% url 'admin-user-create' %}" id="create-user-form" enctype="multipart/form-data">
+            {% csrf_token %}
+            {% include 'administration/forms/user_form.html' with form=hr_form %}
+        </form>
+    </div>
+    <div class="card-action">
+        <div>
+            <a href="{% url 'admin-users-page' %}" class=" btn-flat waves-effect waves-light">Отмена</a>
+            <button form="create-user-form" class="btn waves-effect waves-light" type="submit" >Создать</button>
+        </div>
+    </div>
+</div>
+{% endblock main-content %}
+
+{% block script-page %}
+<script type="text/javascript" src="{% static '/administration/js/create_user.js' %}"></script>
+{% endblock script-page %}

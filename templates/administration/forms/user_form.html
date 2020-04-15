@@ -1,0 +1,86 @@
+<div class="row valign-wrapper" style="margin-bottom: 0rem; display: flex;">
+    <div class="file-field input-field" style="width: 100%; flex-grow: 1;">
+        <div class="btn">
+            <span><i class="material-icons">add_a_photo</i></span>
+            <input type="file" id="{{ form.photo.auto_id }}" class="profile_image"
+                   accept="image/*" name="{{ form.photo.name }}">
+            <input type="hidden" id="photo_old" class="profile_image_old">
+        </div>
+        <div class="file-path-wrapper" >
+            <input class="file-path validate" type="text"
+                   value="{{ form.photo.value }}">
+        </div>
+    </div>
+    <a class="circle remove-photo" href="#" data-default="/media/user-photos/default.png">
+        <img src="{{ hr_user.photo.url }}" class="circle image-preview" alt="">
+    </a>
+</div>
+
+<div class="row" style="margin-bottom: 0rem;">
+    <div class="input-field col s12 l6">
+        <i class="material-icons prefix">person</i>
+        {{ form.first_name }}
+        <span class="helper-text" data-error="Не правильный формат поля">
+            {% if form.first_name.help_text %}
+            {{ form.first_name.help_text }}
+            {% endif %}
+        </span>
+        <label for="{{ form.first_name.auto_id }}">{{ form.first_name.label }}</label>
+    </div>
+    <div class="input-field col s12 l6">
+        <i class="material-icons prefix">person</i>
+        {{ form.last_name  }}
+        <span class="helper-text" data-error="Не правильный формат поля">
+            {% if form.last_name.help_text %}
+            {{ form.last_name.help_text }}
+            {% endif %}
+        </span>
+        <label for="{{ form.last_name.auto_id }}">{{ form.last_name.label }}</label>
+     </div>
+</div>
+
+<div class="row" style="margin-bottom: 0rem;">
+    <div class="input-field col s12 l6">
+        <i class="material-icons prefix">assignment_ind</i>
+        {{ form.username }}
+        <span class="helper-text" data-error="Не правильный формат поля">
+            {% if form.username.help_text %}
+            {{ form.username.help_text }}
+            {% endif %}
+        </span>
+        <label for="{{ form.username.auto_id }}">{{ form.username.label }}</label>
+    </div>
+    <div class="input-field col s12 l6">
+        <i class="material-icons prefix">email</i>
+        {{ form.email }}
+        <span class="helper-text" data-error="Не правильный формат поля">
+            {% if form.email.help_text %}
+            {{ form.email.help_text }}
+            {% endif %}
+        </span>
+        <label for="{{ form.email.auto_id }}">{{ form.email.label }}</label>
+    </div>
+</div>
+
+<div class="row" style="margin-bottom: 0rem;">
+    <div class="input-field col s12 l6">
+        <i class="material-icons prefix">lock</i>
+        {{ form.password }}
+        <label for="{{ form.password.auto_id }}">{{ form.password.label }}</label>
+    </div>
+
+    <div class="input-field col s12 l6">
+        <i class="material-icons prefix">lock</i>
+        {{ form.password_confirm }}
+        <label for="{{ form.password_confirm.auto_id }}">{{ form.password_confirm.label }}</label>
+        <span class="helper-text" data-error="Пароли не совпадают"></span>
+     </div>
+</div>
+
+<div class="row">
+    <div class="input-field col s12">
+        <i class="material-icons prefix">perm_identity</i>
+        {{ form.role }}
+        <label>{{ form.role.label }}</label>
+      </div>
+</div>
