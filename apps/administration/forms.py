@@ -3,7 +3,7 @@ from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 
 
-from .models import HRUser
+from .models import HRUser, Departament
 
 
 class HRUserBasicForm(forms.ModelForm):
@@ -105,3 +105,15 @@ class HRUserEditForm(HRUserBasicForm):
             hr_user.save()
 
         return hr_user
+
+
+class DepartamentForm(forms.ModelForm):
+    """
+    Форма по созданию группы.
+    """
+    class Meta:
+        model = Departament
+        fields = ['name']
+        labels = {
+            'name': _('Название группы')
+        }

@@ -2,10 +2,10 @@
 {% load static %}
 
 <!-- header content -->
-{% block title-content %}PepegaHR: Группы{% endblock title-content %}
+{% block title-content %}PepegaHR: {{ departament.name }}{% endblock title-content %}
 
 {% block head-page %}
-<link rel="stylesheet" href="{% static '/administration/css/departaments.css' %}">
+<!-- <link rel="stylesheet" href="{% static '/administration/css/departaments.css' %}"> -->
 {% endblock head-page %}
 
 <!-- nav content -->
@@ -17,9 +17,6 @@
 <div class="collapsible-body" style="display: block;">
 {% endblock admin-body-nav %}
 
-{% block admin-departaments-nav %}
-<li class="active">
-{% endblock admin-departaments-nav %}
 
 <!-- main content -->
 {% block main-content %}
@@ -27,25 +24,43 @@
     <div class="card-content">
         <div class="card-title">
             <div class="row" >
-                <div class="col s12 m7 no-padding">
-                    Список групп
+                <div class="col s12 m6 no-padding">
+                    {{ departament.name }}
                 </div>
-                <div class="col s12 m5 no-padding right-align">
+                <div class="col s12 m6 no-padding right-align">
                     <a href="#add-modal" class="btn waves-effect waves-light modal-trigger">
-                        <i class="material-icons right">add</i>Добавить группу
+                        <i class="material-icons right">edit</i>Редактировать группу
                     </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="card">
+    <div class="card-content">
+        <div class="card-title">
+            <div class="row">
+                <div class="col s12 no-padding">
+                    <p>Участники 
+                        {% if page.object_list %}
+                        {{ page.object_list.all.count }}
+                        {% endif %}
+                    </p>
                 </div>
             </div>
         </div>
         <div class="row">
         {% if page.object_list %}
             <div class="collection">
-                {% for departament in page.object_list %}
-                <a href="{% url 'admin-departament-page' departament.id %}" class="collection-item">
-                    <h6>{{ departament.name }}</h6>
-                    <div class="row" style="margin-bottom: 0;">
-                        <div class="col s6 no-padding">
-                            <p>Участников: {{ departament.hruser_set.all.count }}</p>
+                {% for user in page.object_list %}
+                <a href="{% url 'profile-page' user.id %}" class="collection-item row black-text">
+                    <div class="col s12 valign-wrapper">          
+                        <div style="display: inline-block; margin-right: 1rem;">
+                            <img src="{{ user.photo.url }}" alt="" class="circle" style="max-width: 48px;">
+                        </div>
+                        <div style="display: inline-block;">
+                            <p style="font-size: large;">{{ user.get_full_name }}</p>
+                            <p>{{ user.get_role_display }}</p>
                         </div>
                     </div>
                 </a>
@@ -86,30 +101,9 @@
     </div>
 </div>
 
-<!-- add group modal window -->
-<div id="add-modal" class="modal">
-    <div class="modal-content">
-        <div class="row">
-            <h4>Добавление группы</h4>
-        </div>
-        <div>
-            <form action="{% url 'admin-departaments-page' %}" method="POST" id="add-group">
-                {% csrf_token %}
-                <div class="input-field">
-                    {{ departament_form.name }}
-                    <label for="{{ departament_form.name.auto_id }}">{{ departament_form.name.label }}</label>
-                </div>
-            </form>
-        </div>
-    </div>
-    <div class="modal-footer right-align">
-        <a class="modal-close btn-flat waves-effect waves-green">Отмена</a>
-        <button class="modal-close btn waves-effect waves-green" form="add-group" type="submit">Добавить</button>
-    </div>
-</div>
 
 {% endblock main-content %}
 
 {% block script-page %}
-<script src="{% static '/administration/js/departaments.js' %}"></script>
+
 {% endblock script-page %}

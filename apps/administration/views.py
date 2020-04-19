@@ -6,7 +6,7 @@ from django.core.paginator import Paginator
 from django.views.decorators.http import require_http_methods, require_GET, require_POST
 
 from .models import HRUser, Departament
-from .forms import HRUserCreateForm, HRUserEditForm
+from .forms import HRUserCreateForm, HRUserEditForm, DepartamentForm
 
 @login_required
 @require_GET
@@ -17,12 +17,10 @@ def users_page(request: WSGIRequest):
     hr_users = HRUser.objects.all()
 
     page_num = request.GET.get('page', 1)
-
     paginator = Paginator(hr_users, 30)
     page = paginator.get_page(page_num)
 
     return render(request, 'administration/users/users.html', {
-        'hr_users': hr_users,
         'page': page
     })
 
@@ -105,17 +103,46 @@ def remove_user(request: WSGIRequest):
 
 
 @login_required
-@require_GET
+@require_http_methods(['GET', 'POST'])
 def departaments_page(request: WSGIRequest):
+    """
+    GET: Отображает страницу с группами.
+    POST: Создает новую группу для пользователей.
+    """
+    if request.method == 'POST':
+        # получение формы
+        form = DepartamentForm(request.POST)
+        if form.is_valid():
+            form.save()
+            form = DepartamentForm()
+
+    else:
+        form = DepartamentForm()
+
     departaments = Departament.objects.all()
 
     page_num = request.GET.get('page', 1)
-
     paginator = Paginator(departaments, 30)
     page = paginator.get_page(page_num)
 
     return render(request, 'administration/departaments/departaments.html', {
-        'departaments': departaments,
+        'departament_form': form,
+        'page': page
+    })
+
+
+@login_required
+@require_GET
+def departament_page(request: WSGIRequest, departament_id: int):
+    departament = Departament.objects.get(id=departament_id)
+    users = departament.hruser_set.all()
+
+    page_num = request.GET.get('page', 1)
+    paginator = Paginator(users, 30)
+    page = paginator.get_page(page_num)
+
+    return render(request, 'administration/departaments/departament.html', {
+        'departament': departament,
         'page': page
     })
 
@@ -123,5 +150,8 @@ def departaments_page(request: WSGIRequest):
 @login_required
 @require_GET
 def information_page(request: WSGIRequest):
+    """
+    Отображает страницу с информацией по администрированию.
+    """
     return render(request, 'administration/information.html')
     

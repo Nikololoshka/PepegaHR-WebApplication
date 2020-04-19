@@ -26,7 +26,7 @@ class HRUser(AbstractUser):
     photo = models.ImageField(upload_to=user_photo_path, default='user-photos/default.png', blank=True)
     role = models.CharField(max_length=3, choices=USER_ROLES, default='usr')
     last_visit = models.DateTimeField(blank=True, null=True)
-    departments = models.ManyToManyField('Departament')
+    departaments = models.ManyToManyField('Departament')
 
     def is_moderator(self) -> bool:
         """
@@ -51,6 +51,7 @@ class Departament(models.Model):
         managed = True
         verbose_name = 'Department'
         verbose_name_plural = 'Departments'
+        ordering = ['name']
 
 
 # DEBUG

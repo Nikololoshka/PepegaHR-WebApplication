@@ -31,10 +31,17 @@
         <div class="divider"></div>
         <div class="row" style="margin-top: 20px;">
             <div class="col s12 xl6">
-                <h6>Groups: None</h6>
+                <h6>Email: {{ hr_user.email }}</h6>
             </div>
             <div class="col s12 xl6">
-                <h6>Email: {{ hr_user.email }}</h6>
+                <h6>Группы:</h6>
+                {% if hr_user.departaments.all %}
+                    {% for departament in hr_user.departaments.all %}
+                    <a href=""><h6>{{ departament.name }}</h6></a>
+                    {% endfor %}
+                {% else %}
+                    <h6>отсутствуют</h6>
+                {% endif %}
             </div>
         </div>
         <div class="divider"></div>

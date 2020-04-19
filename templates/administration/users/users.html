@@ -60,11 +60,11 @@
             </div>
         </div>
 
-        {% if hr_users %}
+        {% if page.object_list %}
         <ul class="collapsible z-depth-0">
-            {% for hr_user in hr_users %}
+            {% for hr_user in page.object_list %}
             <li>
-                <div class="collapsible-header row" style="margin-bottom: 0em;">
+                <div class="collapsible-header waves-effect row" style="margin-bottom: 0em;">
                     <div class="col s10 m11 valign-wrapper">          
                         <div style="display: inline-block; margin-right: 1rem;">
                             <img src="{{ hr_user.photo.url }}" alt="" class="circle" style="max-width: 48px;">
@@ -151,7 +151,9 @@
         </ul> 
 
         {% else %}
+            <div class="divider"></div>
             <div class="center empty-list">Список пуст</div>
+            <div class="divider"></div>
         {% endif %}
     </div>
 </div>
