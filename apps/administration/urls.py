@@ -11,6 +11,7 @@ urlpatterns = [
 
     path('departaments', views.departaments_page, name='admin-departaments-page'),
     path('departaments/<int:departament_id>', views.departament_page, name='admin-departament-page'),
+    path('departaments/<int:departament_id>/remove-user/', views.departament_remove_user, name='admin-departament-user-remove'),
     
     path('information', views.information_page, name='admin-information-page'),
 ]

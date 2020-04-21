@@ -2,7 +2,7 @@
 {% load static %}
 
 <!-- header content -->
-{% block title-content %}PepegaHR: Группы{% endblock title-content %}
+{% block title-content %}PepegaHR: Сведения{% endblock title-content %}
 
 {% block head-page %}
 <!-- link rel="stylesheet" href="{% static '/administration/css/departaments.css' %}"> -->
@@ -23,21 +23,63 @@
 
 <!-- main content -->
 {% block main-content %}
-<div class="card">
-    <div class="card-content">
-        <div class="card-title">
-            <div class="row" >
-                <div class="col s12 m7 no-padding">
-                    Инфа
+<div class="row">
+    <div class="col s12">
+        <div class="card">
+            <div class="card-content">
+                <div class="card-title">
+                    <div class="row" >
+                        <div class="col s12 m7 no-padding">
+                            Сведения
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    
                 </div>
             </div>
-        </div>
-        <div class="row">
-        
         </div>
     </div>
 </div>
 
+<div class="row">
+    <div class="col s12 m6">
+        <div class="card">
+            <div class="card-content">
+                <div class="card-title">
+                    Пользователей
+                </div>
+                <div class="row center-align">
+                    <h5>{{ hr_users_count }}</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col s12 m6">
+        <div class="card">
+            <div class="card-content">
+                <div class="card-title">
+                    Групп
+                </div>
+                <div class="row center-align">
+                    <h5>{{ departaments_count }}</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col s12">
+        <div class="card">
+            <div class="card-content">
+                <div class="card-title">
+                    Последняя активность
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 {% endblock main-content %}
 

@@ -115,6 +115,7 @@
                         </div>
                     </div>
                     <div class="row right-align top-sep" style="margin-bottom: 0em;">
+                        <a href="{% url 'profile-page' hr_user.id %}" class="btn-flat waves-effect waves-light">Профиль</a>
                         <a href="{% url 'admin-user-edit' hr_user.id %}" class="btn-flat waves-effect waves-light">Изменить</a>
                         <a href="#remove-modal" data-id='{{ hr_user.id }}' data-username='{{ hr_user.get_full_name }}'
                         class="btn-flat red-text waves-effect waves-light modal-trigger">Удалить</a>

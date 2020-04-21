@@ -1,4 +1,4 @@
-{% extends 'administration/users.html' %}
+{% extends 'workbase.html' %}
 {% load static %}
 
 <!-- header content -->
@@ -7,6 +7,15 @@
 {% block head-page %}
 <link rel="stylesheet" href="{% static '/administration/css/edit_user.css' %}">
 {% endblock head-page %}
+
+<!-- nav content -->
+{% block admin-nav %}
+<li class="bold active">
+{% endblock admin-nav %}
+
+{% block admin-body-nav %}
+<div class="collapsible-body" style="display: block;">
+{% endblock admin-body-nav %}
 
 <!-- main content -->
 {% block main-content %}

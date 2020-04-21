@@ -36,12 +36,34 @@
                     </a>
                 </div>
             </div>
+            <div class="row valign-wrapper">
+                <div class="col s12 no-padding">
+                    <form class="valign-wrapper" style="display: flex;">
+                        <div class="input-field" style="width: 100%; flex-grow: 1; margin: 0px;">
+                            <input  disabled type="text" placeholder="Поиск">
+                        </div>
+                        <button class="btn-flat disabled" type="submit">
+                            <i class="material-icons">search</i>
+                        </button>
+                        <!-- dropdown trigger -->
+                        <a href="#" class="dropdown-trigger btn waves-effect waves-light disabled" style="min-width: 10rem;" data-target="dropdownfilter">
+                            <i class="material-icons right">filter_list</i>Фильтр
+                        </a>
+                        <!-- dropdown structure -->
+                        <ul id='dropdownfilter' class='dropdown-content'>
+                            <li><a href="#!">one</a></li>
+                            <li><a href="#!">two</a></li>
+                            <li class="divider" tabindex="-1"></li>
+                        </ul>
+                    </form>
+                </div>
+            </div>
         </div>
         <div class="row">
         {% if page.object_list %}
             <div class="collection">
                 {% for departament in page.object_list %}
-                <a href="{% url 'admin-departament-page' departament.id %}" class="collection-item">
+                <a href="{% url 'admin-departament-page' departament.id %}" class="collection-item black-text waves-effect">
                     <h6>{{ departament.name }}</h6>
                     <div class="row" style="margin-bottom: 0;">
                         <div class="col s6 no-padding">

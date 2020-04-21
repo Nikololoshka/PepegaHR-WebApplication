@@ -132,10 +132,25 @@ def departaments_page(request: WSGIRequest):
 
 
 @login_required
-@require_GET
+@require_http_methods(['GET', 'POST'])
 def departament_page(request: WSGIRequest, departament_id: int):
+    """
+    GET: Отображает страницу текущей группы.
+    POST: Изменяет данные текущей группы.
+    """
     departament = Departament.objects.get(id=departament_id)
     users = departament.hruser_set.all()
+
+    if request.method == 'POST':
+        form = DepartamentForm(request.POST, instance=departament)
+        if form.is_valid():
+            form.save()
+
+            departament = Departament.objects.get(id=departament_id)
+            form = DepartamentForm(instance=departament)
+        
+    else:
+        form = DepartamentForm(instance=departament)
 
     page_num = request.GET.get('page', 1)
     paginator = Paginator(users, 30)
@@ -143,8 +158,16 @@ def departament_page(request: WSGIRequest, departament_id: int):
 
     return render(request, 'administration/departaments/departament.html', {
         'departament': departament,
+        'departament_form': form,
         'page': page
     })
+
+
+@login_required
+@require_POST
+def departament_remove_user(request: WSGIRequest, departament_id: int):
+    print(request.POST)
+    return redirect('admin-users-page')
 
 
 @login_required
@@ -153,5 +176,11 @@ def information_page(request: WSGIRequest):
     """
     Отображает страницу с информацией по администрированию.
     """
-    return render(request, 'administration/information.html')
+    hr_users = HRUser.objects.all()
+    departaments = Departament.objects.all()
+
+    return render(request, 'administration/information.html', {
+        'hr_users_count': hr_users.count(),
+        'departaments_count': departaments.count()
+    })
     

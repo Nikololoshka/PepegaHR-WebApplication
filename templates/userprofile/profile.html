@@ -37,7 +37,7 @@
                 <h6>Группы:</h6>
                 {% if hr_user.departaments.all %}
                     {% for departament in hr_user.departaments.all %}
-                    <a href=""><h6>{{ departament.name }}</h6></a>
+                    <a href="{% url 'admin-departament-page' departament.id %}"><h6>{{ departament.name }}</h6></a>
                     {% endfor %}
                 {% else %}
                     <h6>отсутствуют</h6>

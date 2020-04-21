@@ -5,7 +5,7 @@
 {% block title-content %}PepegaHR: {{ departament.name }}{% endblock title-content %}
 
 {% block head-page %}
-<!-- <link rel="stylesheet" href="{% static '/administration/css/departaments.css' %}"> -->
+<!-- <link rel="stylesheet" href="{% static '/administration/css/.css' %}"> -->
 {% endblock head-page %}
 
 <!-- nav content -->
@@ -28,7 +28,7 @@
                     {{ departament.name }}
                 </div>
                 <div class="col s12 m6 no-padding right-align">
-                    <a href="#add-modal" class="btn waves-effect waves-light modal-trigger">
+                    <a href="#edit-modal" class="btn waves-effect waves-light modal-trigger">
                         <i class="material-icons right">edit</i>Редактировать группу
                     </a>
                 </div>
@@ -49,23 +49,35 @@
                 </div>
             </div>
         </div>
+        <form action="{% url 'admin-departament-user-remove' departament.id %}" method="POST" id="remove-user-form">
+            {% csrf_token %}
+        </form>
         <div class="row">
         {% if page.object_list %}
             <div class="collection">
                 {% for user in page.object_list %}
-                <a href="{% url 'profile-page' user.id %}" class="collection-item row black-text">
-                    <div class="col s12 valign-wrapper">          
-                        <div style="display: inline-block; margin-right: 1rem;">
-                            <img src="{{ user.photo.url }}" alt="" class="circle" style="max-width: 48px;">
+                <a href="{% url 'profile-page' user.id %}" class="collection-item black-text waves-effect"> 
+                    <div class="stretch-container valign-wrapper">
+                        <div class="stretch-left">      
+                            <div style="display: inline-block; margin-right: 1rem;">
+                                <img src="{{ user.photo.url }}" alt="" class="circle" style="max-width: 48px;">
+                            </div>
+                            <div style="display: inline-block;">
+                                <p style="font-size: large;">{{ user.get_full_name }}</p>
+                                <p>{{ user.get_role_display }}</p>
+                            </div>
                         </div>
-                        <div style="display: inline-block;">
-                            <p style="font-size: large;">{{ user.get_full_name }}</p>
-                            <p>{{ user.get_role_display }}</p>
+                        <div class="stretch-right">
+                            <button class="btn-flat tooltipped" data-position="bottom" data-tooltip="Удалить" 
+                                    name="user_id" value="{{ user.id }}" form="remove-user-form">
+                                <i class="material-icons">clear</i>
+                            </button>
                         </div>
                     </div>
                 </a>
                 {% endfor %}
             </div>
+
             <!-- pagination -->
             <ul class="pagination right-align">
                 {% if page.has_previous %}
@@ -101,9 +113,30 @@
     </div>
 </div>
 
+<!-- add group modal window -->
+<div id="edit-modal" class="modal">
+    <div class="modal-content">
+        <div class="row">
+            <h4>Редактирование группы</h4>
+        </div>
+        <div>
+            <form action="{% url 'admin-departament-page' departament.id %} " method="POST" id="edit-group">
+                {% csrf_token %}
+                <div class="input-field">
+                    {{ departament_form.name }}
+                    <label for="{{ departament_form.name.auto_id }}">{{ departament_form.name.label }}</label>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="modal-footer right-align">
+        <a class="modal-close btn-flat waves-effect waves-green">Отмена</a>
+        <button class="modal-close btn waves-effect waves-green" form="edit-group" type="submit">Изменить</button>
+    </div>
+</div>
 
 {% endblock main-content %}
 
 {% block script-page %}
-
+<script src="{% static '/administration/js/departament.js' %}"></script>
 {% endblock script-page %}
