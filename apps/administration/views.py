@@ -39,6 +39,8 @@ def create_user_page(request: WSGIRequest):
         form = HRUserCreateForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
+            form.save_m2m()
+            
             return redirect('admin-users-page')
 
     else:
@@ -64,6 +66,8 @@ def edit_user_page(request: WSGIRequest, user_id: int):
 
         if form.is_valid():
             form.save()
+            form.save_m2m()
+
             return redirect('admin-users-page')
 
         # TODO: изменение фото пользователя
@@ -165,9 +169,31 @@ def departament_page(request: WSGIRequest, departament_id: int):
 
 @login_required
 @require_POST
+def departament_remove(request: WSGIRequest, departament_id: int):
+    """
+    Удаляет группу, но не пользователей (лишь из группы, соответсвенно).
+    """
+    departament = Departament.objects.get(id=departament_id)
+    departament.hruser_set.clear()
+    departament.delete()
+    
+    return redirect('admin-departaments-page')
+
+
+@login_required
+@require_POST
 def departament_remove_user(request: WSGIRequest, departament_id: int):
-    print(request.POST)
-    return redirect('admin-users-page')
+    """
+    Удаляет пользователя из группы.
+    """
+    user_id: int = request.POST.get('user_id', None)
+    if user_id is not None:
+        hr_user = HRUser.objects.get(id=user_id)
+        departament = Departament.objects.get(id=departament_id)
+
+        hr_user.departaments.remove(departament)
+
+    return redirect('admin-departament-page', departament_id=departament_id)
 
 
 @login_required

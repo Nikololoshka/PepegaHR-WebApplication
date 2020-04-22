@@ -24,9 +24,9 @@ class HRUser(AbstractUser):
     )
 
     photo = models.ImageField(upload_to=user_photo_path, default='user-photos/default.png', blank=True)
-    role = models.CharField(max_length=3, choices=USER_ROLES, default='usr')
+    role = models.CharField(max_length=3, choices=USER_ROLES, default='usr', blank=False)
     last_visit = models.DateTimeField(blank=True, null=True)
-    departaments = models.ManyToManyField('Departament')
+    departaments = models.ManyToManyField('Departament', blank=True)
 
     def is_moderator(self) -> bool:
         """
@@ -45,7 +45,7 @@ class Departament(models.Model):
     """
     Объект отдела для пользователей.
     """
-    name = models.CharField(max_length=128)
+    name = models.CharField(max_length=128, blank=False)
 
     class Meta:
         managed = True
@@ -53,6 +53,8 @@ class Departament(models.Model):
         verbose_name_plural = 'Departments'
         ordering = ['name']
 
+    def __str__(self):
+        return f'"{self.name}"'
 
 # DEBUG
 # us = HRUser.objects.get(id=1)

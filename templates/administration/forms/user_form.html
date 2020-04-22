@@ -12,7 +12,11 @@
         </div>
     </div>
     <a class="circle remove-photo" href="#" data-default="/media/user-photos/default.png">
-        <img src="{{ hr_user.photo.url }}" class="circle image-preview" alt="">
+        {% if form.instance %}
+        <img src="{{ form.instance.photo.url }}" class="circle image-preview" alt="">
+        {% else %}
+        <img src="/media/user-photos/default.png" class="circle image-preview" alt="">
+        {% endif %}
     </a>
 </div>
 
@@ -77,10 +81,18 @@
      </div>
 </div>
 
-<div class="row">
+<div class="row" style="margin-bottom: 0rem;">
     <div class="input-field col s12">
         <i class="material-icons prefix">perm_identity</i>
         {{ form.role }}
         <label>{{ form.role.label }}</label>
       </div>
+</div>
+
+<div class="row">
+    <div class="input-field col s12">
+        <i class="material-icons prefix">group</i>
+        {{ form.departaments }}
+        <label>{{ form.departaments.label }}</label>
+    </div>
 </div>

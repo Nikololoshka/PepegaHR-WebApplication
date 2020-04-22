@@ -6,20 +6,23 @@ from django.conf import settings
 from .models import HRUser, Departament
 
 
+
 class HRUserBasicForm(forms.ModelForm):
     """
     Форма для редактирования пользователя.
     """
+
     class Meta:
         model = HRUser
-        fields = ['photo', 'first_name', 'last_name', 'username', 'email', 'role']
+        fields = ['photo', 'first_name', 'last_name', 'username', 'email', 'role', 'departaments']
         labels = {
             'photo': _('Фото профиля'),
             'first_name': _('Имя'),
             'last_name': _('Фамилия'),
             'username': _('Username'),
             'email': _('Email'),
-            'role': _('Роль')
+            'role': _('Роль'),
+            'departaments': _('Группы')
         }
         help_texts = {
             'username': _('Латинские буквы, цифры и @ / . / + / - / _')

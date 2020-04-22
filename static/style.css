@@ -27,3 +27,25 @@
     margin-left: auto;
     display: flex;
 }
+
+.image-preview {
+    width: 48px;
+    height: 48px;
+}
+
+.image-preview:hover {
+    opacity: 0.4;
+}
+
+.remove-photo {
+    margin-left: 1rem;
+    width: 48px;
+    height: 48px;
+}
+
+.remove-photo:hover {
+    background-color: lightgrey;
+    background-image: url('/static/administration/img/close.png');
+    background-position: center;
+    z-index: 5;
+}
