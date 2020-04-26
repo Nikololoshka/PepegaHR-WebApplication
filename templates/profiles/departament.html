@@ -1,0 +1,94 @@
+{% extends 'workbase.html' %}
+{% load static %}
+
+<!-- header content -->
+{% block title-content %}PepegaHR: Группа {{ departament.name }}{% endblock title-content %}
+
+<!-- nav content -->
+{% block profile-nav %}
+<li class="bold active">
+{% endblock profile-nav %}
+
+{% block profile-body-nav %}
+<div class="collapsible-body" style="display: block;">
+{% endblock profile-body-nav %}
+
+<!-- main content -->
+{% block main-content %}
+<div class="card">
+    <div class="card-content">
+        <div class="card-title">
+            <div class="row" >
+                {{ departament.name }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-content">
+        <div class="card-title">
+            <div class="row">
+                <div class="col s12 no-padding">
+                    <p>Участники 
+                        {% if page.object_list %}
+                        {{ page.object_list.all.count }}
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+        {% if page.object_list %}
+            <div class="collection">
+                {% for hr_user in page.object_list %}
+                <a href="{% url 'profile-page' user.id %}" class="collection-item black-text waves-effect"> 
+                    <div class="valign-wrapper">   
+                        <div style="display: inline-block; margin-right: 1rem;">
+                            <img src="{{ hr_user.photo.url }}" alt="" class="circle" style="max-width: 48px;">
+                        </div>
+                        <div style="display: inline-block;">
+                            <p style="font-size: large;">{{ hr_user.get_full_name_reverse }}</p>
+                            <p>{{ hr_user.get_role_display }}</p>
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+
+            <!-- pagination -->
+            <ul class="pagination right-align">
+                {% if page.has_previous %}
+                <li class="waves-effect">
+                    <a href="?page={{ page.previous_page_number }}">
+                        <i class="material-icons">chevron_left</i>
+                    </a>
+                </li>
+                <li class="waves-effect"><a href="#!">{{ page.previous_page_number }}</a></li>
+                {% else %}
+                <li class="disabled"><a href="#"><i class="material-icons">chevron_left</i></a></li>
+                {% endif %}
+                
+                <li class="waves-effect active"><a href="{% url 'admin-users-page' %}?page={{ page.number }}">{{ page.number }}</a></li>
+    
+                {% if page.has_next %}
+                <li class="waves-effect">
+                    <a href="###############">
+                        <i class="material-icons">chevron_right</i>
+                    </a>
+                </li>
+                <li class="waves-effect"><a href="#!">{{ page.next_page_number }}</a></li>
+                {% else %}
+                <li class="disabled"><a href="#!"><i class="material-icons">chevron_right</i></a></li>
+                {% endif %}
+            </ul> 
+        {% else %}
+            <div class="divider"></div>
+            <div class="center empty-list">Список пуст</div>
+            <div class="divider"></div>
+        {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endblock main-content %}

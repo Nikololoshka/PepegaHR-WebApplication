@@ -57,21 +57,21 @@
         <div class="row">
         {% if page.object_list %}
             <div class="collection">
-                {% for user in page.object_list %}
-                <a href="{% url 'profile-page' user.id %}" class="collection-item black-text waves-effect"> 
+                {% for hr_user in page.object_list %}
+                <a href="{% url 'profile-page' hr_user.id %}" class="collection-item black-text waves-effect"> 
                     <div class="stretch-container valign-wrapper">
                         <div class="stretch-left">      
                             <div style="display: inline-block; margin-right: 1rem;">
-                                <img src="{{ user.photo.url }}" alt="" class="circle" style="max-width: 48px;">
+                                <img src="{{ hr_user.photo.url }}" alt="" class="circle" style="max-width: 48px;">
                             </div>
                             <div style="display: inline-block;">
-                                <p style="font-size: large;">{{ user.get_full_name }}</p>
-                                <p>{{ user.get_role_display }}</p>
+                                <p style="font-size: large;">{{ hr_user.get_full_name_reverse }}</p>
+                                <p>{{ hr_user.get_role_display }}</p>
                             </div>
                         </div>
                         <div class="stretch-right">
                             <button class="btn-flat tooltipped" data-position="bottom" data-tooltip="Удалить" 
-                                    name="user_id" value="{{ user.id }}" form="remove-user-form">
+                                    name="user_id" value="{{ hr_user.id }}" form="remove-user-form">
                                 <i class="material-icons">clear</i>
                             </button>
                         </div>

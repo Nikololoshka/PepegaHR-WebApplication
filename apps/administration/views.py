@@ -7,8 +7,11 @@ from django.views.decorators.http import require_http_methods, require_GET, requ
 
 from .models import HRUser, Departament
 from .forms import HRUserCreateForm, HRUserEditForm, DepartamentForm
+from .permissions import required_admin
+
 
 @login_required
+@required_admin
 @require_GET
 def users_page(request: WSGIRequest):
     """
@@ -26,6 +29,7 @@ def users_page(request: WSGIRequest):
 
 
 @login_required
+@required_admin
 @require_http_methods(['GET', 'POST'])
 def create_user_page(request: WSGIRequest):
     """
@@ -52,6 +56,7 @@ def create_user_page(request: WSGIRequest):
     
 
 @login_required
+@required_admin
 @require_http_methods(['GET', 'POST'])
 def edit_user_page(request: WSGIRequest, user_id: int):
     """
@@ -92,6 +97,7 @@ def edit_user_page(request: WSGIRequest, user_id: int):
         })
 
 @login_required
+@required_admin
 @require_POST
 def remove_user(request: WSGIRequest):
     """
@@ -107,6 +113,7 @@ def remove_user(request: WSGIRequest):
 
 
 @login_required
+@required_admin
 @require_http_methods(['GET', 'POST'])
 def departaments_page(request: WSGIRequest):
     """
@@ -136,6 +143,7 @@ def departaments_page(request: WSGIRequest):
 
 
 @login_required
+@required_admin
 @require_http_methods(['GET', 'POST'])
 def departament_page(request: WSGIRequest, departament_id: int):
     """
@@ -150,12 +158,14 @@ def departament_page(request: WSGIRequest, departament_id: int):
         if form.is_valid():
             form.save()
 
+            # переинициализация форм
             departament = Departament.objects.get(id=departament_id)
             form = DepartamentForm(instance=departament)
         
     else:
         form = DepartamentForm(instance=departament)
 
+    # пагинация
     page_num = request.GET.get('page', 1)
     paginator = Paginator(users, 30)
     page = paginator.get_page(page_num)
@@ -168,6 +178,7 @@ def departament_page(request: WSGIRequest, departament_id: int):
 
 
 @login_required
+@required_admin
 @require_POST
 def departament_remove(request: WSGIRequest, departament_id: int):
     """
@@ -181,6 +192,7 @@ def departament_remove(request: WSGIRequest, departament_id: int):
 
 
 @login_required
+@required_admin
 @require_POST
 def departament_remove_user(request: WSGIRequest, departament_id: int):
     """
@@ -197,6 +209,7 @@ def departament_remove_user(request: WSGIRequest, departament_id: int):
 
 
 @login_required
+@required_admin
 @require_GET
 def information_page(request: WSGIRequest):
     """
@@ -204,9 +217,11 @@ def information_page(request: WSGIRequest):
     """
     hr_users = HRUser.objects.all()
     departaments = Departament.objects.all()
+    last_users = hr_users.filter(last_visit__isnull=False).order_by('-last_visit')[:5]
 
     return render(request, 'administration/information.html', {
         'hr_users_count': hr_users.count(),
-        'departaments_count': departaments.count()
+        'departaments_count': departaments.count(),
+        'last_users': last_users
     })
     

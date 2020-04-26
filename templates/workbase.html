@@ -42,7 +42,7 @@
                 {% block home-nav %}
                 <li class="bold">
                     {% endblock home-nav %}
-                    <a href="{% url 'home-page' %}" class="collapsible-header waves-effect waves-teal">
+                    <a href="{% url 'home-page' %}" class="collapsible-header waves-effect">
                         <i class="material-icons">home</i>Главная
                     </a>
                 </li>
@@ -51,7 +51,7 @@
                         {% block profile-nav %}
                         <li class="bold">
                         {% endblock profile-nav %}
-                            <a class="collapsible-header waves-effect waves-teal">
+                            <a class="collapsible-header waves-effect">
                                 <i class="material-icons">account_box</i>Профиль
                             </a>
                             {% block profile-body-nav %}
@@ -69,10 +69,12 @@
                                 </ul>
                             </div>
                         </li>
+                        <!-- Администрирование -->
+                        {% if user.is_admin %}
                         {% block admin-nav %}
                         <li class="bold">
                         {% endblock admin-nav %}
-                            <a class="collapsible-header waves-effect waves-teal">
+                            <a class="collapsible-header waves-effect">
                                 <i class="material-icons">people</i>Администрирование
                             </a>
 
@@ -98,6 +100,7 @@
                                 </ul>
                             </div>
                         </li>
+                        {% endif %}
                         <li>
                             <a href="" class="collapsible-header">
                                 <i class="material-icons">poll</i>Тестирование

@@ -53,7 +53,7 @@ INSTALLED_APPS = [
     'start',
     'home',
     'administration',
-    'userprofile',
+    'profiles',
 ]
 
 MIDDLEWARE = [

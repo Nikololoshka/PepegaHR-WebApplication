@@ -17,10 +17,14 @@ class HRUser(AbstractUser):
     Объект пользователя с дополнительной информацией (профилем).
     """
     # возможные роли пользователя
+    ADMIN_ROLE = 'adm'
+    MODERATOR_ROLE = 'mod'
+    USER_ROLE = 'usr'
+
     USER_ROLES = (
-        ('adm', 'Администратор'),
-        ('mod', 'Модератор'),
-        ('usr', 'Пользователь')
+        (ADMIN_ROLE, _('Администратор')),
+        (MODERATOR_ROLE, _('Модератор')),
+        (USER_ROLE, _('Пользователь'))
     )
 
     photo = models.ImageField(upload_to=user_photo_path, default='user-photos/default.png', blank=True)
@@ -28,11 +32,36 @@ class HRUser(AbstractUser):
     last_visit = models.DateTimeField(blank=True, null=True)
     departaments = models.ManyToManyField('Departament', blank=True)
 
+    def is_admin(self) -> bool:
+        """
+        Проверяет, имеет ли пользователь роль администрата.
+        """
+        return self.role == HRUser.ADMIN_ROLE
+
     def is_moderator(self) -> bool:
         """
-        Проверяет, является ли пользователь модератором.
+        Проверяет, имеет ли пользователь роль модератора.
         """
-        return self.role == 'mod'
+        return self.role != HRUser.USER_ROLE
+
+    def is_user(self) -> bool:
+        """
+        Проверяет, имеет ли пользователь роль пользователя.
+        """
+        return self.role == HRUser.USER_ROLE
+
+    @staticmethod
+    def get_departament_model():
+        """
+        Возвращает модуль группы.
+        """
+        return Departament
+
+    def get_full_name_reverse(self) -> str:
+        """
+        Возвращает полное имя пользователя в обратном порядке.
+        """
+        return f'{self.last_name} {self.first_name}'
 
     class Meta:
         managed = True

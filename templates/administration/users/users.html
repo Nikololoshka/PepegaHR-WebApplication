@@ -72,7 +72,7 @@
                             <img src="{{ hr_user.photo.url }}" alt="" class="circle" style="max-width: 48px;">
                         </div>
                         <div style="display: inline-block;">
-                            <p style="font-size: large;">{{ hr_user.get_full_name }}</p>
+                            <p style="font-size: large;">{{ hr_user.get_full_name_reverse }}</p>
                             <p>{{ hr_user.get_role_display }}</p>
                         </div>
                     </div>   
@@ -90,7 +90,7 @@
                 <div class="collapsible-body list-body">
                     <div class="row">
                         <div class="col s12 m6">
-                            <p>Nickname: {{ hr_user.username }}</p>
+                            <p>Username: {{ hr_user.username }}</p>
                         </div>
                         <div class="col s12 m6">
                             <p>Последняя авторизация:

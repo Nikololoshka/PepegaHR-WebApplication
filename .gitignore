@@ -1,7 +1,11 @@
 .idea
 .vscode
 venv/*
+
+# SCSS settings
+static/material/css/*.map
 *.scss
+!static/material/scss/components/_variables.scss
 
 # Created by https://www.gitignore.io/api/code,django,python
 # Edit at https://www.gitignore.io/?templates=code,django,python

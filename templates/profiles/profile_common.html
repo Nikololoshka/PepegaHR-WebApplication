@@ -1,0 +1,27 @@
+<div class="row">
+    <div class="col s12 center-align">
+        <img src="{{ hr_user.photo.url }}" class="circle" alt="" width="172px">
+    </div>
+</div>
+<div class="row">
+    <div class="col s12 center-align">
+        <h5>{{ hr_user.get_full_name }}</h5>
+        <p>{{ hr_user.get_role_display }}</p>
+    </div>
+</div>
+<div class="divider"></div>
+<div class="row" style="margin-top: 20px;">
+    <div class="col s12 xl6">
+        <h6>Email: {{ hr_user.email }}</h6>
+    </div>
+    <div class="col s12 xl6">
+        <h6>Группы:</h6>
+        {% if hr_user.departaments.all %}
+            {% for departament in hr_user.departaments.all %}
+            <a href="{% url 'departament-page' departament.id %}"><h6>{{ departament.name }}</h6></a>
+            {% endfor %}
+        {% else %}
+            <h6>отсутствуют</h6>
+        {% endif %}
+    </div>
+</div>

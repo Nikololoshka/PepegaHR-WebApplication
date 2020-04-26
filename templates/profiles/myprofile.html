@@ -24,34 +24,7 @@
         {% for error in hr_form.errors %}
         <p>{{ error }}</p>
         {% endfor %}
-        <div class="row">
-            <div class="col s12 center-align">
-                <img src="{{ user.photo.url }}" class="circle" alt="" width="172px">
-            </div>
-        </div>
-        <div class="row">
-            <div class="col s12 center-align">
-                <h5>{{ user.get_full_name }}</h5>
-                <p>{{ user.get_role_display }}</p>
-            </div>
-        </div>
-        <div class="divider"></div>
-        <div class="row" style="margin-top: 20px;">
-            <div class="col s12 xl6">
-                <h6>Nickname: {{ user.username }}</h6>
-                <h6>Email: {{ user.email }}</h6>
-            </div>
-            <div class="col s12 xl6">
-                <h6>Группы:</h6>
-                {% if user.departaments.all %}
-                    {% for departament in user.departaments.all %}
-                    <a href="{% url 'admin-departament-page' departament.id %}"><h6>{{ departament.name }}</h6></a>
-                    {% endfor %}
-                {% else %}
-                    <h6>отсутствуют</h6>
-                {% endif %}
-            </div>
-        </div>
+        {% include 'profiles/profile_common.html' with hr_user=user %}       
         <div class="divider"></div>
         <div class="row" style="margin-top: 20px;">
             <div class="col s12 offset-xl6 xl6 right-align">
@@ -112,5 +85,5 @@
 {% endblock main-content %}
 
 {% block script-page %}
-<script type="text/javascript" src="{% static '/userprofile/js/userprofile.js' %}"></script>
+<script type="text/javascript" src="{% static '/profiles/js/userprofile.js' %}"></script>
 {% endblock script-page %}
