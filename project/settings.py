@@ -44,16 +44,19 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    # CSS
+    'widget_tweaks',
+
     # RestAPI
     'rest_framework',
     'rest_framework.authtoken',
 
     # Apps
-    'api',
     'start',
     'home',
     'administration',
     'profiles',
+    'questionnaire'
 ]
 
 MIDDLEWARE = [

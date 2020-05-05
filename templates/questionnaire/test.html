@@ -1,0 +1,98 @@
+{% extends 'workbase.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+<!-- header content -->
+{% block title-content %}PepegaHR: Test{% endblock title-content %}
+
+{% block head-page %}
+<!-- link rel="stylesheet" href="{% static '/administration/css/departaments.css' %}"> -->
+{% endblock head-page %}
+
+<!-- nav content -->
+{% block questionnaire-nav %}
+<li class="bold active">
+{% endblock questionnaire-nav %}
+
+{% block questionnaire-body-nav %}
+<div class="collapsible-body" style="display: block;">
+{% endblock questionnaire-body-nav %}
+
+{% block questionnaire-test-nav %}
+<li class="active">
+{% endblock questionnaire-test-nav %}
+
+<!-- main content -->
+{% block main-content %}
+<div class="row">
+    <div class="col s12">
+        <div class="card">
+            <div class="card-content">
+                <div class="card-title">
+                    Редактирование теста
+                </div>
+                <!-- Редактирование теста -->
+                <form action="" method="POST">
+                    <div class="row" style="margin-bottom: 0;">
+                        <div class="input-field col s12">
+                            {{ form.name|add_class:"validate" }}
+                            <label for="{{ form.name.auto_id }}">{{ form.name.label }}</label>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-bottom: 0;">
+                        <div class="input-field col s12">
+                            {{ form.desciption|add_class:"materialize-textarea" }}
+                            <label for="{{ form.desciption.auto_id }}">{{ form.desciption.label }}</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="input-field col s12">
+                            {{ form.max_count|add_class:"validate"|attr:"min:1" }}
+                            <label for="{{ form.max_count.auto_id }}">{{ form.max_count.label }}</label>
+                            <span class="helper-text">{{ form.max_count.help_text }}</span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label class="col s12">
+                            {{ form.is_shuffle|add_class:"filled-in" }}
+                            <span>
+                                {{ form.is_shuffle.label }}
+                            </span>
+                        </label>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col s12">
+        <div class="card">
+            <div class="card-content">
+                <div class="card-title">
+                    Создание вопроса с одним ответом
+                </div>
+                <!-- Редактирование вопроса -->
+                <form action="{% url 'questionnaire-test' %}" method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {% include 'questionnaire/forms/single_choose.html' with form=main_form formset=formset %}
+                    <div class="row">
+                        <div class="col s12 right-align">
+                            <button type="submit" class="btn">Сохранить</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<p>{{ formset.management_form.total_forms }}</p>
+
+{% endblock main-content %}
+
+{% block script-page %}
+<script src="{% static '/questionnaire/js/single_choose.js' %}"></script>
+
+{% endblock script-page %}

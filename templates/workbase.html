@@ -83,7 +83,7 @@
                             {% endblock admin-body-nav %}
                                 <ul>
                                     {% block admin-information-nav %}
-                                    <li class="disabled">
+                                    <li>
                                     {% endblock admin-information-nav %}
                                         <a href="{% url 'admin-information-page' %}">Сведения</a>
                                     </li>
@@ -101,10 +101,42 @@
                             </div>
                         </li>
                         {% endif %}
-                        <li>
-                            <a href="" class="collapsible-header">
+
+                        <!-- Тестирование -->
+                        {% block questionnaire-nav %}
+                        <li> 
+                        {% endblock questionnaire-nav %}
+                            <a class="collapsible-header waves-effect">
                                 <i class="material-icons">poll</i>Тестирование
                             </a>
+
+                            {% block questionnaire-body-nav %}
+                            <div class="collapsible-body">
+                            {% endblock questionnaire-body-nav %}
+                                <ul>
+                                    {% block questionnaire-test-nav %}
+                                    <li>
+                                    {% endblock questionnaire-test-nav %}
+                                        <a href="{% url 'questionnaire-test' %}">Test</a>
+                                    </li>
+
+                                    {% block questionnaire-drafts-nav %}
+                                    <li>
+                                    {% endblock questionnaire-drafts-nav %}
+                                        <a href="{% url 'questionnaire-drafts-page' %}">Черновики</a>
+                                    </li>
+                                </ul>
+
+                            </div>
+
+                        </li>
+
+                        <!-- Справка -->
+                        <li>
+                            <a href="" class="collapsible-header waves-effect">
+                                <i class="material-icons">info_outline</i>Справка
+                            </a>
+
                         </li>
                     </ul>
                 </li>

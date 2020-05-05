@@ -1,0 +1,46 @@
+{% load widget_tweaks %}
+
+{{ formset.management_form }}
+<div class="row">
+    <div class="input-field col s12">
+        {{ form.question|add_class:"materialize-textarea validate" }}
+        <label for="{{ form.question.auto_id }}">{{ form.question.label }}</label>
+    </div>
+    <div class="col s12">
+        <table>
+            <thead>
+                <tr>
+                    <th>Ответ</th>
+                    <th>Вариант</th>
+                </tr>
+            </thead>
+            <tbody class="form-row">
+                {% for variant in formset %}
+                <tr>
+                    <td>
+                        <div class="center-align">
+                            <label>
+                                {{ variant.right|add_class:"radio-checked filled-in" }}
+                                <span></span>
+                            </label>
+                        </div>
+                    </td>
+                    <td>
+                        <div style="display: flex;">
+                            <div style="width: 100%">
+                                {{ variant.variant|add_class:"materialize-textarea validate" }}
+                            </div>
+                            <div>
+                                <button class="btn-flat tooltipped add-form-row" 
+                                        data-position="bottom" data-tooltip="Добавить вариант">
+                                    <i class="material-icons">add</i>
+                                </button>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -1,25 +1,26 @@
 {% extends 'workbase.html' %}
 {% load static %}
+{% load widget_tweaks %}
 
 <!-- header content -->
-{% block title-content %}PepegaHR: Группы{% endblock title-content %}
+{% block title-content %}PepegaHR: Черновики{% endblock title-content %}
 
 {% block head-page %}
-<link rel="stylesheet" href="{% static '/administration/css/departaments.css' %}">
+<!-- link rel="stylesheet" href="{% static '/administration/css/departaments.css' %}"> -->
 {% endblock head-page %}
 
 <!-- nav content -->
-{% block admin-nav %}
+{% block questionnaire-nav %}
 <li class="bold active">
-{% endblock admin-nav %}
+{% endblock questionnaire-nav %}
 
-{% block admin-body-nav %}
+{% block questionnaire-body-nav %}
 <div class="collapsible-body" style="display: block;">
-{% endblock admin-body-nav %}
+{% endblock questionnaire-body-nav %}
 
-{% block admin-departaments-nav %}
+{% block questionnaire-drafts-nav %}
 <li class="active">
-{% endblock admin-departaments-nav %}
+{% endblock questionnaire-drafts-nav %}
 
 <!-- main content -->
 {% block main-content %}
@@ -32,11 +33,11 @@
                         <div class="col s12">
                             <div class="stretch-container">
                                 <div class="stretch-left">
-                                    Список групп
+                                    Черновики
                                 </div>
                                 <div class="stretch-right">
                                     <a href="#add-modal" class="btn waves-effect waves-light modal-trigger">
-                                        <i class="material-icons right">add</i>Добавить группу
+                                        <i class="material-icons right">add</i>Добавить тест
                                     </a>
                                 </div>
                             </div>
@@ -67,18 +68,19 @@
                         </form>
                     </div>
                 </div>
-                <!-- Список участников -->
+
+                <!-- Список черновиков -->
                 <div class="row no-padding">
                     <div class="col s12">
                         {% if page.object_list %}
                         <div class="collection">
-                            {% for departament in page.object_list %}
-                            <a href="{% url 'admin-departament-page' departament.id %}"
+                            {% for questionnaire in page.object_list %}
+                            <a href="{% url 'questionnaire-draft-page' questionnaire.id %}"
                                 class="collection-item black-text waves-effect">
-                                <h6>{{ departament.name }}</h6>
+                                <h6>{{ questionnaire.name }}</h6>
                                 <div class="row" style="margin-bottom: 0;">
                                     <div class="col s6">
-                                        <p>Участников: {{ departament.hruser_set.all.count }}</p>
+                                        <p>Автор: {{ questionnaire.author.get_full_name_reverse }}</p>
                                     </div>
                                 </div>
                             </a>
@@ -127,26 +129,26 @@
 <div id="add-modal" class="modal">
     <div class="modal-content">
         <div class="row">
-            <h4>Добавление группы</h4>
+            <h4>Добавление теста</h4>
         </div>
         <div>
-            <form action="{% url 'admin-departaments-page' %}" method="POST" id="add-group">
+            <form action="{% url 'questionnaire-drafts-page' %}" method="POST" id="add-questionnaire">
                 {% csrf_token %}
                 <div class="input-field">
-                    {{ departament_form.name }}
-                    <label for="{{ departament_form.name.auto_id }}">{{ departament_form.name.label }}</label>
+                    {{ questionnaire_form.name }}
+                    <label for="{{ questionnaire_form.name.auto_id }}">{{ questionnaire_form.name.label }}</label>
                 </div>
             </form>
         </div>
     </div>
     <div class="modal-footer right-align">
         <a class="modal-close btn-flat waves-effect waves-green">Отмена</a>
-        <button class="modal-close btn waves-effect waves-green" form="add-group" type="submit">Добавить</button>
+        <button class="modal-close btn waves-effect waves-green" form="add-questionnaire" type="submit">Добавить</button>
     </div>
 </div>
 
 {% endblock main-content %}
 
 {% block script-page %}
-<script src="{% static '/administration/js/departaments.js' %}"></script>
+<script src="{% static '/questionnaire/js/drafts.js' %}"></script>
 {% endblock script-page %}
