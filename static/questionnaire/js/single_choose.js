@@ -4,13 +4,13 @@ $(document).ready(function() {
 
 $(document).on('click', '.add-form-row', function(e){
     e.preventDefault();
-    addForm('.form-row:last', 'form');
+    addForm('.form-row:last', 'forms_count');
     return false;
 });
 
 $(document).on('click', '.remove-form-row', function(e){
     e.preventDefault();
-    deleteForm('form', $(this));
+    deleteForm('forms_count', $(this));
     return false;
 });
 
@@ -23,19 +23,24 @@ $(".radio-checked").change(function() {
 function updateElementIndex(el, prefix, ndx) {
     // обновляет индексы элементов
 
-    var id_regex = new RegExp('(' + prefix + '-\\d+)');
-    var replacement = prefix + '-' + ndx;
+    var regexp = new RegExp('(\-\\d+\-)');
+    var replacement = '-' + ndx + '-';
+
+    console.log(el);
+    console.log(regexp);
+    console.log(replacement);
+    console.log('------------------------------');
 
     if ($(el).attr("for")) {
-        $(el).attr("for", $(el).attr("for").replace(id_regex, replacement));
+        $(el).attr("for", $(el).attr("for").replace(regexp, replacement));
     }
 
     if (el.id) {
-        el.id = el.id.replace(id_regex, replacement);
+        el.id = el.id.replace(regexp, replacement);
     }
 
     if (el.name) {
-        el.name = el.name.replace(id_regex, replacement);
+        el.name = el.name.replace(regexp, replacement);
     }
 }
 
@@ -44,20 +49,30 @@ function addForm(selector, prefix) {
     // добавляет форму
 
     var newElement = $(selector).clone(true);
-    var total = $('#id_' + prefix + '-TOTAL_FORMS').val();
+    var total = $('#id_' + prefix).val();
 
+    // для checkbox
     newElement.find('input').each(function() {
         var name = $(this).attr('name')
                             .replace('-' + (total - 1) + '-', '-' + total + '-');
 
         var id = 'id_' + name;
         $(this).attr({'name': name, 'id': id})
-                .val('')
                 .prop('checked', false);
+    });
+    // для textarea
+    newElement.find('textarea').each(function() {
+        var name = $(this).attr('name')
+                            .replace('-' + (total - 1) + '-', '-' + total + '-');
+
+        var id = 'id_' + name;
+        $(this).attr({'name': name, 'id': id})
+                .val('')
+                .removeClass('valid').removeClass('invalid');
     });
 
     total++;
-    $('#id_' + prefix + '-TOTAL_FORMS').val(total);
+    $('#id_' + prefix).val(total);
 
     $(selector).after(newElement);
 
@@ -76,18 +91,16 @@ function addForm(selector, prefix) {
 function deleteForm(prefix, btn) {
     // удаляет форму
 
-    var total = parseInt($('#id_' + prefix + '-TOTAL_FORMS').val());
-    console.log(total);
-    console.log(prefix);
+    var total = parseInt($('#id_' + prefix).val());
 
     if (total > 1){
         btn.closest('.form-row').remove();
         var forms = $('.form-row');
 
-        $('#id_' + prefix + '-TOTAL_FORMS').val(forms.length);
+        $('#id_' + prefix).val(forms.length);
 
         for (var i = 0, formCount = forms.length; i < formCount; i++) {
-            $(forms.get(i)).find('input').each(function() {
+            $(forms.get(i)).find('input, textarea').each(function() {
                 updateElementIndex(this, prefix, i);
             });
         }

@@ -1,13 +1,13 @@
 {% load widget_tweaks %}
 
-{{ formset.management_form }}
+{{ form.forms_count }}
 <div class="row">
     <div class="input-field col s12">
         {{ form.question|add_class:"materialize-textarea validate" }}
         <label for="{{ form.question.auto_id }}">{{ form.question.label }}</label>
     </div>
     <div class="col s12">
-        <table>
+        <table class="responsive-table">
             <thead>
                 <tr>
                     <th>Ответ</th>
@@ -15,12 +15,12 @@
                 </tr>
             </thead>
             <tbody class="form-row">
-                {% for variant in formset %}
+                {% for right, variant in form.get_fields %}
                 <tr>
-                    <td>
+                    <td style="width: 20%;">
                         <div class="center-align">
                             <label>
-                                {{ variant.right|add_class:"radio-checked filled-in" }}
+                                {{ right|add_class:"radio-checked filled-in" }}
                                 <span></span>
                             </label>
                         </div>
@@ -28,7 +28,7 @@
                     <td>
                         <div style="display: flex;">
                             <div style="width: 100%">
-                                {{ variant.variant|add_class:"materialize-textarea validate" }}
+                                {{ variant|add_class:"materialize-textarea validate"|attr:"required" }}
                             </div>
                             <div>
                                 <button class="btn-flat tooltipped add-form-row" 

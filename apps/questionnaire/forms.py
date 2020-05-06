@@ -40,8 +40,11 @@ class QuestionnaireEditForm(forms.ModelForm):
 
 class SingleChooseForm(forms.ModelForm):
     """
-    Форма для редактирование (создания) теста с одним вариантом ответа
+    Форма для вопроса с одним выбором ответа.
     """
+    forms_count = forms.IntegerField(min_value=1, widget=forms.HiddenInput())
+    questionnaire_id = None
+    
     class Meta:
         model = SingleChooseQuiz
         fields = ['question']
@@ -49,32 +52,138 @@ class SingleChooseForm(forms.ModelForm):
             'question': _('Вопрос')
         }
 
+    def __init__(self, *args, **kwargs):
+        if 'questionnaire_id' in kwargs:
+            self.questionnaire_id = kwargs.pop('questionnaire_id')
 
-class SingleChooseVariantForm(forms.ModelForm):
-    """
-    Набор форм для теста с одним вариантом ответа
-    """
-    right = forms.BooleanField(required=False)
+        super().__init__(*args, **kwargs)
+        request = args[0] if len(args) else {}
 
-    class Meta:
-        model = SingleChooseVariant
-        fields = ['variant']
+
+        # если форма из POST запроса
+        if request:
+            i = 0
+            right_field_name = f'right-{i}-form'
+            variant_field_name = f'variant-{i}-form'
+
+            while request.get(variant_field_name):
+                right = request.get(right_field_name, None)
+                right = (1 if right is not None else 0)
+
+                variant = request[variant_field_name]
+                self._add_fields(right_field_name, right, variant_field_name, variant)
+
+                i += 1
+                right_field_name = f'right-{i}-form'
+                variant_field_name = f'variant-{i}-form'
+        else:
+            # получения вариантов вопроса
+            variants = SingleChooseVariant.objects.filter(
+                quiz=self.instance
+            )
+
+            if len(variants):       
+                # создание полей
+                self.fields['forms_count'].initial = len(variants) 
+                right = self.instance.right
+                
+                for i in range(len(variants)):
+                    right_field_name = f'right-{i}-form'
+                    variant_field_name = f'variant-{i}-form'
+
+                    self._add_fields(right_field_name, variants[i] == right, variant_field_name, variants[i])
+            else:
+                # extra форма
+                self.fields['forms_count'].initial = 1
+
+                right_field_name = f'right-0-form'
+                variant_field_name = f'variant-0-form'
+
+                self._add_fields(right_field_name, False, variant_field_name, '')
+
+    def _add_fields(self, right_field_name: str, right: bool, variant_field_name: str, variant: str):
+        """
+        Добавляет пля на форму.
+        """
+        self.fields[right_field_name] = forms.BooleanField(required=False)
+        self.initial[right_field_name] = 'on' if right else ''
         
-        
-class SingleChooseVariantValidation(forms.BaseModelFormSet):
-    """
-    Валидар для набора форм теста с одним вариантом ответа.
-    """
+        self.fields[variant_field_name] = forms.CharField(widget=forms.Textarea(), required=True)
+        self.initial[variant_field_name] = variant
+
+
     def clean(self):
-        super(SingleChooseVariantValidation, self).clean()
+        """
+        Проверяет форму на правильность.
+        """
+        cleaned_data = super(SingleChooseForm, self).clean()
 
-        count = 0
-        for form in self.forms:
-            if 'right' in form.cleaned_data:
-                count += int(form.cleaned_data['right'])
+        rights = list()
+        variants = list()
 
-        if count != 1:
+        i = 0
+        right_field_name = f'right-{i}-form'
+        variant_field_name = f'variant-{i}-form'
+
+
+        while cleaned_data.get(variant_field_name):
+            right = cleaned_data.get(right_field_name, None)
+
+            variant = cleaned_data[variant_field_name]
+
+            if variant in variants:
+                raise forms.ValidationError(_('Есть одинаковые поля'))
+            else:
+                rights.append(right)
+                variants.append(variant)
+
+            i += 1
+            right_field_name = f'right-{i}-form'
+            variant_field_name = f'variant-{i}-form'
+
+        print(rights)
+        if sum(rights) != 1:
             raise ValidationError(_('Должен быть ровно один правильный ответ'))
 
-SingleChooseFormset = modelformset_factory(SingleChooseVariant, form=SingleChooseVariantForm, 
-                        formset=SingleChooseVariantValidation, extra=1, min_num=1, can_order=True, can_delete=True)
+        self.cleaned_data['rights'] = rights
+        self.cleaned_data['variants'] = variants
+
+    def save(self):
+        """
+        Сохраняет вопрос в БД.
+        """
+        quiz = super(SingleChooseForm, self).save(commit=False)
+        questionnaire = Questionnaire.objects.get(id=self.questionnaire_id)
+        quiz.questionnaire = questionnaire
+        quiz.order = len(questionnaire.get_quizzes_list())
+        quiz.variants.all().delete()
+        quiz.save()
+
+        for index, (right, variant) in enumerate(zip(self.cleaned_data['rights'], self.cleaned_data['variants'])):
+           single_variant = SingleChooseVariant.objects.create(
+               quiz=quiz,
+               variant=variant,
+               order=index
+           )
+           if right:
+                quiz.right = single_variant
+
+        quiz.save()
+
+        return quiz
+
+    def get_fields(self):
+        """
+        Возвращает список кортежей с полями.
+        """
+        i = 0
+        while True:
+            right_field_name = f'right-{i}-form'
+            variant_field_name = f'variant-{i}-form'
+
+            if self.fields.get(right_field_name) and self.fields.get(variant_field_name):
+                yield self[right_field_name], self[variant_field_name]
+                i += 1
+            else:
+                break
+

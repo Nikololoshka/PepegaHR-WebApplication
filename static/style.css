@@ -4,7 +4,24 @@
 }
 
 .empty-list {
-    padding: 2rem;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
+
+.list-body {
+    padding: 1rem;
+}
+
+.collapsible-header:hover {
+    background-color: rgba(50, 50, 50, 0.06);
+}
+
+.collapsible li.active .collapsible-header {
+    background-color: rgba(50, 50, 50, 0.06);
+}
+
+.table-content {
+    padding: 0px 5px;
 }
 
 .btn-flat:hover {
