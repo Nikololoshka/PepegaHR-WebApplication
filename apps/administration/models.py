@@ -69,6 +69,9 @@ class HRUser(AbstractUser):
         verbose_name_plural = 'HRUsers'
         ordering = ['last_name', 'first_name']
 
+    def __str__(self):
+        return f'{self.first_name} {self.last_name}'
+
 
 class Departament(models.Model):
     """

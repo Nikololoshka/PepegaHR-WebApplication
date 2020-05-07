@@ -3,11 +3,7 @@
 {% load widget_tweaks %}
 
 <!-- header content -->
-{% block title-content %}PepegaHR: Редактирование черновика{% endblock title-content %}
-
-{% block head-page %}
-<!-- link rel="stylesheet" href="{% static '/administration/css/departaments.css' %}"> -->
-{% endblock head-page %}
+{% block title-content %}PepegaHR: Черновик "{{ form.name.value }}"{% endblock title-content %}
 
 <!-- nav content -->
 {% block questionnaire-nav %}
@@ -31,7 +27,10 @@
                         </div>
                     </div>
                 </div>
-
+                <!-- Ошибки -->
+                {% if form.errors %}
+                {% include 'patterns/errors.html' with errors=form.errors.values %}
+                {% endif %}
                 <div class="row no-padding">
                     <div class="col s12">
                         <form action="" method="POST" id="questionnaire-form">
@@ -57,121 +56,13 @@
                                         <span class="helper-text">{{ form.max_count.help_text }}</span>
                                     </div>
                                 </div>
-                                <div class="row">
+                                <div class="row" style="margin-bottom: 0;">
                                     <label class="col s12">
                                         {{ form.is_shuffle|add_class:"filled-in" }}
                                         <span>
                                             {{ form.is_shuffle.label }}
                                         </span>
                                     </label>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col s12">
-                                </div>
-                            </div>
-                            <!-- Список с вопросами -->
-                            <div>
-                                <div class="row">
-                                    <div class="col s12">
-                                        <div class="stretch-container">
-                                            <div class="stretch-left">
-                                                 <div class="card-title">
-                                                    Список вопросов
-                                                 </div>
-                                            </div>
-                                            <div class="stretch-right">
-                                                <!--Выбор вопроса  -->
-                                                <a href="#" class="dropdown-trigger btn waves-effect waves-light" data-target="create_quiz">
-                                                    <i class="material-icons right">add</i>Добавить вопрос
-                                                </a>
-                                                <!-- Структура с созданием вопросов -->
-                                                <ul id='create_quiz' class='dropdown-content'>
-                                                    <li><a href="{% url 'questionnaire-single-choose-create' questionnaire.id %}">С одним вариантом</a></li>
-                                                    <li class="disabled"><a href="#!">С множеством вариантов</a></li>
-                                                    <li class="disabled"><a href="#!">С свободном вариантом</a></li>
-                                                </ul> 
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col s12">
-                                        {% if quizzes %}
-                                        <ul class="collapsible expandable z-depth-0">
-                                        {% for quiz in quizzes %}
-                                            {% if quiz.get_quiz_type == SINGLE_QUIZ %}
-                                            <li>
-                                                <div class="collapsible-header waves-effect row" style="margin: 0;">
-                                                    <div class="col s12 no-padding">
-                                                        <div class="table-content">
-                                                            <h6 class="truncate">{{ quiz.question }}</h6>
-                                                            <p>Тип: один вариант</p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="collapsible-body list-body">
-                                                    <div class="row">
-                                                        <div class="col s12">
-                                                            <div class="table-content">
-                                                                <b>Вопрос:</b> {{ quiz.question }}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="row">
-                                                        <div class="col s12">
-                                                            <table>
-                                                                <thead>
-                                                                    <tr>
-                                                                        <th>Ответ</th>
-                                                                        <th>Вариант</th>
-                                                                    </tr>
-                                                                </thead>
-                                                                <tbody>
-                                                                    {% for variant in quiz.variants.all %}
-                                                                    <tr>
-                                                                        <td style="width: 20%;"> 
-                                                                            <div class="center-align">
-                                                                                <label>
-                                                                                    <input type="checkbox" class="filled-in" onclick="return false;"
-                                                                                        {% if variant == quiz.right %} checked="checked" {% endif %}
-                                                                                    />
-                                                                                    <span></span>
-                                                                                </label>
-                                                                            </div>
-                                                                        </td>
-                                                                        <td>
-                                                                            {{ variant.variant }}
-                                                                        </td>
-                                                                    </tr>
-                                                                    {% endfor %}
-                                                                </tbody>
-                                                            </table>
-                                                        </div>
-                                                    </div>
-                                                    <div class="row">
-                                                        <div class="col s12">
-                                                            <div class="table-content right-align">
-                                                                <a href="" class="btn-flat red-text">
-                                                                    Удалить
-                                                                </a>
-                                                                <a href="" class="btn-flat">
-                                                                    Редактировать
-                                                                </a>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </li>
-                                            {% endif %}
-                                        {% endfor %}
-                                        </ul>
-                                        {% else %}
-                                        <div class="divider"></div>
-                                        <div class="center empty-list">Список пуст</div>
-                                        <div class="divider"></div>
-                                        {% endif %}
-                                    </div>
                                 </div>
                             </div>
                         </form>
@@ -182,6 +73,209 @@
                 <div>
                     <a href="{% url 'questionnaire-drafts-page' %}" class=" btn-flat waves-effect waves-light">Назад</a>
                     <button form="questionnaire-form" class="btn waves-effect waves-light" type="submit" >Сохранить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Список с вопросами -->
+<div class="row">
+    <div class="col s12 no-padding">
+        <div class="card">
+            <div class="card-content">
+                <!-- Заголовок -->
+                <div class="row">
+                    <div class="col s12">
+                        <div class="stretch-container">
+                            <div class="stretch-left">
+                                 <div class="card-title">
+                                    Список вопросов 
+                                    {% if quizzes %}
+                                        {{ quizzes|length }}
+                                    {% endif %}
+                                 </div>
+                            </div>
+                            <div class="stretch-right">
+                                <!--Выбор вопроса  -->
+                                <a href="#" class="dropdown-trigger btn waves-effect waves-light" data-target="create_quiz">
+                                    <i class="material-icons right">add</i>Добавить вопрос
+                                </a>
+                                <!-- Структура с созданием вопросов -->
+                                <ul id='create_quiz' class='dropdown-content'>
+                                    <li>
+                                        <a href="{% url 'questionnaire-single-choose-create' questionnaire.id %}">
+                                            <i class="material-icons">radio_button_checked</i>Одим вариант
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="{% url 'questionnaire-multi-choose-create' questionnaire.id %}">
+                                            <i class="material-icons">check_box</i>Несколько вариантов
+                                        </a>
+                                    </li>
+                                    <li class="disabled">
+                                        <a href="#!">
+                                            <i class="material-icons">subject</i>Cвободная форма
+                                        </a>
+                                    </li>
+                                </ul> 
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Список вопросов -->
+                <div class="row">
+                    <div class="col s12">
+                        {% if quizzes %}
+                        <ul class="collapsible expandable z-depth-0">
+                        {% for quiz in quizzes %}
+                            {% if quiz.get_quiz_type == SINGLE_QUIZ %}
+                            <li>
+                                <div class="collapsible-header waves-effect row" style="margin: 0;">
+                                    <div class="col s12 no-padding">
+                                        <div class="table-content">
+                                            <i class="material-icons left tooltipped" data-position="bottom" data-tooltip="Один вариант">radio_button_checked</i>
+                                            <h6 class="truncate" style="line-height: inherit;">{{ quiz.question }}</h6>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="collapsible-body list-body">
+                                    <div class="row">
+                                        <div class="col s12">
+                                            <div class="table-content">
+                                                <b>Вопрос:</b> {{ quiz.question }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col s12">
+                                            <table>
+                                                <thead>
+                                                    <tr>
+                                                        <th>Ответ</th>
+                                                        <th>Вариант</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for variant in quiz.variants.all %}
+                                                    <tr>
+                                                        <td style="width: 20%;"> 
+                                                            <div class="center-align">
+                                                                <label>
+                                                                    <input type="radio" class="with-gap" onclick="return false;"
+                                                                        {% if variant == quiz.right %} checked="checked" {% endif %}
+                                                                    />
+                                                                    <span></span>
+                                                                </label>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            {{ variant.variant }}
+                                                        </td>
+                                                    </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col s12">
+                                            <div class="table-content">
+                                                <div class="right">
+                                                    <a href="{% url 'questionnaire-single-choose-edit' questionnaire.id quiz.id %}"
+                                                         class="btn-flat waves-effect waves-light">
+                                                        Редактировать
+                                                    </a>
+                                                </div>
+                                                <div class="right">
+                                                    <form action="{% url 'questionnaire-single-choose-remove' questionnaire.id quiz.id %}" method="POST">
+                                                        {% csrf_token %}
+                                                        <button class="btn-flat red-text waves-effect waves-light" type="submit">Удалить</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            {% elif quiz.get_quiz_type == MULTI_QUIZ %}
+                            <li>
+                                <div class="collapsible-header waves-effect row" style="margin: 0;">
+                                    <div class="col s12 no-padding">
+                                        <div class="table-content">
+                                            <i class="material-icons left tooltipped" data-position="bottom" data-tooltip="Несколько вариантов">check_box</i>
+                                            <h6 class="truncate" style="line-height: inherit;">{{ quiz.question }}</h6>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="collapsible-body list-body">
+                                    <div class="row">
+                                        <div class="col s12">
+                                            <div class="table-content">
+                                                <b>Вопрос:</b> {{ quiz.question }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col s12">
+                                            <table>
+                                                <thead>
+                                                    <tr>
+                                                        <th>Ответ</th>
+                                                        <th>Вариант</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for variant in quiz.variants.all %}
+                                                    <tr>
+                                                        <td style="width: 20%;"> 
+                                                            <div class="center-align">
+                                                                <label>
+                                                                    <input type="checkbox" class="filled-in" onclick="return false;"
+                                                                        {% if variant.right %} checked="checked" {% endif %}
+                                                                    />
+                                                                    <span></span>
+                                                                </label>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            {{ variant.variant }}
+                                                        </td>
+                                                    </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col s12">
+                                            <div class="table-content">
+                                                <div class="right">
+                                                    <a href="{% url 'questionnaire-multi-choose-edit' questionnaire.id quiz.id %}"
+                                                         class="btn-flat waves-effect waves-light">
+                                                        Редактировать
+                                                    </a>
+                                                </div>
+                                                <div class="right">
+                                                    <form action="{% url 'questionnaire-multi-choose-remove' questionnaire.id quiz.id %}" method="POST">
+                                                        {% csrf_token %}
+                                                        <button class="btn-flat red-text waves-effect waves-light" type="submit">Удалить</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            {% endif %}
+                        {% endfor %}
+                        </ul>
+                        {% else %}
+                        <div class="divider"></div>
+                        <div class="center empty-list">Список пуст</div>
+                        <div class="divider"></div>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
         </div>

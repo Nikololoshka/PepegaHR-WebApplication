@@ -1,13 +1,8 @@
 {% extends 'workbase.html' %}
 {% load static %}
-{% load widget_tweaks %}
 
 <!-- header content -->
 {% block title-content %}PepegaHR: Черновики{% endblock title-content %}
-
-{% block head-page %}
-<!-- link rel="stylesheet" href="{% static '/administration/css/departaments.css' %}"> -->
-{% endblock head-page %}
 
 <!-- nav content -->
 {% block questionnaire-nav %}
@@ -22,132 +17,102 @@
 <li class="active">
 {% endblock questionnaire-drafts-nav %}
 
-<!-- main content -->
-{% block main-content %}
+                
+<!-- Заголовок -->
+{% block card-title %}
 <div class="row">
-    <div class="col s12 no-padding">
-        <div class="card">
-            <div class="card-content">
+    <div class="col s12">
+        <div class="stretch-container">
+            <div class="stretch-left">
                 <div class="card-title">
-                    <div class="row">
-                        <div class="col s12">
-                            <div class="stretch-container">
-                                <div class="stretch-left">
-                                    Черновики
+                    Черновики
+                </div>
+            </div>
+            <div class="stretch-right">
+                <a href="#add-modal" class="btn waves-effect waves-light modal-trigger">
+                    <i class="material-icons right">add</i>Добавить тест
+                </a>
+                <!-- add group modal window -->
+                <div id="add-modal" class="modal">
+                    <div class="modal-content">
+                        <div class="row">
+                            <h4>Добавление теста</h4>
+                        </div>
+                        <div>
+                            <form action="{% url 'questionnaire-drafts-page' %}" method="POST" id="add-questionnaire">
+                                {% csrf_token %}
+                                <div class="input-field">
+                                    {{ questionnaire_form.name }}
+                                    <label for="{{ questionnaire_form.name.auto_id }}">{{ questionnaire_form.name.label }}</label>
                                 </div>
-                                <div class="stretch-right">
-                                    <a href="#add-modal" class="btn waves-effect waves-light modal-trigger">
-                                        <i class="material-icons right">add</i>Добавить тест
-                                    </a>
-                                </div>
-                            </div>
+                            </form>
                         </div>
                     </div>
-                </div>
-                <!-- Поиск -->
-                <div class="row valign-wrapper no-padding">
-                    <div class="col s12">
-                        <form class="valign-wrapper" style="display: flex;">
-                            <div class="input-field" style="width: 100%; flex-grow: 1; margin: 0px;">
-                                <input disabled type="text" placeholder="Поиск">
-                            </div>
-                            <button class="btn-flat disabled" type="submit">
-                                <i class="material-icons">search</i>
-                            </button>
-                            <!-- dropdown trigger -->
-                            <a href="#" class="dropdown-trigger btn waves-effect waves-light disabled"
-                                style="min-width: 10rem;" data-target="dropdownfilter">
-                                <i class="material-icons right">filter_list</i>Фильтр
-                            </a>
-                            <!-- dropdown structure -->
-                            <ul id='dropdownfilter' class='dropdown-content'>
-                                <li><a href="#!">one</a></li>
-                                <li><a href="#!">two</a></li>
-                                <li class="divider" tabindex="-1"></li>
-                            </ul>
-                        </form>
-                    </div>
-                </div>
-
-                <!-- Список черновиков -->
-                <div class="row no-padding">
-                    <div class="col s12">
-                        {% if page.object_list %}
-                        <div class="collection">
-                            {% for questionnaire in page.object_list %}
-                            <a href="{% url 'questionnaire-draft-page' questionnaire.id %}"
-                                class="collection-item black-text waves-effect">
-                                <h6>{{ questionnaire.name }}</h6>
-                                <div class="row" style="margin-bottom: 0;">
-                                    <div class="col s6">
-                                        <p>Автор: {{ questionnaire.author.get_full_name_reverse }}</p>
-                                    </div>
-                                </div>
-                            </a>
-                            {% endfor %}
-                        </div>
-                        <!-- pagination -->
-                        <ul class="pagination right-align">
-                            {% if page.has_previous %}
-                            <li class="waves-effect">
-                                <a href="?page={{ page.previous_page_number }}">
-                                    <i class="material-icons">chevron_left</i>
-                                </a>
-                            </li>
-                            <li class="waves-effect"><a href="#!">{{ page.previous_page_number }}</a></li>
-                            {% else %}
-                            <li class="disabled"><a href="#"><i class="material-icons">chevron_left</i></a></li>
-                            {% endif %}
-
-                            <li class="waves-effect active"><a
-                                    href="{% url 'admin-users-page' %}?page={{ page.number }}">{{ page.number }}</a></li>
-
-                            {% if page.has_next %}
-                            <li class="waves-effect">
-                                <a href="###############">
-                                    <i class="material-icons">chevron_right</i>
-                                </a>
-                            </li>
-                            <li class="waves-effect"><a href="#!">{{ page.next_page_number }}</a></li>
-                            {% else %}
-                            <li class="disabled"><a href="#!"><i class="material-icons">chevron_right</i></a></li>
-                            {% endif %}
-                        </ul>
-                        {% else %}
-                        <div class="divider"></div>
-                        <div class="center empty-list">Список пуст</div>
-                        <div class="divider"></div>
-                        {% endif %}
+                    <div class="modal-footer right-align">
+                        <a class="modal-close btn-flat waves-effect waves-green">Отмена</a>
+                        <button class="modal-close btn waves-effect waves-green" form="add-questionnaire" type="submit">Добавить</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+{% endblock card-title %}
 
-<!-- add group modal window -->
-<div id="add-modal" class="modal">
-    <div class="modal-content">
-        <div class="row">
-            <h4>Добавление теста</h4>
-        </div>
-        <div>
-            <form action="{% url 'questionnaire-drafts-page' %}" method="POST" id="add-questionnaire">
-                {% csrf_token %}
-                <div class="input-field">
-                    {{ questionnaire_form.name }}
-                    <label for="{{ questionnaire_form.name.auto_id }}">{{ questionnaire_form.name.label }}</label>
-                </div>
-            </form>
-        </div>
-    </div>
-    <div class="modal-footer right-align">
-        <a class="modal-close btn-flat waves-effect waves-green">Отмена</a>
-        <button class="modal-close btn waves-effect waves-green" form="add-questionnaire" type="submit">Добавить</button>
+{% block card-content %}
+<!-- Поиск -->
+<div class="row valign-wrapper no-padding">
+    <div class="col s12">
+        <form class="valign-wrapper" style="display: flex;">
+            <div class="input-field" style="width: 100%; flex-grow: 1; margin: 0px;">
+                <input disabled type="text" placeholder="Поиск">
+            </div>
+            <button class="btn-flat disabled" type="submit">
+                <i class="material-icons">search</i>
+            </button>
+            <!-- dropdown trigger -->
+            <a href="#" class="dropdown-trigger btn waves-effect waves-light disabled"
+                style="min-width: 10rem;" data-target="dropdownfilter">
+                <i class="material-icons right">filter_list</i>Фильтр
+            </a>
+            <!-- dropdown structure -->
+            <ul id='dropdownfilter' class='dropdown-content'>
+                <li><a href="#!">one</a></li>
+                <li><a href="#!">two</a></li>
+                <li class="divider" tabindex="-1"></li>
+            </ul>
+        </form>
     </div>
 </div>
+<!-- Список черновиков -->
+<div class="row no-padding">
+    <div class="col s12">
+        {% if page.object_list %}
+        <div class="collection">
+            {% for questionnaire in page.object_list %}
+            <a href="{% url 'questionnaire-draft-page' questionnaire.id %}"
+                class="collection-item black-text waves-effect">
+                <h6>{{ questionnaire.name }}</h6>
+                <div class="row" style="margin-bottom: 0;">
+                    <div class="col s6">
+                        <p>Автор: {{ questionnaire.author.get_full_name_reverse }}</p>
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+        <!-- pagination -->
+        {% include 'patterns/pagination.html' with page=page %}
 
-{% endblock main-content %}
+        {% else %}
+        <div class="divider"></div>
+        <div class="center empty-list">Список пуст</div>
+        <div class="divider"></div>
+        {% endif %}
+    </div>
+</div>
+{% endblock card-content %}
+
 
 {% block script-page %}
 <script src="{% static '/questionnaire/js/drafts.js' %}"></script>

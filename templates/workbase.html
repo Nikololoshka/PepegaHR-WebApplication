@@ -15,6 +15,7 @@
 <!-- main content -->
 {% block body-content %}
 <body class="workbase-body">
+    <!--navigation  -->
     <header>
         <div class="navbar-fixed">
             <nav>
@@ -109,7 +110,6 @@
                             <a class="collapsible-header waves-effect">
                                 <i class="material-icons">poll</i>Тестирование
                             </a>
-
                             {% block questionnaire-body-nav %}
                             <div class="collapsible-body">
                             {% endblock questionnaire-body-nav %}
@@ -126,17 +126,13 @@
                                         <a href="{% url 'questionnaire-drafts-page' %}">Черновики</a>
                                     </li>
                                 </ul>
-
                             </div>
-
                         </li>
-
                         <!-- Справка -->
                         <li>
                             <a href="" class="collapsible-header waves-effect">
                                 <i class="material-icons">info_outline</i>Справка
                             </a>
-
                         </li>
                     </ul>
                 </li>
@@ -144,8 +140,24 @@
         </ul>
     </header>
 
+    <!-- content -->
     <main class="workbase-container container">
         {% block main-content %}
+        <div class="row">
+            <div class="col s12 no-padding">
+                <div class="card">
+                    <div class="card-content">
+                        {% block card-title %}
+                        {% endblock card-title %}
+
+                        {% block card-content %}
+                        {% endblock card-content %}
+                    </div>
+                    {% block card-action %}
+                    {% endblock card-action %}
+                </div>
+            </div>
+        </div>
         {% endblock main-content %}
     </main>
 
@@ -156,12 +168,12 @@
 {% block script-content %}
 <script>
     $(document).ready(function () {
-        $(".sidenav").sidenav();
+        $('.sidenav').sidenav();
         $('.collapsible').collapsible();
     });
 </script>
 
-{% block script-page %}
-{% endblock script-page %}
+    {% block script-page %}
+    {% endblock script-page %}
 
 {% endblock script-content %}

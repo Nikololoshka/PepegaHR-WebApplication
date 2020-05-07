@@ -1,21 +1,25 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.core.handlers.wsgi import WSGIRequest
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods, require_GET, require_POST
+from django.utils.translation import gettext_lazy as _
 
-from .forms import SimpleQuestionnaireForm, QuestionnaireEditForm, SingleChooseForm
-from .models import Questionnaire, SingleChooseQuiz
+from .forms import SimpleQuestionnaireForm, QuestionnaireEditForm, SingleChooseForm, MultiChooseForm
+from .models import Questionnaire, SingleChooseQuiz, MultiChooseQuiz
+
+from apps.administration.permissions import required_moderator
 
 
 @login_required
+@required_moderator
 def test(request: WSGIRequest):
-
     return render(request, 'questionnaire/test.html', {
     })
 
 
 @login_required
+@required_moderator
 @require_http_methods(['GET', 'POST'])
 def drafts_page(request: WSGIRequest):
     """
@@ -48,12 +52,13 @@ def drafts_page(request: WSGIRequest):
 
 
 @login_required
+@required_moderator
 @require_http_methods(['GET', 'POST'])
 def draft_page(request: WSGIRequest, questionnaire_id: int):
     """
     Отображает текущий черновик теста.
     """
-    questionnaire = Questionnaire.objects.get(id=questionnaire_id)
+    questionnaire = get_object_or_404(Questionnaire, id=questionnaire_id)
 
     if request.method == 'POST':
         form = QuestionnaireEditForm(request.POST, instance=questionnaire)
@@ -75,26 +80,97 @@ def draft_page(request: WSGIRequest, questionnaire_id: int):
 
 
 @login_required
+@required_moderator
 @require_http_methods(['GET', 'POST'])
-def single_choose_create_page(request: WSGIRequest, questionnaire_id: int):
+def single_choose_page(request: WSGIRequest, questionnaire_id: int, quiz_id: int = -1):
     """
-    Создает вопрос с одним вариантом выбора ответа для теста.
+    Создает (редактирует) вопрос с одним вариантом выбора ответа для теста.
     """
+    instance = get_object_or_404(SingleChooseQuiz, id=quiz_id) if quiz_id != -1 else None
+
     if request.method == 'POST':
         # получение формы
-        form = SingleChooseForm(request.POST, questionnaire_id=questionnaire_id)
+        form = SingleChooseForm(request.POST, instance=instance, questionnaire_id=questionnaire_id)
         if form.is_valid():
             form.save()
 
             return redirect('questionnaire-draft-page', questionnaire_id=questionnaire_id)
 
-        else:
-            print(form.errors)
+    else:
+        form = SingleChooseForm(instance=instance)
+
+    return render(request, 'questionnaire/single_choose.html', {
+        'form': form,
+        'quiz_id': quiz_id if quiz_id != -1 else '',
+        'questionnaire_id': questionnaire_id,
+        'action': _('Добавить') if instance is None else _('Изменить'),
+        'title_action': _('Создание') if instance is None else _('Редактирование')
+    })
+
+
+@login_required
+@required_moderator
+@require_POST
+def single_choose_remove(request: WSGIRequest, questionnaire_id: int, quiz_id: int):
+    """
+    Удаляет вопрос с одним вариантом ответа из теста
+    """
+    questionnaire = get_object_or_404(Questionnaire, id=questionnaire_id)
+    quiz = get_object_or_404(questionnaire.single_quizzes, id=quiz_id)
+
+    quiz.delete()
+    questionnaire.recompute_order()
+
+    return redirect('questionnaire-draft-page', questionnaire_id=questionnaire_id)
+    
+
+@login_required
+@required_moderator
+@require_http_methods(['GET', 'POST'])
+def multi_choose_page(request: WSGIRequest, questionnaire_id: int, quiz_id: int = -1):
+    """
+    Создает (редактирует) вопрос с множестов вариантов выбора ответа для теста.
+    """
+    instance = get_object_or_404(MultiChooseQuiz, id=quiz_id) if quiz_id != -1 else None
+
+    if request.method == 'POST':
+        # получение формы
+        form = MultiChooseForm(request.POST, instance=instance, questionnaire_id=questionnaire_id)
+        if form.is_valid():
+            form.save()
+
+            return redirect('questionnaire-draft-page', questionnaire_id=questionnaire_id)
 
     else:
-        form = SingleChooseForm()
+        form = MultiChooseForm(instance=instance)
 
-    return render(request, 'questionnaire/single_choose_create.html', {
+    return render(request, 'questionnaire/multi_choose.html', {
         'form': form,
-        'questionnaire_id': questionnaire_id
+        'quiz_id': quiz_id if quiz_id != -1 else '',
+        'questionnaire_id': questionnaire_id,
+        'action': _('Добавить') if instance is None else _('Изменить'),
+        'title_action': _('Создание') if instance is None else _('Редактирование')
     })
+
+
+@login_required
+@required_moderator
+@require_POST
+def multi_choose_remove(request: WSGIRequest, questionnaire_id: int, quiz_id: int):
+    """
+    Удаляет вопрос с множестов вариантов выбора из ответа
+    """
+    questionnaire = get_object_or_404(Questionnaire, id=questionnaire_id)
+    quiz = get_object_or_404(questionnaire.multi_quizzes, id=quiz_id)
+
+    quiz.delete()
+    questionnaire.recompute_order()
+
+    return redirect('questionnaire-draft-page', questionnaire_id=questionnaire_id)
+
+
+def arbitrary_page(request: WSGIRequest, questionnaire_id: int, quiz_id: int = -1):
+    pass
+
+def arbitrary_remove_page(request: WSGIRequest, questionnaire_id: int, quiz_id: int):
+    pass

@@ -1,0 +1,63 @@
+{% extends 'workbase.html' %}
+{% load static %}
+
+<!-- header content -->
+{% block title-content %}PepegaHR: {{ title_action }} вопроса с свободной формой{% endblock title-content %}
+
+<!-- nav content -->
+{% block questionnaire-nav %}
+<li class="bold active">
+{% endblock questionnaire-nav %}
+
+{% block questionnaire-body-nav %}
+<div class="collapsible-body" style="display: block;">
+{% endblock questionnaire-body-nav %}
+
+<!-- Заголовок -->
+{% block card-title %}
+<div class="card-title">
+    <div class="row">
+        <div class="col s12">
+            {{ title_action }} вопроса с свободной формой
+        </div>
+    </div>
+</div>
+{% endblock card-title %}
+
+<!-- Контент -->
+{% block card-content %}
+    <!-- Ошибки -->
+    {% if form.errors %}
+    {% include 'patterns/errors.html' with errors=form.errors.values %}
+    {% endif %}
+    <!-- Создание вопроса -->
+    <div class="row no-padding">
+        <div class="col s12">
+            {% if quiz_id %}
+            <form action="{% url 'questionnaire-multi-choose-edit' questionnaire_id quiz_id %}" method="POST"
+                 enctype="multipart/form-data" id="single-choose-form">
+            {% else %}
+            <form action="{% url 'questionnaire-multi-choose-create' questionnaire_id %}" method="POST"
+                 enctype="multipart/form-data" id="single-choose-form">
+            {% endif %}
+                {% csrf_token %}
+                {% include 'questionnaire/forms/choose_quiz.html' with form=form type='MULTI' %}
+            </form>
+        </div>
+    </div>
+{% endblock card-content %}
+
+{% block card-action %}
+<div class="card-action">
+    <div>
+        <a href="{% url 'questionnaire-draft-page' questionnaire_id %}" class=" btn-flat waves-effect waves-light">Отмена</a>
+        <button form="single-choose-form" class="btn waves-effect waves-light" type="submit" >{{ action }}</button>
+    </div>
+</div>
+{% endblock card-action %}
+
+
+{% block script-page %}
+<script src="{% static '/questionnaire/js/choose_quiz.js' %}"></script>
+<script src="{% static '/questionnaire/js/multi_choose.js' %}"></script>
+{% endblock script-page %}

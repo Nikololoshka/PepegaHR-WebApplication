@@ -38,6 +38,14 @@ class Questionnaire(models.Model):
             list(self.arbitrary_quizzes.all())
         ]), key=lambda x: x.order)
 
+    def recompute_order(self):
+        """
+        Перевычисляет порядок вопросов в тесте.
+        """
+        for order, quiz in enumerate(self.get_quizzes_list()):
+            quiz.order = order
+            quiz.save()
+
 
 class SingleChooseQuiz(models.Model):
     """
@@ -45,10 +53,7 @@ class SingleChooseQuiz(models.Model):
     """  
     questionnaire = models.ForeignKey('Questionnaire', related_name='single_quizzes', on_delete=models.CASCADE)
     question = models.TextField(max_length=512)
-    
-    order = models.SmallIntegerField(default=0)
-    # right = models.SmallIntegerField(default=0)
-
+    order = models.SmallIntegerField(default=-1)
     right = models.OneToOneField('SingleChooseVariant', on_delete=models.SET_NULL, null=True)
 
     class Meta:
@@ -70,7 +75,7 @@ class SingleChooseVariant(models.Model):
     """  
     quiz = models.ForeignKey('SingleChooseQuiz', related_name='variants', on_delete=models.CASCADE)
     variant = models.TextField(max_length=256, blank=False)
-    order = models.SmallIntegerField(default=0, db_index=True)
+    order = models.SmallIntegerField(default=-1, db_index=True)
 
     class Meta:
         managed = True
@@ -79,18 +84,18 @@ class SingleChooseVariant(models.Model):
         ordering = ['order', 'variant']
 
 
-class MultiChooseeQuiz(models.Model):
+class MultiChooseQuiz(models.Model):
     """
     Модель вопроса с множеством вариантов ответа.
     """  
     questionnaire = models.ForeignKey('Questionnaire', related_name='multi_quizzes', on_delete=models.CASCADE)
     question = models.TextField(max_length=512)
-    order = models.SmallIntegerField(default=0)
+    order = models.SmallIntegerField(default=-1)
 
     class Meta:
         managed = True
-        verbose_name = 'MultiChooseeQuiz'
-        verbose_name_plural = 'MultiChooseeQuizzes'
+        verbose_name = 'MultiChooseQuiz'
+        verbose_name_plural = 'MultiChooseQuizzes'
     
     @staticmethod
     def get_quiz_type() -> str:
@@ -100,17 +105,20 @@ class MultiChooseeQuiz(models.Model):
         return Questionnaire.MULTI_QUIZ
 
 
-class MultiChooseeVariant(models.Model):
+class MultiChooseVariant(models.Model):
     """
     Вариант вопроса с множеством вариантов ответа.
     """  
-    quiz = models.ForeignKey('MultiChooseeQuiz', related_name='variants', on_delete=models.CASCADE)
+    quiz = models.ForeignKey('MultiChooseQuiz', related_name='variants', on_delete=models.CASCADE)
     variant = models.CharField(max_length=128)
+    order = models.SmallIntegerField(default=-1, db_index=True)
+    right = models.BooleanField(default=False)
 
     class Meta:
         managed = True
-        verbose_name = 'MultiChooseeVariant'
-        verbose_name_plural = 'MultiChooseeVariants'
+        verbose_name = 'MultiChooseVariant'
+        verbose_name_plural = 'MultiChooseVariants'
+        ordering = ['order', 'variant']
 
 
 class ArbitraryQuiz(models.Model):
@@ -119,7 +127,7 @@ class ArbitraryQuiz(models.Model):
     """  
     questionnaire = models.ForeignKey('Questionnaire', related_name='arbitrary_quizzes', on_delete=models.CASCADE)
     question = models.TextField(max_length=512)
-    order = models.SmallIntegerField(default=0)
+    order = models.SmallIntegerField(default=-1)
 
     class Meta:
         managed = True

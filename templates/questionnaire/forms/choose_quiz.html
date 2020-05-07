@@ -7,20 +7,24 @@
         <label for="{{ form.question.auto_id }}">{{ form.question.label }}</label>
     </div>
     <div class="col s12">
-        <table class="responsive-table">
+        <table>
             <thead>
                 <tr>
                     <th>Ответ</th>
                     <th>Вариант</th>
                 </tr>
             </thead>
-            <tbody class="form-row">
+            <tbody>
                 {% for right, variant in form.get_fields %}
-                <tr>
+                <tr class="form-row">
                     <td style="width: 20%;">
                         <div class="center-align">
                             <label>
-                                {{ right|add_class:"radio-checked filled-in" }}
+                                {% if type == 'SINGLE' %}
+                                    {{ right|add_class:"radio-checked with-gap"|attr:"type:radio" }}
+                                {% elif type == 'MULTI' %}
+                                    {{ right|add_class:"filled-in" }}
+                                {% endif %}
                                 <span></span>
                             </label>
                         </div>
@@ -31,10 +35,17 @@
                                 {{ variant|add_class:"materialize-textarea validate"|attr:"required" }}
                             </div>
                             <div>
+                                {% if forloop.last %}
                                 <button class="btn-flat tooltipped add-form-row" 
                                         data-position="bottom" data-tooltip="Добавить вариант">
                                     <i class="material-icons">add</i>
                                 </button>
+                                {% else %}
+                                <button class="btn-flat tooltipped remove-form-row" 
+                                        data-position="bottom" data-tooltip="Удалить">
+                                    <i class="material-icons">close</i>
+                                </button>
+                                {% endif %}
                             </div>
                         </div>
                     </td>
