@@ -1,11 +1,48 @@
-{% if user.is_authenticated %}
-    {% extends 'base.html' %}
-{% else %}
-    {% extends 'workbase.html' %}
-{% endif %}
-
+{% extends user.is_authenticated|yesno:'workbase.html, registration/base.html' %}
 {% load static %}
 
+{% block title-content %}PepegaHR: 403 ошибка{% endblock title-content %}
+
 {% block main-content %}
-403 ошибка
-{% endblock body-content %}
+<div class="row">
+    <div class="col s12 no-padding">
+        <div class="card">
+            <div class="card-content">
+                <div class="card-title">
+                    <div class="row">
+                        <div class="col s12">
+                            Отказано в доступе (403)
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col s12">
+                        <div class="card-image">
+                            <img src="{% static '403.jpg' %}" alt="">
+                        </div>
+                        
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col s12">
+                        <h6>
+                            Вы запросили страницу, доступ к которой ограничен специальными правами.
+                        </h6>
+                        <h6>
+                            Возможно, это закрытая группа или личные файлы пользователя.
+                        </h6>
+                    </div>
+                </div>
+            </div>
+            <div class="card-action right-align">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'home-page' %}" class="btn waves-effect waves-light">На главную</a>
+                {% else %}
+                    <a href="{% url 'start-page' %}" class="btn waves-effect waves-light">На главную</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock main-content %}

@@ -14,7 +14,7 @@ from apps.administration.permissions import required_moderator
 @login_required
 @required_moderator
 def test(request: WSGIRequest):
-    return render(request, 'questionnaire/test.html', {
+    return render(request, '403.html', {
     })
 
 
