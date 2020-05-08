@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title-content %}{{ project_name }}PepegaHR{% endblock title-content %}
+{% block title-content %}PepegaHR{% endblock title-content %}
 
 {% block head-content %}
 <link rel="stylesheet" href="{% static '/registration/css/style.css' %}">
@@ -35,14 +35,14 @@
                         <div class="card-title">Добро пожаловать, {{ user.get_full_name }}</div>
                     </div>
                     <div class="card-action">
-                        <a class="btn" href="{% url 'home-page' %}">Продолжить работу</a>
+                        <a class="btn waves-effect waves-light" href="{% url 'home-page' %}">Продолжить работу</a>
                     </div>
                     {% else %}
                     <div class="card-content">
                         <div class="card-title">Начни тестирование прямо сейчас!</div>
                     </div>
                     <div class="card-action">
-                        <a class="btn" href="{% url 'login' %}">Войти в систему</a>
+                        <a class="btn waves-effect waves-light" href="{% url 'login' %}">Войти в систему</a>
                     </div>
                     {% endif %}
                 </div>

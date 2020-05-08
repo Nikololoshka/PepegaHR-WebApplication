@@ -30,13 +30,15 @@
     {% if form.errors %}
     {% include 'patterns/errors.html' with errors=form.errors.values %}
     {% endif %}
-    <!-- Создание вопроса -->
+    <!-- Форма вопроса  -->
     <div class="row no-padding">
         <div class="col s12">
             {% if quiz_id %}
+            <!-- Редактируем -->
             <form action="{% url 'questionnaire-single-choose-edit' questionnaire_id quiz_id %}" method="POST"
                  enctype="multipart/form-data" id="single-choose-form">
             {% else %}
+            <!-- Создаем -->
             <form action="{% url 'questionnaire-single-choose-create' questionnaire_id %}" method="POST"
                  enctype="multipart/form-data" id="single-choose-form">
             {% endif %}

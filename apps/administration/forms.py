@@ -6,11 +6,14 @@ from django.conf import settings
 from .models import HRUser, Departament
 
 
-
-class HRUserBasicForm(forms.ModelForm):
+class HRUserForm(forms.ModelForm):
     """
-    Форма для редактирования пользователя.
+    Форма создания (редактирования) пользователя. 
     """
+    password = forms.CharField(widget=forms.PasswordInput(), \
+         label=_('Пароль'), required=True)
+    password_confirm = forms.CharField(widget=forms.PasswordInput(), \
+         label=_('Подтвердите пароль'), required=True)
 
     class Meta:
         model = HRUser
@@ -33,21 +36,21 @@ class HRUserBasicForm(forms.ModelForm):
             }
         }
 
-
-class HRUserCreateForm(HRUserBasicForm):
-    """
-    Форма создания пользователя. 
-    """
-    password = forms.CharField(widget=forms.PasswordInput(), \
-         label=_('Пароль'), required=True)
-    password_confirm = forms.CharField(widget=forms.PasswordInput(), \
-         label=_('Подтвердите пароль'), required=True)
+    def __init__(self, *args, **kwargs):
+        super(HRUserForm, self).__init__(*args, **kwargs)
+        
+        # если редактируем
+        if self.instance.id is not None:
+            self.fields['password'].label = _('Новый пароль')
+            self.fields['password'].required = False
+            self.fields['password_confirm'].label = _('Подтвердите новый пароль')
+            self.fields['password_confirm'].required = False
 
     def clean(self):
         """
         Валидация всей формы, в целом.
         """
-        cleaned_data = super(HRUserCreateForm, self).clean()
+        cleaned_data = super(HRUserForm, self).clean()
 
         password = cleaned_data.get('password')
         password_confirm = cleaned_data.get('password_confirm')
@@ -59,50 +62,14 @@ class HRUserCreateForm(HRUserBasicForm):
         """
         Сохранение созданой формы в БД.
         """
-        hr_user = super(HRUserCreateForm, self).save(commit=False)
+        hr_user = super(HRUserForm, self).save(commit=False)
         
-        password = self.cleaned_data['password']
-        hr_user.set_password(password)
-
-        if commit:
-            hr_user.save()
-
-        return hr_user
-
-
-class HRUserEditForm(HRUserBasicForm):
-    """
-    Форма редактирования формы.
-    """
-    password = forms.CharField(widget=forms.PasswordInput(), \
-         label=_('Новый пароль'), required=False)
-    password_confirm = forms.CharField(widget=forms.PasswordInput(), \
-         label=_('Подтвердите новый пароль'), required=False)
-
-    def clean(self):
-        """
-        Валидация всей формы, в целом.
-        """
-        cleaned_data = super(HRUserEditForm, self).clean()
-
-        password = cleaned_data.get('password')
-        password_confirm = cleaned_data.get('password_confirm')
-
-        if password != password_confirm:
-            raise forms.ValidationError(_('Пароли не совпадают'))
-
-    def save(self, commit=True):
-        """
-        Сохранение отредактированной формы в БД.
-        """
-        hr_user = super(HRUserEditForm, self).save(commit=False)
-        
-        password = self.cleaned_data['password']
-        if password is not None and password:
+        if hasattr(hr_user, 'password'):
+            if password is not None and password:
+                hr_user.set_password(password)
+        else:
+            password = self.cleaned_data['password']
             hr_user.set_password(password)
-
-            if settings.DEBUG:
-                print(f'Change password for {hr_user.id} to: {password}')
 
         if commit:
             hr_user.save()

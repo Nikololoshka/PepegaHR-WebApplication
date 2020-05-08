@@ -3,7 +3,7 @@ from django.forms import formset_factory, modelformset_factory
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
 
-from .models import Questionnaire, SingleChooseQuiz, SingleChooseVariant, MultiChooseQuiz, MultiChooseVariant
+from .models import Questionnaire, SingleChooseQuiz, SingleChooseVariant, MultiChooseQuiz, MultiChooseVariant, ArbitraryQuiz
 
 
 class SimpleQuestionnaireForm(forms.ModelForm):
@@ -340,3 +340,40 @@ class MultiChooseForm(forms.ModelForm):
                 i += 1
             else:
                 break
+
+
+class ArbitraryQuizForm(forms.ModelForm):
+    """
+    Форма для вопроса с свободной формой ответа.
+    """
+    questionnaire_id = None
+
+    class Meta:
+        model = ArbitraryQuiz
+        fields = ['question']
+        labels = {
+            'question': _('Вопрос')
+        }
+
+    def __init__(self, *args, **kwargs):
+        if 'questionnaire_id' in kwargs:
+            self.questionnaire_id = kwargs.pop('questionnaire_id')
+
+        super(ArbitraryQuizForm, self).__init__(*args, **kwargs)
+
+    def save(self, commit=True):
+        """
+        Сохраняет вопрос в БД.
+        """
+        quiz = super(ArbitraryQuizForm, self).save(commit=False)
+
+        if not hasattr(quiz, 'questionnaire'):
+            questionnaire = Questionnaire.objects.get(id=self.questionnaire_id)
+            quiz.questionnaire = questionnaire
+            quiz.order = len(questionnaire.get_quizzes_list())
+        
+        if commit:
+            quiz.save()
+
+        return quiz
+

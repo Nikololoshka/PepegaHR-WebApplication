@@ -13,22 +13,20 @@
 <div class="collapsible-body" style="display: block;">
 {% endblock profile-body-nav %}
 
-<!-- main content -->
-{% block main-content %}
-<div class="card">
-    <div class="card-content">
-        {% include 'profiles/profile_common.html' with hr_user=hr_user %}        
-        <div class="divider"></div>
-        <div class="row" style="margin-top: 20px;">
-            <div class="col s12 xl6">
-                {% if hr_user.last_visit %}
-                <h6>Последняя активность: {{ hr_user.last_visit|date:"H:i:s, d/m/Y" }}</h6>
-                {% else %}
-                <h6>Последняя активность: не было</h6>
-                {% endif %}
-            </div>
-        </div>
+
+{% block card-content %}
+
+{% include 'profiles/profile_common.html' with hr_user=hr_user %}        
+<div class="divider"></div>
+<div class="row" style="margin-top: 20px;">
+    <div class="col s12 xl6">
+        {% if hr_user.last_visit %}
+        <h6>Последняя активность: {{ hr_user.last_visit|date:"H:i:s, d/m/Y" }}</h6>
+        {% else %}
+        <h6>Последняя активность: не было</h6>
+        {% endif %}
     </div>
 </div>
 
-{% endblock main-content %}
+{% endblock card-content %}
+

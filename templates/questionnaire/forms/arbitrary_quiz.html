@@ -1,0 +1,8 @@
+{% load widget_tweaks %}
+
+<div class="row" style="margin-bottom: 0;">
+    <div class="input-field col s12">
+        {{ form.question|add_class:"materialize-textarea validate" }}
+        <label for="{{ form.question.auto_id }}">{{ form.question.label }}</label>
+    </div>
+</div>

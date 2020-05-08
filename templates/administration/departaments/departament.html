@@ -4,10 +4,6 @@
 <!-- header content -->
 {% block title-content %}PepegaHR: {{ departament.name }}{% endblock title-content %}
 
-{% block head-page %}
-<!-- <link rel="stylesheet" href="{% static '/administration/css/.css' %}"> -->
-{% endblock head-page %}
-
 <!-- nav content -->
 {% block admin-nav %}
 <li class="bold active">
@@ -20,13 +16,16 @@
 
 <!-- main content -->
 {% block main-content %}
-<div class="card">
-    <div class="card-content">
-        <div class="card-title">
-            <div class="row" >
+
+<div class="row">
+    <div class="col s12 no-padding">
+        <div class="card">
+            <div class="card-content">
                 <div class="stretch-container">
                     <div class="stretch-left">
-                        {{ departament.name }}
+                        <div class="card-title">
+                            {{ departament.name }}
+                        </div>
                     </div>
                     <div class="stretch-right">
                         <a href="#edit-modal" class="btn waves-effect waves-light modal-trigger">
@@ -38,79 +37,65 @@
         </div>
     </div>
 </div>
-<div class="card">
-    <div class="card-content">
-        <div class="card-title">
-            <div class="row">
-                <div class="col s12 no-padding">
-                    <p>Участники 
-                        {% if page.object_list %}
-                        {{ page.object_list.all.count }}
-                        {% endif %}
-                    </p>
-                </div>
-            </div>
-        </div>
-        <form action="{% url 'admin-departament-user-remove' departament.id %}" method="POST" id="remove-user-form">
-            {% csrf_token %}
-        </form>
-        <div class="row">
-        {% if page.object_list %}
-            <div class="collection">
-                {% for hr_user in page.object_list %}
-                <a href="{% url 'profile-page' hr_user.id %}" class="collection-item black-text waves-effect"> 
-                    <div class="stretch-container valign-wrapper">
-                        <div class="stretch-left">      
-                            <div style="display: inline-block; margin-right: 1rem;">
-                                <img src="{{ hr_user.photo.url }}" alt="" class="circle" style="max-width: 48px;">
-                            </div>
-                            <div style="display: inline-block;">
-                                <p style="font-size: large;">{{ hr_user.get_full_name_reverse }}</p>
-                                <p>{{ hr_user.get_role_display }}</p>
-                            </div>
-                        </div>
-                        <div class="stretch-right">
-                            <button class="btn-flat tooltipped" data-position="bottom" data-tooltip="Удалить" 
-                                    name="user_id" value="{{ hr_user.id }}" form="remove-user-form">
-                                <i class="material-icons">clear</i>
-                            </button>
+
+<div class="row">
+    <div class="col s12 no-padding">
+        <div class="card">
+            <div class="card-content">
+                <div class="card-title">
+                    <div class="row">
+                        <div class="col s12">
+                            <p>Участники 
+                                {% if page.object_list %}
+                                {{ page.object_list.all.count }}
+                                {% endif %}
+                            </p>
                         </div>
                     </div>
-                </a>
-                {% endfor %}
-            </div>
+                </div>
 
-            <!-- pagination -->
-            <ul class="pagination right-align">
-                {% if page.has_previous %}
-                <li class="waves-effect">
-                    <a href="?page={{ page.previous_page_number }}">
-                        <i class="material-icons">chevron_left</i>
-                    </a>
-                </li>
-                <li class="waves-effect"><a href="#!">{{ page.previous_page_number }}</a></li>
-                {% else %}
-                <li class="disabled"><a href="#"><i class="material-icons">chevron_left</i></a></li>
-                {% endif %}
-                
-                <li class="waves-effect active"><a href="{% url 'admin-users-page' %}?page={{ page.number }}">{{ page.number }}</a></li>
-    
-                {% if page.has_next %}
-                <li class="waves-effect">
-                    <a href="###############">
-                        <i class="material-icons">chevron_right</i>
-                    </a>
-                </li>
-                <li class="waves-effect"><a href="#!">{{ page.next_page_number }}</a></li>
-                {% else %}
-                <li class="disabled"><a href="#!"><i class="material-icons">chevron_right</i></a></li>
-                {% endif %}
-            </ul> 
-        {% else %}
-            <div class="divider"></div>
-            <div class="center empty-list">Список пуст</div>
-            <div class="divider"></div>
-        {% endif %}
+                <form action="{% url 'admin-departament-user-remove' departament.id %}" method="POST" id="remove-user-form">
+                    {% csrf_token %}
+                </form>
+
+                <div class="row no-padding">
+                    <div class="col s12"> 
+                        {% if page.object_list %}
+                        <div class="collection">
+                            {% for hr_user in page.object_list %}
+                            <a href="{% url 'profile-page' hr_user.id %}" class="collection-item black-text waves-effect"> 
+                                <div class="stretch-container valign-wrapper">
+                                    <div class="stretch-left">      
+                                        <div style="display: inline-block; margin-right: 1rem;">
+                                            <img src="{{ hr_user.photo.url }}" alt="" class="circle" style="max-width: 48px;">
+                                        </div>
+                                        <div style="display: inline-block;">
+                                            <p style="font-size: large;">{{ hr_user.get_full_name_reverse }}</p>
+                                            <p>{{ hr_user.get_role_display }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="stretch-right">
+                                        <button class="btn-flat waves-effect waves-light tooltipped" data-position="bottom" data-tooltip="Удалить" 
+                                                name="user_id" value="{{ hr_user.id }}" form="remove-user-form">
+                                            <i class="material-icons">clear</i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </a>
+                            {% endfor %}
+                        </div>
+            
+                        <!-- pagination -->
+                        {% include 'patterns/pagination.html' with page=page %}
+
+                        {% else %}
+                        <div class="divider"></div>
+                        <div class="center empty-list">Список пуст</div>
+                        <div class="divider"></div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -135,9 +120,9 @@
         </div>
     </div>
     <div class="modal-footer right-align">
-        <a class="modal-close btn-flat waves-effect">Отмена</a>
-        <button class="modal-close btn-flat red-text waves-effect" form="remove-group" type="submit">Удалить группу</button>
-        <button class="modal-close btn waves-effect" form="edit-group" type="submit">Изменить</button>
+        <a class="modal-close btn-flat waves-effect waves-light">Отмена</a>
+        <button class="modal-close btn-flat red-text waves-effect waves-light" form="remove-group" type="submit">Удалить группу</button>
+        <button class="modal-close btn waves-effect waves-light" form="edit-group" type="submit">Изменить</button>
     </div>
 </div>
 

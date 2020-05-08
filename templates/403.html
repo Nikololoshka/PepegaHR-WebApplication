@@ -1,6 +1,11 @@
-{% extends 'base.html' %}
+{% if user.is_authenticated %}
+    {% extends 'base.html' %}
+{% else %}
+    {% extends 'workbase.html' %}
+{% endif %}
+
 {% load static %}
 
-{% block body-content %}
-403 
+{% block main-content %}
+403 ошибка
 {% endblock body-content %}

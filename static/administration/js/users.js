@@ -7,4 +7,7 @@ $(document).ready(function(){
             $('.modal-username').text(trigger.dataset['username']);
         }
     });
+    $('.collapsible.expandable').collapsible({
+        'accordion': false
+    });
 });

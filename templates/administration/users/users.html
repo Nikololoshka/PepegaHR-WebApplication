@@ -4,10 +4,6 @@
 <!-- header content -->
 {% block title-content %}PepegaHR: Пользователи{% endblock title-content %}
 
-{% block head-page %}
-<link rel="stylesheet" href="{% static '/administration/css/users.css' %}">
-{% endblock head-page %}
-
 <!-- nav content -->
 {% block admin-nav %}
 <li class="bold active">
@@ -21,53 +17,54 @@
 <li class="active">
 {% endblock admin-users-nav %}
 
-<!-- main content -->
-{% block main-content %}
-<div class="card">
-    <div class="card-content">
-        <div class="card-title">
-            <div class="row" >
-                <div class="stretch-container">
-                    <div class="stretch-left">
-                        Список пользователей
-                    </div>
-                    <div class="stretch-right">
-                        <a href="{% url 'admin-user-create' %}" class="btn waves-effect waves-light">
-                            <i class="material-icons right">add</i>Добавить пользователя
-                        </a>
-                    </div>
-                </div>
-            </div>
-            <div class="row valign-wrapper">
-                <div class="col s12 no-padding">
-                    <form class="valign-wrapper" style="display: flex;">
-                        <div class="input-field" style="width: 100%; flex-grow: 1; margin: 0px;">
-                            <input  disabled type="text" placeholder="Поиск">
-                        </div>
-                        <button class="btn-flat disabled" type="submit">
-                            <i class="material-icons">search</i>
-                        </button>
-                        <!-- dropdown trigger -->
-                        <a href="#" class="dropdown-trigger btn waves-effect waves-light disabled" style="min-width: 10rem;" data-target="dropdownfilter">
-                            <i class="material-icons right">filter_list</i>Фильтр
-                        </a>
-                        <!-- dropdown structure -->
-                        <ul id='dropdownfilter' class='dropdown-content'>
-                            <li><a href="#!">one</a></li>
-                            <li><a href="#!">two</a></li>
-                            <li class="divider" tabindex="-1"></li>
-                        </ul>
-                    </form>
-                </div>
-            </div>
-        </div>
 
+{% block card-title %}
+<div class="stretch-container">
+    <div class="stretch-left">
+        <div class="card-title">
+            Список пользователей
+        </div>
+    </div>
+    <div class="stretch-right">
+        <a href="{% url 'admin-user-create' %}" class="btn waves-effect waves-light">
+            <i class="material-icons right">add</i>Добавить пользователя
+        </a>
+    </div>
+</div>
+{% endblock card-title %}
+
+{% block card-content %}
+<div class="row">
+    <div class="col s12">
+        <form class="valign-wrapper" style="display: flex;">
+            <div class="input-field" style="width: 100%; flex-grow: 1; margin: 0px;">
+                <input  disabled type="text" placeholder="Поиск">
+            </div>
+            <button class="btn-flat waves-effect waves-light disabled" type="submit">
+                <i class="material-icons">search</i>
+            </button>
+            <!-- dropdown trigger -->
+            <a href="#" class="dropdown-trigger btn waves-effect waves-light disabled" style="min-width: 10rem;" data-target="dropdownfilter">
+                <i class="material-icons right">filter_list</i>Фильтр
+            </a>
+            <!-- dropdown structure -->
+            <ul id='dropdownfilter' class='dropdown-content'>
+                <li><a href="#!">one</a></li>
+                <li><a href="#!">two</a></li>
+                <li class="divider" tabindex="-1"></li>
+            </ul>
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col s12">
         {% if page.object_list %}
-        <ul class="collapsible z-depth-0">
+        <ul class="collapsible expandable z-depth-0">
             {% for hr_user in page.object_list %}
             <li>
-                <div class="collapsible-header waves-effect row" style="margin-bottom: 0em;">
-                    <div class="col s10 m11 valign-wrapper">          
+                <div class="collapsible-header waves-effect row" style="margin: 0;">
+                    <div class="col s10 m11 valign-wrapper no-padding">          
                         <div style="display: inline-block; margin-right: 1rem;">
                             <img src="{{ hr_user.photo.url }}" alt="" class="circle" style="max-width: 48px;">
                         </div>
@@ -116,56 +113,36 @@
                             </p>
                         </div>
                     </div>
+
                     <div class="divider" style="margin-bottom: 1em;"></div>
+
                     <div class="row" style="margin-bottom: 0em;">
-                        <div class="s12 stretch-container">
-                            <div class="stretch-left">
-                                <a href="{% url 'profile-page' hr_user.id %}" class="btn-flat waves-effect waves-light">Профиль</a>
-                            </div>
-                            <div class="stretch-right">
-                                <a href="{% url 'admin-user-edit' hr_user.id %}" class="btn-flat waves-effect waves-light">Изменить</a>
-                                <a href="#remove-modal" data-id='{{ hr_user.id }}' data-username='{{ hr_user.get_full_name }}'
-                                    class="btn-flat red-text waves-effect waves-light modal-trigger">Удалить</a>
+                        <div class="col s12">
+                            <div class="stretch-container">
+                                <div class="stretch-left">
+                                    <a href="{% url 'profile-page' hr_user.id %}" class="btn-flat waves-effect waves-light">Профиль</a>
+                                </div>
+                                <div class="stretch-right">
+                                    <a href="#remove-modal" data-id='{{ hr_user.id }}' data-username='{{ hr_user.get_full_name }}'
+                                        class="btn-flat red-text waves-effect waves-light modal-trigger">Удалить</a>
+                                    <a href="{% url 'admin-user-edit' hr_user.id %}" class="btn-flat waves-effect waves-light">Редактировать</a>
+                                </div>
                             </div>
                         </div>
-
                     </div>
                 </div>
             </li>
             {% endfor %}
-        </ul>   
+        </ul>
+
         <!-- pagination -->
-        <ul class="pagination right-align">
-            {% if page.has_previous %}
-            <li class="waves-effect">
-                <a href="?page={{ page.previous_page_number }}">
-                    <i class="material-icons">chevron_left</i>
-                </a>
-            </li>
-            <li class="waves-effect"><a href="#!">{{ page.previous_page_number }}</a></li>
-            {% else %}
-            <li class="disabled"><a href="#"><i class="material-icons">chevron_left</i></a></li>
-            {% endif %}
-            
-            <li class="waves-effect active"><a href="{% url 'admin-users-page' %}?page={{ page.number }}">{{ page.number }}</a></li>
+        {% include 'patterns/pagination.html' with page=page %}
 
-            {% if page.has_next %}
-            <li class="waves-effect">
-                <a href="###############">
-                    <i class="material-icons">chevron_right</i>
-                </a>
-            </li>
-            <li class="waves-effect"><a href="#!">{{ page.next_page_number }}</a></li>
-            {% else %}
-            <li class="disabled"><a href="#!"><i class="material-icons">chevron_right</i></a></li>
-            {% endif %}
-        </ul> 
-
-        {% else %}
-            <div class="divider"></div>
-            <div class="center empty-list">Список пуст</div>
-            <div class="divider"></div>
-        {% endif %}
+    {% else %}
+        <div class="divider"></div>
+        <div class="center empty-list">Список пуст</div>
+        <div class="divider"></div>
+    {% endif %}
     </div>
 </div>
 
@@ -181,14 +158,15 @@
     <div class="modal-footer right-align">
         <form action="{% url 'admin-user-remove' %}" method="POST" >
             {% csrf_token %}
-            <a class="modal-close btn-flat waves-effect waves-green">Отмена</a>
+            <a class="modal-close btn-flat waves-effect waves-light">Отмена</a>
             <input type="hidden" name="id" value="-1" class="modal-id">
-            <button class="modal-close btn-flat red-text waves-effect waves-green" type="submit">Удалить</button>
+            <button class="modal-close btn-flat red-text waves-effect waves-light" type="submit">Удалить</button>
         </form>
     </div>
 </div>
 
-{% endblock main-content %}
+{% endblock card-content %}
+
 
 {% block script-page %}
 <script src="{% static '/administration/js/users.js' %}"></script>

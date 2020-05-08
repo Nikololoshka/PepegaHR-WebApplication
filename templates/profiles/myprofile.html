@@ -17,72 +17,72 @@
 <li class="active">
 {% endblock profile-myprofile-nav %}
 
-<!-- main content -->
-{% block main-content %}
-<div class="card">
-    <div class="card-content">
-        {% for error in hr_form.errors %}
-        <p>{{ error }}</p>
-        {% endfor %}
-        {% include 'profiles/profile_common.html' with hr_user=user %}       
-        <div class="divider"></div>
-        <div class="row" style="margin-top: 20px;">
-            <div class="col s12 offset-xl6 xl6 right-align">
-                <button class="waves-effect waves-light btn edit-button">
-                    <i class="material-icons left">edit</i>Редактировать профиль
-                </button>
-            </div>
-        </div>
-        <div class="row">
-            <ul class="collapsible edit-row z-depth-0">
-                <li>
-                    <div class="collapsible-body">
-                        <form action="{% url 'my-profile' %}" method="POST" id="profile-edit-form">
-                            {% csrf_token %}
 
-                            <div class="row" style="margin-bottom: 0;">
-                                <div class="input-field col s12 xl6">
-                                    <i class="material-icons prefix">assignment_ind</i>
-                                    {{ profile_form.username }}
-                                    <span class="helper-text" data-error="Не правильный формат поля"></span>
-                                    <label for="{{ profile_form.username.auto_id }}">{{ profile_form.username.label }}</label>
-                                </div>
-                                <div class="input-field col s12 xl6">
-                                    <i class="material-icons prefix">email</i>
-                                    {{ profile_form.email }}
-                                    <span class="helper-text" data-error="Не правильный формат поля"></span>
-                                    <label for="{{ profile_form.email.auto_id }}">{{ profile_form.email.label }}</label>
-                                </div>
-                            </div>
+{% block card-content %}
 
-                            <div class="row" style="margin-bottom: 0;">
-                                <div class="input-field col s12 xl6">
-                                    <i class="material-icons prefix">lock</i>
-                                    {{ profile_form.password }}
-                                    <label for="{{ profile_form.password.auto_id }}">{{ profile_form.password.label }}</label>
-                                </div>
-                                <div class="input-field col s12 xl6">
-                                    <i class="material-icons prefix">lock</i>
-                                    {{ profile_form.password_confirm }}
-                                    <label for="{{ profile_form.password_confirm.auto_id }}">{{ profile_form.password_confirm.label }}</label>
-                                    <span class="helper-text" data-error="Пароли не совпадают"></span>
-                                </div>
-                            </div>
+{% if hr_form.errors %}
+{% include 'patterns/errors.html' with errors=hr_form.errors.values %}
+{% endif %}
 
-                            <div class="row">
-                                <div class="col s12 right-align">
-                                    <button class="waves-effect waves-light btn" type="submit">Изменить</button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </li>
-            </ul>
-        </div>
+{% include 'profiles/profile_common.html' with hr_user=user %}       
+<div class="divider"></div>
+<div class="row" style="margin-top: 20px;">
+    <div class="col s12 offset-xl6 xl6 right-align">
+        <button class="btn waves-effect waves-light edit-button">
+            <i class="material-icons left">edit</i>Редактировать профиль
+        </button>
     </div>
 </div>
 
-{% endblock main-content %}
+<div class="row">
+    <ul class="collapsible edit-row z-depth-0">
+        <li>
+            <div class="collapsible-body">
+                <form action="{% url 'my-profile' %}" method="POST" id="profile-edit-form">
+                    {% csrf_token %}
+
+                    <div class="row" style="margin-bottom: 0;">
+                        <div class="input-field col s12 xl6">
+                            <i class="material-icons prefix">assignment_ind</i>
+                            {{ profile_form.username }}
+                            <span class="helper-text" data-error="Не правильный формат поля"></span>
+                            <label for="{{ profile_form.username.auto_id }}">{{ profile_form.username.label }}</label>
+                        </div>
+                        <div class="input-field col s12 xl6">
+                            <i class="material-icons prefix">email</i>
+                            {{ profile_form.email }}
+                            <span class="helper-text" data-error="Не правильный формат поля"></span>
+                            <label for="{{ profile_form.email.auto_id }}">{{ profile_form.email.label }}</label>
+                        </div>
+                    </div>
+
+                    <div class="row" style="margin-bottom: 0;">
+                        <div class="input-field col s12 xl6">
+                            <i class="material-icons prefix">lock</i>
+                            {{ profile_form.password }}
+                            <label for="{{ profile_form.password.auto_id }}">{{ profile_form.password.label }}</label>
+                        </div>
+                        <div class="input-field col s12 xl6">
+                            <i class="material-icons prefix">lock</i>
+                            {{ profile_form.password_confirm }}
+                            <label for="{{ profile_form.password_confirm.auto_id }}">{{ profile_form.password_confirm.label }}</label>
+                            <span class="helper-text" data-error="Пароли не совпадают"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col s12 right-align">
+                            <button class="btn waves-effect waves-light" type="submit">Изменить</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </li>
+    </ul>
+</div>
+
+{% endblock card-content %}
+
 
 {% block script-page %}
 <script type="text/javascript" src="{% static '/profiles/js/userprofile.js' %}"></script>

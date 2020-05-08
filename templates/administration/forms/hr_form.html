@@ -1,23 +1,25 @@
-<div class="row valign-wrapper" style="margin-bottom: 0rem; display: flex;">
-    <div class="file-field input-field" style="width: 100%; flex-grow: 1;">
-        <div class="btn">
-            <span><i class="material-icons">add_a_photo</i></span>
-            <input type="file" id="{{ form.photo.auto_id }}" class="profile_image"
-                   accept="image/*" name="{{ form.photo.name }}">
-            <input type="hidden" id="photo_old" class="profile_image_old">
+<div class="row valign-wrapper" style="margin-bottom: 0rem;">
+    <div class="col s12" style="display: flex;">
+        <div class="file-field input-field" style="width: 100%; flex-grow: 1;">
+            <div class="btn waves-effect waves-light">
+                <span><i class="material-icons">add_a_photo</i></span>
+                <input type="file" id="{{ form.photo.auto_id }}" class="profile_image"
+                    accept="image/*" name="{{ form.photo.name }}">
+                <input type="hidden" id="photo_old" class="profile_image_old">
+            </div>
+            <div class="file-path-wrapper" >
+                <input class="file-path validate" type="text"
+                    value="{{ form.photo.value }}">
+            </div>
         </div>
-        <div class="file-path-wrapper" >
-            <input class="file-path validate" type="text"
-                   value="{{ form.photo.value }}">
-        </div>
+        <a class="circle remove-photo" href="#" data-default="/media/user-photos/default.png">
+            {% if form.instance %}
+            <img src="{{ form.instance.photo.url }}" class="circle image-preview" alt="">
+            {% else %}
+            <img src="/media/user-photos/default.png" class="circle image-preview" alt="">
+            {% endif %}
+        </a>
     </div>
-    <a class="circle remove-photo" href="#" data-default="/media/user-photos/default.png">
-        {% if form.instance %}
-        <img src="{{ form.instance.photo.url }}" class="circle image-preview" alt="">
-        {% else %}
-        <img src="/media/user-photos/default.png" class="circle image-preview" alt="">
-        {% endif %}
-    </a>
 </div>
 
 <div class="row" style="margin-bottom: 0rem;">

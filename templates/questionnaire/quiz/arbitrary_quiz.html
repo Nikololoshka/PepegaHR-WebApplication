@@ -30,18 +30,20 @@
     {% if form.errors %}
     {% include 'patterns/errors.html' with errors=form.errors.values %}
     {% endif %}
-    <!-- Создание вопроса -->
+    <!-- Форма вопроса -->
     <div class="row no-padding">
         <div class="col s12">
             {% if quiz_id %}
-            <form action="{% url 'questionnaire-multi-choose-edit' questionnaire_id quiz_id %}" method="POST"
+            <!-- Редактируем -->
+            <form action="{% url 'questionnaire-arbitrary-edit' questionnaire_id quiz_id %}" method="POST"
                  enctype="multipart/form-data" id="single-choose-form">
             {% else %}
-            <form action="{% url 'questionnaire-multi-choose-create' questionnaire_id %}" method="POST"
+            <!-- Создаем -->
+            <form action="{% url 'questionnaire-arbitrary-create' questionnaire_id %}" method="POST"
                  enctype="multipart/form-data" id="single-choose-form">
             {% endif %}
                 {% csrf_token %}
-                {% include 'questionnaire/forms/choose_quiz.html' with form=form type='MULTI' %}
+                {% include 'questionnaire/forms/arbitrary_quiz.html' with form=form %}
             </form>
         </div>
     </div>
@@ -55,9 +57,3 @@
     </div>
 </div>
 {% endblock card-action %}
-
-
-{% block script-page %}
-<script src="{% static '/questionnaire/js/choose_quiz.js' %}"></script>
-<script src="{% static '/questionnaire/js/multi_choose.js' %}"></script>
-{% endblock script-page %}

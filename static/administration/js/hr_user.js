@@ -1,18 +1,17 @@
-$(document).ready(function(){
+$(document).ready(function() {
     $('.tooltipped').tooltip();
     $('select').formSelect();
 
     $(".profile_image").change(function() {
-        // $('.profile_image').val('');
         readURL(this);
     });
 
-    $('#password, #confirm_password').on('keyup', function () {
-        correctPassword();
+    $('#id_password, #id_password_confirm').on('keyup', function () {
+        correctPassword('#id_password', '#id_password_confirm');
     });
 
     $('#edit-user-form').on('submit', function () { 
-        return validPassword();
+        return validPassword('#id_password', '#id_password_confirm');
     });
 
     $('.remove-photo').on('click', function (e) {
@@ -24,17 +23,33 @@ $(document).ready(function(){
    });
 });
 
-function correctPassword() {
-    var first_el = $('#password');
-    var second_el = $('#confirm_password');
+function correctPassword(id_password, id_confirm_password) {
+    var first_el = $(id_password);
+    var second_el = $(id_confirm_password);
+
     var first = first_el.val();
     var second = second_el.val();
 
-    if (first == second && !(first === "" || second === "")) {
+    console.log(first);
+    console.log(second);
+
+    if (first === "" && second === "") {
+        first_el.removeClass('invalid').removeClass('valid');
+        second_el.removeClass('invalid').removeClass('valid');
+
+        return true;
+    }
+
+    if (first === second) {
+        first_el.removeClass('invalid').addClass('valid');
         second_el.removeClass('invalid').addClass('valid');
+
         return true;
     } 
+
+    first_el.removeClass('valid').addClass('invalid');
     second_el.removeClass('valid').addClass('invalid');
+
     return false;
 };
 
@@ -48,16 +63,19 @@ function readURL(input) {
     }
 };
 
-function validPassword() {
-    var first_el = $('#password');
-    var second_el = $('#confirm_password');
+function validPassword(id_password, id_confirm_password) {
+    var first_el = $(id_password);
+    var second_el = $(id_confirm_password);
     var first = first_el.val();
     var second = second_el.val();
 
     if (first === second) {
+        first_el.removeClass('invalid').addClass('valid');
         second_el.removeClass('invalid').addClass('valid');
         return true;
     } 
+    first_el.removeClass('valid').addClass('invalid');
     second_el.removeClass('valid').addClass('invalid');
+
     return false;
 }
