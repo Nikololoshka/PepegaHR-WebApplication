@@ -11,29 +11,49 @@ PepegaHR-WebApplication - веб-приложение для прохожден�
 
 ### Установка
 1. Virtual Environments (не обязательный шаг)
+
     a. Создание venv
-    ```console
+    ```
     $ python -m venv .\venv         <-- Windows
     $ python -m venv ./venv         <-- Linux  
     ```
+    
     b. Активация venv
-    ```console
+    ```
     $ venv\Scripts\activate.bat     <-- Windows
     $ source venv/bin/activate      <-- Linux
     ```
 2. Установка модулей
-```console
-    $ python -m pip install -r requirements.txt        
+```
+$ python -m pip install -r requirements.txt        
 ```
 
 ### Запуск
 1. Инициализация БД (требуется только перед первым запуском)
-```console
-    $ python manage.py makemigrations 
-    $ python manage.py migrate 
 ```
+$ python manage.py makemigrations 
+$ python manage.py migrate 
+```
+    
 2. Старт сервера
-```console
-    $ python manage.py 127.0.0.1:8000
 ```
-### Примеры
+$ python manage.py 127.0.0.1:8000
+```
+    
+### Скриншоты
+
+| Профиль                              |
+| ---                                  |
+| ![Screenshot 1](./screenshots/1.PNG) | 
+
+| Просмотр пользователей               |
+| ---                                  |
+| ![Screenshot 2](./screenshots/2.PNG) |
+
+| Редактирование пользователя          |
+| ---                                  |
+| ![Screenshot 3](./screenshots/3.PNG) |
+
+| Редактирование теста                 |
+| ---                                  |
+| ![Screenshot 4](./screenshots/4.PNG) |
