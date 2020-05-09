@@ -35,50 +35,52 @@
 </div>
 
 <div class="row">
-    <ul class="collapsible edit-row z-depth-0">
-        <li>
-            <div class="collapsible-body">
-                <form action="{% url 'my-profile' %}" method="POST" id="profile-edit-form">
-                    {% csrf_token %}
+    <div class="col s12">
+        <ul class="collapsible edit-row z-depth-0">
+            <li>
+                <div class="collapsible-body">
+                    <form action="{% url 'my-profile' %}" method="POST" id="profile-edit-form">
+                        {% csrf_token %}
 
-                    <div class="row" style="margin-bottom: 0;">
-                        <div class="input-field col s12 xl6">
-                            <i class="material-icons prefix">assignment_ind</i>
-                            {{ profile_form.username }}
-                            <span class="helper-text" data-error="Не правильный формат поля"></span>
-                            <label for="{{ profile_form.username.auto_id }}">{{ profile_form.username.label }}</label>
+                        <div class="row" style="margin-bottom: 0;">
+                            <div class="input-field col s12 xl6">
+                                <i class="material-icons prefix">assignment_ind</i>
+                                {{ profile_form.username }}
+                                <span class="helper-text" data-error="Не правильный формат поля"></span>
+                                <label for="{{ profile_form.username.auto_id }}">{{ profile_form.username.label }}</label>
+                            </div>
+                            <div class="input-field col s12 xl6">
+                                <i class="material-icons prefix">email</i>
+                                {{ profile_form.email }}
+                                <span class="helper-text" data-error="Не правильный формат поля"></span>
+                                <label for="{{ profile_form.email.auto_id }}">{{ profile_form.email.label }}</label>
+                            </div>
                         </div>
-                        <div class="input-field col s12 xl6">
-                            <i class="material-icons prefix">email</i>
-                            {{ profile_form.email }}
-                            <span class="helper-text" data-error="Не правильный формат поля"></span>
-                            <label for="{{ profile_form.email.auto_id }}">{{ profile_form.email.label }}</label>
-                        </div>
-                    </div>
 
-                    <div class="row" style="margin-bottom: 0;">
-                        <div class="input-field col s12 xl6">
-                            <i class="material-icons prefix">lock</i>
-                            {{ profile_form.password }}
-                            <label for="{{ profile_form.password.auto_id }}">{{ profile_form.password.label }}</label>
+                        <div class="row" style="margin-bottom: 0;">
+                            <div class="input-field col s12 xl6">
+                                <i class="material-icons prefix">lock</i>
+                                {{ profile_form.password }}
+                                <label for="{{ profile_form.password.auto_id }}">{{ profile_form.password.label }}</label>
+                            </div>
+                            <div class="input-field col s12 xl6">
+                                <i class="material-icons prefix">lock</i>
+                                {{ profile_form.password_confirm }}
+                                <label for="{{ profile_form.password_confirm.auto_id }}">{{ profile_form.password_confirm.label }}</label>
+                                <span class="helper-text" data-error="Пароли не совпадают"></span>
+                            </div>
                         </div>
-                        <div class="input-field col s12 xl6">
-                            <i class="material-icons prefix">lock</i>
-                            {{ profile_form.password_confirm }}
-                            <label for="{{ profile_form.password_confirm.auto_id }}">{{ profile_form.password_confirm.label }}</label>
-                            <span class="helper-text" data-error="Пароли не совпадают"></span>
-                        </div>
-                    </div>
 
-                    <div class="row">
-                        <div class="col s12 right-align">
-                            <button class="btn waves-effect waves-light" type="submit">Изменить</button>
+                        <div class="row">
+                            <div class="col s12 right-align">
+                                <button class="btn waves-effect waves-light" type="submit">Изменить</button>
+                            </div>
                         </div>
-                    </div>
-                </form>
-            </div>
-        </li>
-    </ul>
+                    </form>
+                </div>
+            </li>
+        </ul>
+    </div>
 </div>
 
 {% endblock card-content %}
