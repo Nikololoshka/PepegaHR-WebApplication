@@ -12,10 +12,8 @@ from apps.administration.permissions import required_moderator
 
 
 @login_required
-@required_moderator
-def test(request: WSGIRequest):
-    return render(request, '404.html', {
-    })
+def publications_page(request: WSGIRequest):
+    return render(request, 'questionnaire/publications.html')
 
 
 @login_required
@@ -53,29 +51,59 @@ def drafts_page(request: WSGIRequest):
 
 @login_required
 @required_moderator
-@require_http_methods(['GET', 'POST'])
-def draft_page(request: WSGIRequest, questionnaire_id: int):
+@require_GET
+def survey_page(request: WSGIRequest, questionnaire_id: int):
     """
     Отображает текущий черновик теста.
     """
     questionnaire = get_object_or_404(Questionnaire, id=questionnaire_id)
 
-    if request.method == 'POST':
-        form = QuestionnaireEditForm(request.POST, instance=questionnaire)
-        if form.is_valid():
-            questionnaire = form.save()
-            form = QuestionnaireEditForm(instance=questionnaire)
-
-    else:
-        form = QuestionnaireEditForm(instance=questionnaire)
-
-    return render(request, 'questionnaire/draft.html', {
-        'form': form,
+    return render(request, 'questionnaire/survey.html', {
         'questionnaire': questionnaire,
         'quizzes': questionnaire.get_quizzes_list(),
         'SINGLE_QUIZ': Questionnaire.SINGLE_QUIZ,
         'MULTI_QUIZ': Questionnaire.MULTI_QUIZ,
         'ARBITRARY_QUIZ': Questionnaire.ARBITRARY_QUIZ
+    })
+
+
+@login_required
+@required_moderator
+@require_http_methods(['GET', 'POST'])
+def survey_setting_page(request: WSGIRequest, questionnaire_id: int):
+    """
+    Редактирует тест.
+    """
+    questionnaire = get_object_or_404(Questionnaire, id=questionnaire_id)
+
+    if request.method == 'POST':
+        # получение формы
+        form = QuestionnaireEditForm(request.POST, instance=questionnaire)
+        if form.is_valid():
+            form.save()
+
+            return redirect('questionnaire-survey-page', questionnaire_id=questionnaire_id)
+
+    else:
+        form = QuestionnaireEditForm(instance=questionnaire)
+
+    return render(request, 'questionnaire/survey_setting.html', {
+        'form': form,
+        'questionnaire': questionnaire
+    })
+
+
+@login_required
+@required_moderator
+@require_http_methods(['GET', 'POST'])
+def survey_publication_page(request: WSGIRequest, questionnaire_id: int):
+    """
+    Настраивает тест для публикации.
+    """
+    questionnaire = get_object_or_404(Questionnaire, id=questionnaire_id)
+
+    return render(request, 'questionnaire/survey_publication.html', {
+        'questionnaire': questionnaire
     })
 
 
@@ -212,3 +240,13 @@ def arbitrary_remove_page(request: WSGIRequest, questionnaire_id: int, quiz_id: 
     questionnaire.recompute_order()
 
     return redirect('questionnaire-draft-page', questionnaire_id=questionnaire_id)
+
+
+@login_required
+def reports_page(request: WSGIRequest):
+    return render(request, 'questionnaire/reports.html')
+
+
+@login_required
+def mytests_page(request: WSGIRequest):
+    return render(request, 'questionnaire/mytests.html')

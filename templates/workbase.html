@@ -1,8 +1,11 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load brand %}
 
 <!-- header content -->
-{% block title-content %}Home page{% endblock title-content %}
+{% block title-content %}
+    {% get_project_name %}
+{% endblock title-content %}
 
 {% block head-content %}
 <link rel="stylesheet" href="{% static '/home/css/style.css' %}">
@@ -114,16 +117,28 @@
                             <div class="collapsible-body">
                             {% endblock questionnaire-body-nav %}
                                 <ul>
-                                    {% block questionnaire-test-nav %}
+                                    {% block questionnaire-publications-nav %}
                                     <li>
-                                    {% endblock questionnaire-test-nav %}
-                                        <a href="{% url 'questionnaire-test' %}">Test</a>
+                                    {% endblock questionnaire-publications-nav %}
+                                        <a href="{% url 'questionnaire-publications-page' %}">Публикации</a>
                                     </li>
 
                                     {% block questionnaire-drafts-nav %}
                                     <li>
                                     {% endblock questionnaire-drafts-nav %}
                                         <a href="{% url 'questionnaire-drafts-page' %}">Черновики</a>
+                                    </li>
+
+                                    {% block questionnaire-reports-nav %}
+                                    <li>
+                                    {% endblock questionnaire-reports-nav %}
+                                        <a href="{% url 'questionnaire-reports-page' %}">Отчеты</a>
+                                    </li>
+
+                                    {% block questionnaire-mytests-nav %}
+                                    <li>
+                                    {% endblock questionnaire-mytests-nav %}
+                                        <a href="{% url 'questionnaire-my-tests-page' %}">Мои тесты</a>
                                     </li>
                                 </ul>
                             </div>

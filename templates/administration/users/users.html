@@ -2,7 +2,7 @@
 {% load static %}
 
 <!-- header content -->
-{% block title-content %}PepegaHR: Пользователи{% endblock title-content %}
+{% block title-content %}Пользователи{% endblock title-content %}
 
 <!-- nav content -->
 {% block admin-nav %}
@@ -27,7 +27,7 @@
     </div>
     <div class="stretch-right">
         <a href="{% url 'admin-user-create' %}" class="btn waves-effect waves-light">
-            <i class="material-icons right">add</i>Добавить пользователя
+            <i class="material-icons left">add</i>Добавить пользователя
         </a>
     </div>
 </div>
@@ -45,7 +45,7 @@
             </button>
             <!-- dropdown trigger -->
             <a href="#" class="dropdown-trigger btn waves-effect waves-light disabled" style="min-width: 10rem;" data-target="dropdownfilter">
-                <i class="material-icons right">filter_list</i>Фильтр
+                <i class="material-icons left">filter_list</i>Фильтр
             </a>
             <!-- dropdown structure -->
             <ul id='dropdownfilter' class='dropdown-content'>

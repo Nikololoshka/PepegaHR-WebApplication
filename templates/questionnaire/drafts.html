@@ -2,7 +2,7 @@
 {% load static %}
 
 <!-- header content -->
-{% block title-content %}PepegaHR: Черновики{% endblock title-content %}
+{% block title-content %}Черновики{% endblock title-content %}
 
 <!-- nav content -->
 {% block questionnaire-nav %}
@@ -30,7 +30,7 @@
             </div>
             <div class="stretch-right">
                 <a href="#add-modal" class="btn waves-effect waves-light modal-trigger">
-                    <i class="material-icons right">add</i>Добавить тест
+                    <i class="material-icons left">add</i>Добавить тест
                 </a>
                 <!-- add group modal window -->
                 <div id="add-modal" class="modal">
@@ -73,7 +73,7 @@
             <!-- dropdown trigger -->
             <a href="#" class="dropdown-trigger btn waves-effect waves-light disabled"
                 style="min-width: 10rem;" data-target="dropdownfilter">
-                <i class="material-icons right">filter_list</i>Фильтр
+                <i class="material-icons left">filter_list</i>Фильтр
             </a>
             <!-- dropdown structure -->
             <ul id='dropdownfilter' class='dropdown-content'>
@@ -90,7 +90,7 @@
         {% if page.object_list %}
         <div class="collection">
             {% for questionnaire in page.object_list %}
-            <a href="{% url 'questionnaire-draft-page' questionnaire.id %}"
+            <a href="{% url 'questionnaire-survey-page' questionnaire.id %}"
                 class="collection-item black-text waves-effect">
                 <h6>{{ questionnaire.name }}</h6>
                 <div class="row" style="margin-bottom: 0;">

@@ -1,9 +1,8 @@
 {% extends 'workbase.html' %}
 {% load static %}
-{% load widget_tweaks %}
 
 <!-- header content -->
-{% block title-content %}PepegaHR: Черновик "{{ form.name.value }}"{% endblock title-content %}
+{% block title-content %}{{ questionnaire.name }}{% endblock title-content %}
 
 <!-- nav content -->
 {% block questionnaire-nav %}
@@ -23,56 +22,67 @@
                 <div class="card-title">
                     <div class="row">
                         <div class="col s12">
-                            Редактирование черновика
+                            {{ questionnaire.name }}
                         </div>
                     </div>
                 </div>
-                <!-- Ошибки -->
-                {% if form.errors %}
-                    {% include 'patterns/errors.html' with errors=form.errors.values %}
-                {% endif %}
-                <div class="row no-padding">
+                <div class="row">
                     <div class="col s12">
-                        <form action="" method="POST" id="questionnaire-form">
-                            {% csrf_token %}
-                            <!-- Редактирование основной информации -->
-                            <div>
-                                <div class="row" style="margin-bottom: 0;">
-                                    <div class="input-field col s12">
-                                        {{ form.name|add_class:"validate" }}
-                                        <label for="{{ form.name.auto_id }}">{{ form.name.label }}</label>
-                                    </div>
-                                </div>
-                                <div class="row" style="margin-bottom: 0;">
-                                    <div class="input-field col s12">
-                                        {{ form.desciption|add_class:"materialize-textarea" }}
-                                        <label for="{{ form.desciption.auto_id }}">{{ form.desciption.label }}</label>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="input-field col s12">
-                                        {{ form.max_count|add_class:"validate"|attr:"min:1" }}
-                                        <label for="{{ form.max_count.auto_id }}">{{ form.max_count.label }}</label>
-                                        <span class="helper-text">{{ form.max_count.help_text }}</span>
-                                    </div>
-                                </div>
-                                <div class="row" style="margin-bottom: 0;">
-                                    <label class="col s12">
-                                        {{ form.is_shuffle|add_class:"filled-in" }}
-                                        <span>
-                                            {{ form.is_shuffle.label }}
-                                        </span>
-                                    </label>
-                                </div>
-                            </div>
-                        </form>
+                        <b>Описание:</b> 
+                        {% if questionnaire.desciption %}
+                            {{ questionnaire.desciption }}
+                        {% else %}
+                            отсутствует
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col s12">
+                         <div class="divider"></div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col s12 m4">
+                        <label>
+                            <input type="checkbox" class="filled-in input-disable"
+                                {% if questionnaire.is_shuffle %} checked='checked' {% endif %}
+                            />
+                            <span>Перемешавать вопросы</span>
+                        </label>
+                    </div>
+                    <div class="col s12 m4">
+                        {% if questionnaire.max_count %} 
+                            Максимум вопросов в тесте <b>{{ questionnaire.max_count }}</b>
+                        {% else %}
+                            <b>Неограниченное</b> количество вопросов в тесте
+                        {% endif %} 
+                    </div>
+                    <div class="col s12 m4">
+                        Статус:
+                        <b>
+                        {% if questionnaire.is_draft %}
+                            черновик
+                        {% else %}
+                            опубликован
+                        {% endif %} 
+                        </b> 
                     </div>
                 </div>
             </div>
             <div class="card-action">
-                <div>
-                    <a href="{% url 'questionnaire-drafts-page' %}" class=" btn-flat waves-effect waves-light">Назад</a>
-                    <button form="questionnaire-form" class="btn waves-effect waves-light" type="submit" >Сохранить</button>
+                <div class="stretch-container">
+                    <div class="stretch-left">
+                        <a href="{% url 'questionnaire-drafts-page' %}" class=" btn-flat waves-effect waves-light">Назад</a>
+                    </div>
+                    <div class="stretch-right">
+                        <a href="{% url 'questionnaire-survey-publication-page' questionnaire.id %}" class="btn waves-effect waves-light">
+                            <i class="material-icons left">reply</i>Публикация
+                        </a>
+                        <div style="padding-left: 24px;"></div>
+                        <a href="{% url 'questionnaire-survey-setting-page' questionnaire.id %}" class="btn waves-effect waves-light">
+                            <i class="material-icons left">settings</i>Настройки
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -99,7 +109,7 @@
                             <div class="stretch-right">
                                 <!--Выбор вопроса  -->
                                 <a href="#" class="dropdown-trigger btn waves-effect waves-light" data-target="create_quiz">
-                                    <i class="material-icons right">add</i>Добавить вопрос
+                                    <i class="material-icons left">add</i>Добавить вопрос
                                 </a>
                                 <!-- Структура с созданием вопросов -->
                                 <ul id='create_quiz' class='dropdown-content'>
@@ -153,5 +163,5 @@
 {% endblock main-content %}
 
 {% block script-page %}
-<script src="{% static '/questionnaire/js/draft.js' %}"></script>
+<script src="{% static '/questionnaire/js/survey.js' %}"></script>
 {% endblock script-page %}

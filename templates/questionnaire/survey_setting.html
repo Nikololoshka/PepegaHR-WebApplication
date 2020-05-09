@@ -1,0 +1,79 @@
+{% extends 'workbase.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+<!-- header content -->
+{% block title-content %}Настройка теста: {{ questionnaire.name }}{% endblock title-content %}
+
+<!-- nav content -->
+{% block questionnaire-nav %}
+<li class="bold active">
+{% endblock questionnaire-nav %}
+
+{% block questionnaire-body-nav %}
+<div class="collapsible-body" style="display: block;">
+{% endblock questionnaire-body-nav %}
+
+<!-- Заголовок -->
+{% block card-title %}
+<div class="row">
+    <div class="col s12">
+        <div class="card-title">
+            Настройка теста: {{ questionnaire.name }}
+        </div>
+    </div>
+</div>
+{% endblock card-title %}
+
+{% block card-content %}
+<div class="row">
+    <div class="col s12">
+        <!-- Ошибки -->
+        {% if form.errors %}
+            {% include 'patterns/errors.html' with errors=form.errors.values %}
+        {% endif %}
+        <form action="{% url 'questionnaire-survey-setting-page' questionnaire.id %}" method="POST" id="questionnaire-form">
+            {% csrf_token %}
+            <!-- Редактирование основной информации -->
+            <div>
+                <div class="row" style="margin-bottom: 0;">
+                    <div class="input-field col s12">
+                        {{ form.name|add_class:"validate" }}
+                        <label for="{{ form.name.auto_id }}">{{ form.name.label }}</label>
+                    </div>
+                </div>
+                <div class="row" style="margin-bottom: 0;">
+                    <div class="input-field col s12">
+                        {{ form.desciption|add_class:"materialize-textarea" }}
+                        <label for="{{ form.desciption.auto_id }}">{{ form.desciption.label }}</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="input-field col s12">
+                        {{ form.max_count|add_class:"validate"|attr:"min:1" }}
+                        <label for="{{ form.max_count.auto_id }}">{{ form.max_count.label }}</label>
+                        <span class="helper-text">{{ form.max_count.help_text }}</span>
+                    </div>
+                </div>
+                <div class="row" style="margin-bottom: 0;">
+                    <label class="col s12">
+                        {{ form.is_shuffle|add_class:"filled-in" }}
+                        <span>
+                            {{ form.is_shuffle.label }}
+                        </span>
+                    </label>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock card-content %}
+
+{% block card-action %}
+<div class="card-action">
+    <a href="{% url 'questionnaire-survey-page' questionnaire.id %}" class="btn-flat waves-effect waves-light">Назад</a>
+    <button form="questionnaire-form" class="btn waves-effect waves-light" type="submit">
+        <i class="material-icons left">save</i>Сохранить
+    </button>
+</div>
+{% endblock card-action %}

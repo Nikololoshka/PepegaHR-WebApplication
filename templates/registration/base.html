@@ -1,7 +1,10 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load brand %}
 
-{% block title-content %}PepegaHR{% endblock title-content %}
+{% block title-content %}
+    {% get_project_name %}
+{% endblock title-content %}
 
 {% block head-content %}
 <link rel="stylesheet" href="{% static '/registration/css/style.css' %}">
@@ -12,7 +15,7 @@
 <body class="start-body">
     <nav>
         <div class="nav-wrapper container">
-            <a href="/" class="brand-logo">PepegaHR</a>
+            <a href="/" class="brand-logo">{% get_project_name %}</a>
             <a href="#" data-target="mobile-demo" class="sidenav-trigger">
                 <i class="material-icons">menu</i>
             </a>
@@ -81,6 +84,5 @@
     $(document).ready(function () {
         $(".sidenav").sidenav();
     });
-
 </script>
 {% endblock script-content %}

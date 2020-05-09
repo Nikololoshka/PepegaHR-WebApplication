@@ -7,3 +7,7 @@ $(document).ready(function() {
         'accordion': false
     });
 });
+
+$('.input-disable').on('click', function(e) {
+    return false;
+});

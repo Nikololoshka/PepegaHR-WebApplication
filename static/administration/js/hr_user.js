@@ -30,9 +30,6 @@ function correctPassword(id_password, id_confirm_password) {
     var first = first_el.val();
     var second = second_el.val();
 
-    console.log(first);
-    console.log(second);
-
     if (first === "" && second === "") {
         first_el.removeClass('invalid').removeClass('valid');
         second_el.removeClass('invalid').removeClass('valid');
