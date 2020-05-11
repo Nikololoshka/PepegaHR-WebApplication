@@ -5,7 +5,8 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods, require_GET, require_POST
 from django.utils.translation import gettext_lazy as _
 
-from .forms import SimpleQuestionnaireForm, QuestionnaireEditForm, SingleChooseForm, MultiChooseForm, ArbitraryQuizForm
+from .forms import SimpleQuestionnaireForm, QuestionnaireEditForm, QuestionnairePublicationForm, \
+                   SingleChooseForm, MultiChooseForm, ArbitraryQuizForm
 from .models import Questionnaire, SingleChooseQuiz, MultiChooseQuiz, ArbitraryQuiz
 
 from apps.administration.permissions import required_moderator
@@ -32,13 +33,13 @@ def drafts_page(request: WSGIRequest):
             questionnaire.author = request.user
             questionnaire.save()
 
-            return redirect('questionnaire-draft-page', questionnaire_id=questionnaire.id)
+            return redirect('questionnaire-survey-page', questionnaire_id=questionnaire.id)
 
     else:
         form = SimpleQuestionnaireForm()
 
     questionnaires = Questionnaire.objects.all()
-
+    
     page_num = request.GET.get('page', 1)
     paginator = Paginator(questionnaires, 30)
     page = paginator.get_page(page_num)
@@ -102,9 +103,67 @@ def survey_publication_page(request: WSGIRequest, questionnaire_id: int):
     """
     questionnaire = get_object_or_404(Questionnaire, id=questionnaire_id)
 
+    if request.method == 'POST':
+        # получение формы
+        form = QuestionnairePublicationForm(request.POST, instance=questionnaire, user_id=request.user.id)
+
+        if form.is_valid():
+            form.save()
+            form.save_m2m()
+
+            return redirect('questionnaire-survey-page', questionnaire_id=questionnaire_id)
+
+    else:
+        form = QuestionnairePublicationForm(instance=questionnaire, user_id=request.user.id)
+
     return render(request, 'questionnaire/survey_publication.html', {
+        'form': form,
         'questionnaire': questionnaire
     })
+
+
+@login_required
+@required_moderator
+@require_POST
+def survey_to_publish(request: WSGIRequest):
+    """
+    Переводит тест в состояние "Опубликован".
+    """
+    questionnaire_id = request.POST.get('questionnaire_id', None)
+    questionnaire = get_object_or_404(Questionnaire, id=questionnaire_id)
+    questionnaire.is_draft = False
+    questionnaire.save()
+
+    return redirect('questionnaire-survey-page', questionnaire_id=questionnaire_id)
+
+
+@login_required
+@required_moderator
+@require_POST
+def survey_to_draft(request: WSGIRequest):
+    """
+    Переводит тест в состояние "Черновик".
+    """
+    questionnaire_id = request.POST.get('questionnaire_id', None)
+    questionnaire = get_object_or_404(Questionnaire, id=questionnaire_id)
+    questionnaire.is_draft = True
+    questionnaire.save()
+
+    return redirect('questionnaire-survey-page', questionnaire_id=questionnaire_id)
+
+
+@login_required
+@required_moderator
+@require_POST
+def survey_remove(request: WSGIRequest):
+    """
+    Удаляет тест и связанные с ним вопросы.
+    """
+    questionnaire_id = request.POST.get('questionnaire_id', None)
+    questionnaire = get_object_or_404(Questionnaire, id=questionnaire_id)
+    questionnaire.delete()
+
+    return redirect('questionnaire-drafts-page')
 
 
 @login_required
@@ -122,7 +181,7 @@ def single_choose_page(request: WSGIRequest, questionnaire_id: int, quiz_id: int
         if form.is_valid():
             form.save()
 
-            return redirect('questionnaire-draft-page', questionnaire_id=questionnaire_id)
+            return redirect('questionnaire-survey-page', questionnaire_id=questionnaire_id)
 
     else:
         form = SingleChooseForm(instance=instance)
@@ -139,17 +198,18 @@ def single_choose_page(request: WSGIRequest, questionnaire_id: int, quiz_id: int
 @login_required
 @required_moderator
 @require_POST
-def single_choose_remove(request: WSGIRequest, questionnaire_id: int, quiz_id: int):
+def single_choose_remove(request: WSGIRequest, questionnaire_id: int):
     """
     Удаляет вопрос с одним вариантом ответа из теста.
     """
+    quiz_id = request.POST.get('quiz_id', None)
     questionnaire = get_object_or_404(Questionnaire, id=questionnaire_id)
     quiz = get_object_or_404(questionnaire.single_quizzes, id=quiz_id)
 
     quiz.delete()
     questionnaire.recompute_order()
 
-    return redirect('questionnaire-draft-page', questionnaire_id=questionnaire_id)
+    return redirect('questionnaire-survey-page', questionnaire_id=questionnaire_id)
     
 
 @login_required
@@ -167,7 +227,7 @@ def multi_choose_page(request: WSGIRequest, questionnaire_id: int, quiz_id: int 
         if form.is_valid():
             form.save()
 
-            return redirect('questionnaire-draft-page', questionnaire_id=questionnaire_id)
+            return redirect('questionnaire-survey-page', questionnaire_id=questionnaire_id)
 
     else:
         form = MultiChooseForm(instance=instance)
@@ -184,17 +244,18 @@ def multi_choose_page(request: WSGIRequest, questionnaire_id: int, quiz_id: int 
 @login_required
 @required_moderator
 @require_POST
-def multi_choose_remove(request: WSGIRequest, questionnaire_id: int, quiz_id: int):
+def multi_choose_remove(request: WSGIRequest, questionnaire_id: int):
     """
     Удаляет вопрос с множестов вариантов выбора из теста.
     """
+    quiz_id = request.POST.get('quiz_id', None)
     questionnaire = get_object_or_404(Questionnaire, id=questionnaire_id)
     quiz = get_object_or_404(questionnaire.multi_quizzes, id=quiz_id)
 
     quiz.delete()
     questionnaire.recompute_order()
 
-    return redirect('questionnaire-draft-page', questionnaire_id=questionnaire_id)
+    return redirect('questionnaire-survey-page', questionnaire_id=questionnaire_id)
 
 
 @login_required
@@ -212,7 +273,7 @@ def arbitrary_page(request: WSGIRequest, questionnaire_id: int, quiz_id: int = N
         if form.is_valid():
             form.save()
 
-            return redirect('questionnaire-draft-page', questionnaire_id=questionnaire_id)
+            return redirect('questionnaire-survey-page', questionnaire_id=questionnaire_id)
 
     else:
         form = ArbitraryQuizForm(instance=instance)
@@ -229,17 +290,18 @@ def arbitrary_page(request: WSGIRequest, questionnaire_id: int, quiz_id: int = N
 @login_required
 @required_moderator
 @require_POST
-def arbitrary_remove_page(request: WSGIRequest, questionnaire_id: int, quiz_id: int):
+def arbitrary_remove_page(request: WSGIRequest, questionnaire_id: int):
     """
     Удаляет вопрос с свободной формой из теста.
     """
+    quiz_id = request.POST.get('quiz_id', None)
     questionnaire = get_object_or_404(Questionnaire, id=questionnaire_id)
     quiz = get_object_or_404(questionnaire.arbitrary_quizzes, id=quiz_id)
 
     quiz.delete()
     questionnaire.recompute_order()
 
-    return redirect('questionnaire-draft-page', questionnaire_id=questionnaire_id)
+    return redirect('questionnaire-survey-page', questionnaire_id=questionnaire_id)
 
 
 @login_required

@@ -24,7 +24,10 @@ urlpatterns = [
     path('home/', include('home.urls')),
     path('administration/', include('administration.urls')),
     path('questionnaire/', include('questionnaire.urls')),
+    path('help/', include('help.urls')),
     path('', include('profiles.urls')), # профиль, группа
     path('', include('start.urls')),    # начальная страница
     path('', include('django.contrib.auth.urls')), # авторизация
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) \
+  + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

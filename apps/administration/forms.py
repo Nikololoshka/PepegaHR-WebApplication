@@ -65,6 +65,7 @@ class HRUserForm(forms.ModelForm):
         hr_user = super(HRUserForm, self).save(commit=False)
         
         if hasattr(hr_user, 'password'):
+            password = self.cleaned_data['password']
             if password is not None and password:
                 hr_user.set_password(password)
         else:

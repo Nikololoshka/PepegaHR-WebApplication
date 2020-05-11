@@ -21,7 +21,7 @@
             <div class="card-content">
                 <div class="card-title">
                     <div class="row">
-                        <div class="col s12">
+                        <div class="col s12 truncate">
                             {{ questionnaire.name }}
                         </div>
                     </div>
@@ -51,35 +51,94 @@
                         </label>
                     </div>
                     <div class="col s12 m4">
+                        Максимум вопросов в тесте: 
+                        <b>
                         {% if questionnaire.max_count %} 
-                            Максимум вопросов в тесте <b>{{ questionnaire.max_count }}</b>
+                            {{ questionnaire.max_count }}
                         {% else %}
-                            <b>Неограниченное</b> количество вопросов в тесте
+                            неограниченно
+                        {% endif %} 
+                        </b>
+                    </div>
+                    <div class="col s12 m4">
+                        Время прохождения теста:
+                        <b>
+                        {% if questionnaire.test_time %} 
+                            {{ questionnaire.test_time|time:"H:i" }}
+                        {% else %}
+                            неограниченно
+                        {% endif %} 
+                        </b>
+                    </div>
+                    
+                </div>
+                <div class="row">
+                    <div class="col s12">
+                         <div class="divider"></div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col s12 m4">
+                        Статус теста:
+                        {% if questionnaire.is_draft %}
+                            <b class="orange-text darken-2">Черновик</b>
+                        {% else %}
+                            <b class="green-text darken-1">Опубликован</b>
                         {% endif %} 
                     </div>
                     <div class="col s12 m4">
-                        Статус:
+                        Время начала: 
                         <b>
-                        {% if questionnaire.is_draft %}
-                            черновик
+                        {% if questionnaire.open_datetime %}
+                            {{ questionnaire.open_datetime }}
                         {% else %}
-                            опубликован
-                        {% endif %} 
-                        </b> 
+                            отсутствует
+                        {% endif %}
+                        </b>
+                    </div>
+                    <div class="col s12 m4">
+                        Время конца: 
+                        <b>
+                        {% if questionnaire.close_datetime %}
+                            {{ questionnaire.close_datetime }}
+                        {% else %}
+                            отсутствует
+                        {% endif %}
+                        </b>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col s12">
+                         <div class="divider"></div>
+                    </div>
+                </div>
+                <div class="row no-margin">
+                    <div class="col s12">
+                        Группы: 
+                        {% if questionnaire.groups.all %}
+                            {% for group in questionnaire.groups.all %}
+                                <a href="{% url 'departament-page' group.id %}">{{ group.name }}</a>
+                                {% if not forloop.last %},{% endif %}
+                            {% endfor %}
+                        {% else %}
+                            <b>отсутствуют</b>
+                        {% endif %}
                     </div>
                 </div>
             </div>
             <div class="card-action">
                 <div class="stretch-container">
                     <div class="stretch-left">
-                        <a href="{% url 'questionnaire-drafts-page' %}" class=" btn-flat waves-effect waves-light">Назад</a>
-                    </div>
-                    <div class="stretch-right">
-                        <a href="{% url 'questionnaire-survey-publication-page' questionnaire.id %}" class="btn waves-effect waves-light">
-                            <i class="material-icons left">reply</i>Публикация
+                        <a href="{% url 'questionnaire-drafts-page' %}" class=" btn-flat waves-effect waves-light">
+                            <i class="material-icons left">arrow_back</i>Назад
                         </a>
-                        <div style="padding-left: 24px;"></div>
-                        <a href="{% url 'questionnaire-survey-setting-page' questionnaire.id %}" class="btn waves-effect waves-light">
+                    </div>
+                    <div class="stretch-flex-right">
+                        <a href="{% url 'questionnaire-survey-publication-page' questionnaire.id %}" class="btn waves-effect waves-light truncate stretch-item">
+                            <i class="material-icons left">rss_feed</i>Публикация
+                        </a>
+                        <div class="card-action-divider"></div>
+                        <a href="{% url 'questionnaire-survey-setting-page' questionnaire.id %}" class="btn waves-effect waves-light truncate stretch-item">
                             <i class="material-icons left">settings</i>Настройки
                         </a>
                     </div>
@@ -108,7 +167,7 @@
                             </div>
                             <div class="stretch-right">
                                 <!--Выбор вопроса  -->
-                                <a href="#" class="dropdown-trigger btn waves-effect waves-light" data-target="create_quiz">
+                                <a href="#" class="dropdown-trigger btn waves-effect waves-light truncate" data-target="create_quiz">
                                     <i class="material-icons left">add</i>Добавить вопрос
                                 </a>
                                 <!-- Структура с созданием вопросов -->
@@ -136,6 +195,15 @@
                 <!-- Список вопросов -->
                 <div class="row">
                     <div class="col s12">
+                        <form action="{% url 'questionnaire-single-choose-remove' questionnaire.id %}" method="POST" id="single-remove">
+                            {% csrf_token %}
+                        </form>
+                        <form action="{% url 'questionnaire-multi-choose-remove' questionnaire.id %}" method="POST" id="multi-remove">
+                            {% csrf_token %}
+                        </form>
+                        <form action="{% url 'questionnaire-arbitrary-remove' questionnaire.id %}" method="POST" id="arbitrary-remove">
+                            {% csrf_token %}
+                        </form>
                         {% if quizzes %}
                         <ul class="collapsible expandable z-depth-0"> 
                         {% for quiz in quizzes %}

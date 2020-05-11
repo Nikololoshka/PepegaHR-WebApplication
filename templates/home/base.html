@@ -27,9 +27,9 @@
     </div>
 </div>
 
-<div class="row" style="margin: -0.75rem;">
+<div class="row" style="margin-left: -0.75rem; margin-right: -0.75rem; display: flex;">
     <div class="col s12 l6">
-        <div class="card hoverable">
+        <div class="card hoverable" style="height: 100%;">
             <a href="{% url 'my-profile' %}" class="black-text">
                 <div class="card-image">
                     <img src="{% static 'home/img/profile.jpg' %}" alt="">
@@ -41,9 +41,8 @@
             </a>
         </div>
     </div>
-    <div style="padding: 1px;"></div>
     <div class="col s12 l6">
-        <div class="card hoverable">
+        <div class="card hoverable" style="height: 100%;">
             <a href="{% url 'admin-information-page' %}" class="black-text">
                 <div class="card-image">
                     <img src="{% static 'home/img/administration.jpg' %}" alt="">

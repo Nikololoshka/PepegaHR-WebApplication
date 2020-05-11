@@ -32,17 +32,43 @@
     background-color: rgba(50, 50, 50, 0.06);
 }
 
+.row.no-margin {
+    margin-bottom: unset;
+}
+
+.card-action-divider {
+    padding-left: 24px;
+}
+
 .stretch-container {
     display: flex;
+    flex-wrap: wrap;
 }
 
 .stretch-left {
-    display: flex;
+    margin: 2px;
 }
 
 .stretch-right {
-    margin-left: auto;
+    margin: 2px 2px 2px auto;
+}
+
+.stretch-flex-right {
+    margin: 2px;
     display: flex;
+    flex-wrap: wrap;
+}
+
+.stretch-item {
+    margin-top: 2px;
+    margin-bottom: 2px;
+}
+
+@media only screen and (min-width: 601px)  {
+    .stretch-flex-right {
+        margin: 2px 2px 2px auto;
+        display: flex;
+    }
 }
 
 .image-preview {

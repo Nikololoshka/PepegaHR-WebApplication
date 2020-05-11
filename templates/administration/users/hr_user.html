@@ -44,8 +44,25 @@
 
 {% block card-action %}
 <div class="card-action">
-    <a href="{% url 'admin-users-page' %}" class=" btn-flat waves-effect waves-light">Отмена</a>
-    <button form="hr-user-form" class="btn waves-effect waves-light" type="submit" >{{ action }}</button>
+    <div class="stretch-container">
+        <div class="stretch-left">
+            <a href="{% url 'admin-users-page' %}" class=" btn-flat waves-effect waves-light">
+                <i class="material-icons left">arrow_back</i>Назад
+            </a>
+        </div>
+        <div class="stretch-right">
+            <button form="hr-user-form" class="btn waves-effect waves-light" type="submit" >
+                <i class="material-icons left">
+                    {% if is_edit %}
+                        edit
+                    {% else %}
+                        add
+                    {% endif %}
+                </i>
+                {{ action }}
+            </button>
+        </div>
+    </div>
 </div>
 {% endblock card-action %}
 

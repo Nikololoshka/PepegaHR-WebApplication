@@ -2,6 +2,11 @@ from django import forms
 from django.forms import formset_factory, modelformset_factory
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
+from django.contrib.auth import get_user_model
+
+import locale
+from contextlib import contextmanager
+from datetime import datetime
 
 from .models import Questionnaire, SingleChooseQuiz, SingleChooseVariant, MultiChooseQuiz, MultiChooseVariant, ArbitraryQuiz
 
@@ -24,18 +29,160 @@ class QuestionnaireEditForm(forms.ModelForm):
     """
     class Meta:
         model = Questionnaire
-        fields = ['name', 'desciption', 'max_count', 'is_shuffle']
+        fields = ['name', 'desciption', 'max_count', 'is_shuffle', 'test_time']
 
         labels = {
             'name': _('Название'),
             'desciption': _('Описание'),
             'max_count': _('Максимальное количество вопросов'),
-            'is_shuffle': _('Перемешивать вопросы')
+            'is_shuffle': _('Перемешивать вопросы'),
+            'test_time': _('Время прохождения теста')
         }
 
         help_texts = {
-            'max_count': _('Если не указано, то нет ограничений')
+            'max_count': _('Если не указано, то нет ограничений'),
+            'test_time': _('Если не указано, то нет ограничений')
         }
+
+
+class QuestionnairePublicationForm(forms.ModelForm):
+    """
+    Форма для публикации теста.
+    """
+    open_date = forms.CharField(label=_('Дата начала'), required=False)
+    open_time = forms.TimeField(label=_('Время начала'), required=False)
+    close_date = forms.CharField(label=_('Дата конца'), required=False)
+    close_time = forms.TimeField(label=_('Время конца'), required=False)
+
+    user_id = None
+
+    class Meta:
+        model = Questionnaire
+        fields = ['groups']
+        labels = {
+            'groups': _('Группы')
+        }
+
+    def __init__(self, *args, **kwargs):
+        if 'user_id' in kwargs:
+            self.user_id = kwargs.pop('user_id')
+
+        super(QuestionnairePublicationForm, self).__init__(*args, **kwargs)
+        
+        # инициализация списка групп
+        if self.user_id is not None:
+            HRUser = get_user_model()
+            hr_user = HRUser.objects.get(id=self.user_id)
+            self.fields['groups'].queryset = hr_user.departaments.all()
+
+        # инициализация даты и времени
+        if self.instance:
+            open_datetime = self.instance.open_datetime
+            close_datetime = self.instance.close_datetime
+
+            with QuestionnairePublicationForm.rus_locale():
+                pattern_date = '%b %d, %Y'
+                pattern_time = '%H:%M'
+
+                if open_datetime is not None:
+                    self.fields['open_date'].initial = open_datetime.strftime(pattern_date).title()
+                    self.fields['open_time'].initial = open_datetime.strftime(pattern_time).title()
+
+                if close_datetime is not None:
+                    self.fields['close_date'].initial = close_datetime.strftime(pattern_date).title()
+                    self.fields['close_time'].initial = close_datetime.strftime(pattern_time).title()
+ 
+    @staticmethod
+    @contextmanager
+    def rus_locale():
+        """
+        Устанавливает русскую локаль в контекст.
+        """
+        saved = locale.setlocale(locale.LC_ALL)
+        try:
+            yield locale.setlocale(locale.LC_ALL, 'rus')
+        finally:
+            locale.setlocale(locale.LC_ALL, saved)
+
+    def clean(self):
+        """
+        Проверяет форму на правильность.
+        """
+        cleaned_data = super(QuestionnairePublicationForm, self).clean()
+
+        # проверка дат
+        pattern = '%b %d, %Y'
+        open_date = self.cleaned_data['open_date']
+        close_date = self.cleaned_data['close_date']
+
+        # парсинг с локалью
+        with QuestionnairePublicationForm.rus_locale():
+            # парсинг начала
+            if open_date:
+                try:
+                    open_date = datetime.strptime(open_date, pattern)
+                except ValueError:
+                    raise ValidationError(_('Не правильный формат даты: ') + open_date)
+
+            # парсинг конца
+            if close_date:
+                try:
+                    close_date = datetime.strptime(close_date, pattern)
+                except ValueError:
+                    raise ValidationError(_('Не правильный формат даты: ') + close_date)
+        
+
+        if open_date and close_date and open_date > close_date:
+            raise ValidationError(_('Дата начала позже даты конца'))
+
+        open_date = open_date if open_date else None
+        close_date = close_date if close_date else None
+
+        open_time = self.cleaned_data['open_time']
+        close_time = self.cleaned_data['close_time']
+
+
+        # дата и время
+        if (open_date is None) ^ (open_time is None):
+            raise ValidationError(_('Дата и время начала заполнены не до конца'))
+        else:
+            # заполнена дата начала
+            if open_date is None and open_time is None:
+                open_datetime = None
+            else:
+                open_datetime = datetime.combine(open_date, open_time)
+
+        if (close_date is None) ^ (close_time is None):
+            raise ValidationError(_('Дата и время конца заполнены не до конца'))
+        else:
+            # заполнена дата конца
+            if close_date is None and close_time is None:
+                close_datetime = None
+            else:
+                close_datetime = datetime.combine(close_date, close_time)
+
+        if open_datetime is not None and close_datetime is not None and open_datetime >= close_datetime:
+            raise ValidationError(_('Время и дата начала позже времени и даты конца или совпадает'))
+
+        self.cleaned_data['open_datetime_clean'] = open_datetime
+        self.cleaned_data['close_datetime_clean'] = close_datetime        
+
+    def save(self, commit=True):
+        """
+        Сохраняет данные в БД.
+        """
+        questionnaire = super(QuestionnairePublicationForm, self).save(commit=False)
+        
+        open_datetime = self.cleaned_data['open_datetime_clean']
+        close_datetime = self.cleaned_data['close_datetime_clean']
+
+        questionnaire.open_datetime = open_datetime
+        questionnaire.close_datetime = close_datetime
+
+        if commit:
+            questionnaire.save()
+
+        return questionnaire
 
 
 class SingleChooseForm(forms.ModelForm):

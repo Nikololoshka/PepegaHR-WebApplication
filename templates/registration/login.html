@@ -1,7 +1,7 @@
 {% extends 'registration/base.html' %}
 {% load static %}
 
-{% block title-content %}Login page{% endblock title-content %}
+{% block title-content %}Вход в систему{% endblock title-content %}
 
 
 {% block main-content %}
@@ -32,7 +32,7 @@
             </form>
 
             <div class="card-action">
-                <input form="login-form" class="btn waves-effect waves-light" type="submit" value="Войти" />
+                <button form="login-form" class="btn waves-effect waves-light" type="submit">Войти</button>
                 <input form="login-form" type="hidden" name="next" value="{{ next }}" />
                 <a href="{% url 'password_reset' %}" class="btn-flat waves-effect waves-light">Забыли пароль?</a>
             </div>

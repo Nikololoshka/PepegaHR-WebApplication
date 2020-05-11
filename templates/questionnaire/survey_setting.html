@@ -50,9 +50,16 @@
                 </div>
                 <div class="row">
                     <div class="input-field col s12">
-                        {{ form.max_count|add_class:"validate"|attr:"min:1" }}
+                        {{ form.max_count|add_class:"validate"|attr:"min:1"|attr:"placeholder:Без ограничений" }}
                         <label for="{{ form.max_count.auto_id }}">{{ form.max_count.label }}</label>
                         <span class="helper-text">{{ form.max_count.help_text }}</span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="input-field col s12">
+                        {{ form.test_time|add_class:"timepicker"|attr:"placeholder:Без ограничений" }}
+                        <label for="{{ form.test_time.auto_id }}">{{ form.test_time.label }}</label>
+                        <span class="helper-text">{{ form.test_time.help_text }}</span>
                     </div>
                 </div>
                 <div class="row" style="margin-bottom: 0;">
@@ -71,9 +78,47 @@
 
 {% block card-action %}
 <div class="card-action">
-    <a href="{% url 'questionnaire-survey-page' questionnaire.id %}" class="btn-flat waves-effect waves-light">Назад</a>
-    <button form="questionnaire-form" class="btn waves-effect waves-light" type="submit">
-        <i class="material-icons left">save</i>Сохранить
-    </button>
+    <div class="stretch-container">
+        <div class="stretch-left">
+            <a href="{% url 'questionnaire-survey-page' questionnaire.id %}" class="btn-flat waves-effect waves-light">
+                <i class="material-icons left">arrow_back</i>Назад
+            </a>
+        </div>
+        <div class="stretch-flex-right">
+            <a href="#remove-modal" class="btn-flat red-text waves-effect waves-light modal-trigger">
+                <i class="material-icons left">clear</i>Удалить тест
+            </a>
+            <div class="card-action-divider"></div>
+            <button form="questionnaire-form" class="btn waves-effect waves-light" type="submit">
+                <i class="material-icons left">save</i>Сохранить
+            </button>
+        </div>
+    </div>
 </div>
+
+<!-- remove questionnaire window -->
+<div id="remove-modal" class="modal">
+    <div class="modal-content">
+        <h4>Удаление теста</h4>
+        <p>
+            Вы действительно хотите удалить тест: <b>{{ questionnaire.name }}</b>?
+            При удалении будет потеряны все данные связанные с этим тестом.
+        </p>
+    </div>
+    <div class="modal-footer right-align">
+        <form action="{% url 'questionnaire-survey-remove' %}" method="POST">
+            {% csrf_token %}
+            <a class="modal-close btn-flat waves-effect waves-light">Отмена</a>
+            <button class="btn-flat waves-effect waves-light red-text" name="questionnaire_id" value="{{ questionnaire.id }}">
+                Удалить
+            </button>
+        </form>
+    </div>
+</div>
+
 {% endblock card-action %}
+
+
+{% block script-page %}
+<script src="{% static '/questionnaire/js/survey_settings.js' %}"></script>
+{% endblock script-page %}

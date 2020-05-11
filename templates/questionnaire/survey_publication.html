@@ -34,8 +34,31 @@
         {% endif %}
         <form action="{% url 'questionnaire-survey-publication-page' questionnaire.id %}" method="POST" id="publication-form">
             {% csrf_token %}
-            <!-- Редактирование публикацией -->
-
+            <!-- Редактирование публикации -->
+            <div class="row">
+                <div class="input-field col s12 m6 xl3">
+                    {{ form.open_date|add_class:"datepicker" }}
+                    <label for="{{ form.open_date.auto_id }}">{{ form.open_date.label }}</label>
+                </div>
+                <div class="input-field col s12 m6 xl3">
+                    {{ form.open_time|add_class:"timepicker" }}
+                    <label for="{{ form.open_time.auto_id }}">{{ form.open_time.label }}</label>
+                </div>
+                <div class="input-field col s12 m6 xl3">
+                    {{ form.close_date|add_class:"datepicker" }}
+                    <label for="{{ form.close_date.auto_id }}">{{ form.close_date.label }}</label>
+                </div>
+                <div class="input-field col s12 m6 xl3">
+                    {{ form.close_time|add_class:"timepicker" }}
+                    <label for="{{ form.close_time.auto_id }}">{{ form.close_time.label }}</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="input-field col s12">
+                    {{ form.groups }}
+                    <label for="{{ form.groups.auto_id }}">{{ form.groups.label }}</label>
+                </div>
+            </div>
         </form>
     </div>
 </div>
@@ -43,9 +66,108 @@
 
 {% block card-action %}
 <div class="card-action">
-    <a href="{% url 'questionnaire-survey-page' questionnaire.id %}" class="btn-flat waves-effect waves-light">Назад</a>
-    <button form="publication-form" class="btn waves-effect waves-light" type="submit">
-        <i class="material-icons left">save</i>Сохранить
-    </button>
+    <div class="stretch-container">
+        <div class="stretch-left">
+            <a href="{% url 'questionnaire-survey-page' questionnaire.id %}" class="btn-flat waves-effect waves-light">
+                <i class="material-icons left">arrow_back</i>Назад
+            </a>
+        </div>
+        <div class="stretch-flex-right">
+            {% if questionnaire.is_draft %}
+            <form action="{% url 'questionnaire-survey-to-publish' %}" method="POST">
+            {% else %}
+            <form action="{% url 'questionnaire-survey-to-draft' %}" method="POST"> 
+            {% endif %}
+                {% csrf_token %}
+                <button class="btn waves-effect waves-light" type="submit" name="questionnaire_id" value="{{ questionnaire.id }}">
+                    {% if questionnaire.is_draft %}
+                        <i class="material-icons left">speaker_notes</i>Опубликовать
+                    {% else %}
+                        <i class="material-icons left">speaker_notes_off</i>Убрать из публикации
+                    {% endif %}
+                </button>
+            </form>
+
+            <div class="card-action-divider"></div>
+            <button form="publication-form" class="btn waves-effect waves-light" type="submit">
+                <i class="material-icons left">save</i>Сохранить
+            </button>
+        </div>
+    </div>
 </div>
 {% endblock card-action %}
+
+{% block script-page %}
+<script src="{% static '/questionnaire/js/survey_publication.js' %}"></script>
+<script>
+    var open_date = $('#{{ form.open_date.auto_id }}');
+    var open_time = $('#{{ form.open_time.auto_id }}');
+
+    var close_date = $('#{{ form.close_date.auto_id }}');
+    var close_time = $('#{{ form.close_time.auto_id }}');
+
+    open_date.on('change', function(e) {
+        // обнуление
+        currect_date = M.Datepicker.getInstance(open_date);
+        other_date = M.Datepicker.getInstance(close_date);
+
+        if (!$(this).val()) {
+            open_time.val('');
+            other_date.options.minDate = null;
+            
+        } else {
+            if (!open_time.val()) {
+                open_time.val('00:00');
+            }
+
+            other_date.options.minDate = currect_date.date;
+
+            if (other_date.date < currect_date.date) {
+                other_date.setDate(currect_date.date);
+                close_date.val(other_date.toString());
+            }
+        }
+        M.updateTextFields();
+    });
+
+    open_time.on('change', function(e) {
+        // обнуление
+        if (!open_date.val()) {
+            date = M.Datepicker.getInstance(open_date);
+            date.setDate(new Date());
+            open_date.val(date.toString());
+        }
+        M.updateTextFields();
+    });
+
+    close_date.on('change', function(e) {
+        // обнуление
+        if (!$(this).val()) {
+            close_time.val('');
+        } else {
+            if (!close_time.val()) {
+                close_time.val('00:00');
+            }
+        }
+        M.updateTextFields();
+    });
+
+    close_time.on('change', function(e) {
+        // обнуление
+        if (!close_date.val()) {
+            date = M.Datepicker.getInstance(close_date);
+            date.setDate(new Date());
+            close_date.val(date.toString());
+        }
+        M.updateTextFields();
+    });
+    
+    $(document).ready(function() {
+        M.Datepicker.getInstance(open_date)
+                    .setDate(new Date('{{ form.instance.open_datetime.isoformat }}'));
+        M.Datepicker.getInstance(close_date)
+                    .setDate(new Date('{{ form.instance.close_datetime.isoformat }}'));
+    });
+
+</script>
+{% endblock script-page %}

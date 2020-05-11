@@ -61,7 +61,7 @@ def hr_user_page(request: WSGIRequest, user_id: int = None):
             # elif photo_old is None or not photo_old:
             #     # нет старого, т.е. default состоянию
             #     hr_user.photo.delete()
-            
+       
             return redirect('admin-users-page')
 
     else:
@@ -71,9 +71,10 @@ def hr_user_page(request: WSGIRequest, user_id: int = None):
             'hr_form': form,
             'user_id': user_id,
             'action': _('Добавить') if instance is None else _('Изменить'),
-            'title_action': _('Создание') if instance is None else _('Редактирование')
+            'title_action': _('Создание') if instance is None else _('Редактирование'),
+            'is_edit': instance is not None
         })
-    
+
 
 @login_required
 @required_admin
@@ -136,7 +137,7 @@ def departament_page(request: WSGIRequest, departament_id: int):
             departament = form.save()
 
             form = DepartamentForm(instance=departament)
-        
+
     else:
         form = DepartamentForm(instance=departament)
 

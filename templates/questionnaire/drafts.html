@@ -92,10 +92,20 @@
             {% for questionnaire in page.object_list %}
             <a href="{% url 'questionnaire-survey-page' questionnaire.id %}"
                 class="collection-item black-text waves-effect">
-                <h6>{{ questionnaire.name }}</h6>
-                <div class="row" style="margin-bottom: 0;">
-                    <div class="col s6">
-                        <p>Автор: {{ questionnaire.author.get_full_name_reverse }}</p>
+                <div class="stretch-container">
+                    <div class="stretch-left">
+                        <h6>{{ questionnaire.name }}</h6>
+                        <div class="row" style="margin-bottom: 0;">
+                            <div class="col s6">
+                                <p>Автор: {{ questionnaire.author.get_full_name_reverse }}</p>
+                            </div>
+                        </div> 
+                    </div>
+                    <div class="stretch-flex-right valign-wrapper">
+                        <div>
+                            <p>Создан: {{ questionnaire.create_date }}</p>   
+                            <p>Изменен: {{ questionnaire.modify_date }}</p>  
+                        </div> 
                     </div>
                 </div>
             </a>

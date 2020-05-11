@@ -25,10 +25,10 @@
                         </a>
                     </div>
                     <div class="right">
-                        <form action="{% url 'questionnaire-arbitrary-remove' questionnaire.id quiz.id %}" method="POST">
-                            {% csrf_token %}
-                            <button class="btn-flat red-text waves-effect waves-light" type="submit">Удалить</button>
-                        </form>
+                        <button class="btn-flat red-text waves-effect waves-light" form="arbitrary-remove"
+                        name="quiz_id" value="{{ quiz.id }}" type="submit">
+                            Удалить
+                        </button>
                     </div>
                 </div>
             </div>

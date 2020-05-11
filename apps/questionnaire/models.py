@@ -18,9 +18,15 @@ class Questionnaire(models.Model):
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, blank=True, null=True)
     create_date = models.DateTimeField(auto_now_add=True)
     modify_date = models.DateTimeField(auto_now=True)
+
     max_count = models.PositiveSmallIntegerField(validators=[MinValueValidator(1)], default=None, blank=True, null=True)
     is_shuffle = models.BooleanField(default=False)
     is_draft = models.BooleanField(default=True)
+    test_time = models.TimeField(blank=True, null=True)
+
+    open_datetime = models.DateTimeField(null=True)
+    close_datetime = models.DateTimeField(null=True)
+    groups = models.ManyToManyField('administration.Departament', blank=True)
 
     class Meta:
         managed = True

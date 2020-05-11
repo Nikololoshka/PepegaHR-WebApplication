@@ -26,7 +26,7 @@
         </div>
     </div>
     <div class="stretch-right">
-        <a href="{% url 'admin-user-create' %}" class="btn waves-effect waves-light">
+        <a href="{% url 'admin-user-create' %}" class="btn waves-effect waves-light truncate">
             <i class="material-icons left">add</i>Добавить пользователя
         </a>
     </div>
@@ -122,7 +122,7 @@
                                 <div class="stretch-left">
                                     <a href="{% url 'profile-page' hr_user.id %}" class="btn-flat waves-effect waves-light">Профиль</a>
                                 </div>
-                                <div class="stretch-right">
+                                <div class="stretch-flex-right">
                                     <a href="#remove-modal" data-id='{{ hr_user.id }}' data-username='{{ hr_user.get_full_name }}'
                                         class="btn-flat red-text waves-effect waves-light modal-trigger">Удалить</a>
                                     <a href="{% url 'admin-user-edit' hr_user.id %}" class="btn-flat waves-effect waves-light">Редактировать</a>

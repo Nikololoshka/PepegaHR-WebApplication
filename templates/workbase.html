@@ -144,10 +144,23 @@
                             </div>
                         </li>
                         <!-- Справка -->
+                        {% block help-nav %}
                         <li>
-                            <a href="" class="collapsible-header waves-effect">
+                        {% endblock help-nav %}
+                            <a class="collapsible-header waves-effect">
                                 <i class="material-icons">info_outline</i>Справка
                             </a>
+                            {% block help-body-nav %}
+                            <div class="collapsible-body">
+                            {% endblock help-body-nav %}
+                                <ul>
+                                    {% block help-quick-nav %}
+                                    <li>
+                                    {% endblock help-quick-nav %}
+                                        <a href="{% url 'help-quick-page' %}">Quick start</a>
+                                    </li>
+                                </ul>
+                            </div>
                         </li>
                     </ul>
                 </li>
@@ -156,7 +169,7 @@
     </header>
 
     <!-- content -->
-    <main class="workbase-container container">
+    <main class="workbase-container container" style="max-width: unset;">
         {% block main-content %}
         <div class="row">
             <div class="col s12 no-padding">
