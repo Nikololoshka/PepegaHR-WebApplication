@@ -22,9 +22,8 @@
 {% block card-title %}
 <div class="row">
     <div class="col s12">
-            <div class="card-title">
-                Мои тесты
-            </div>
+        <div class="card-title">
+            Мои тесты
         </div>
     </div>
 </div>
@@ -32,9 +31,37 @@
 
 {% block card-content %}
 <!-- Поиск -->
-<div class="row valign-wrapper no-padding">
+<div class="row no-padding">
     <div class="col s12">
-        
+        {% if questionnaires %}
+        <div class="collection">
+            {% for questionnaire in questionnaires %}
+            <a href="{% url 'questionnaire-review-page' questionnaire.id %}"
+                class="collection-item black-text waves-effect">
+                <h6>{{ questionnaire.name }}</h6>
+                <div class="row no-margin">
+                    <div class="col s12">
+                        <p>
+                            Статус: 
+                            {% if questionnaire.is_wait %}
+                            <b class="orange-text">Ожидает открытия</b>
+                            {% elif questionnaire.is_close %}
+                            <b class="red-text">Закрыт</b>
+                            {% else %}
+                            <b class="green-text">Открыт</b>
+                            {% endif %}
+                        </p>
+                        <p>Автор: {{ questionnaire.author.get_full_name_reverse }}</p>
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="divider"></div>
+        <div class="center empty-list">Список пуст</div>
+        <div class="divider"></div>
+        {% endif %}
     </div>
 </div>
 {% endblock card-content %}

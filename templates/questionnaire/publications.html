@@ -22,9 +22,8 @@
 {% block card-title %}
 <div class="row">
     <div class="col s12">
-            <div class="card-title">
-                Публикации
-            </div>
+        <div class="card-title">
+            Публикации
         </div>
     </div>
 </div>
@@ -32,9 +31,76 @@
 
 {% block card-content %}
 <!-- Поиск -->
-<div class="row valign-wrapper no-padding">
+<div class="row no-padding">
+    <!-- Поиск -->
     <div class="col s12">
-        
+        <form class="valign-wrapper" style="display: flex;">
+            <div class="input-field" style="width: 100%; flex-grow: 1; margin: 0px;">
+                <input disabled type="text" placeholder="Поиск">
+            </div>
+            <button class="btn-flat waves-effect waves-light disabled" type="submit">
+                <i class="material-icons">search</i>
+            </button>
+            <!-- dropdown trigger -->
+            <a href="#" class="dropdown-trigger btn waves-effect waves-light disabled"
+                style="min-width: 10rem;" data-target="dropdownfilter">
+                <i class="material-icons left">filter_list</i>Фильтр
+            </a>
+            <!-- dropdown structure -->
+            <ul id='dropdownfilter' class='dropdown-content'>
+                <li><a href="#!">one</a></li>
+                <li><a href="#!">two</a></li>
+                <li class="divider" tabindex="-1"></li>
+            </ul>
+        </form>
+    </div>
+</div>
+
+<div class="row no-padding">
+    <div class="col s12">
+        {% if page.object_list %}
+        <div class="collection">
+            {% for questionnaire in page.object_list %}
+            <a href="{% url 'questionnaire-survey-page' questionnaire.id %}"
+                class="collection-item black-text waves-effect">
+                <div class="stretch-container">
+                    <div class="stretch-left">
+                        <h6>{{ questionnaire.name }}</h6>
+                        <div class="row no-margin">
+                            <div class="col s12">
+                                <p>
+                                    Статус: 
+                                    {% if questionnaire.is_wait %}
+                                    <b class="orange-text">Ожидает открытия</b>
+                                    {% elif questionnaire.is_close %}
+                                    <b class="red-text">Закрыт</b>
+                                    {% else %}
+                                    <b class="green-text">Открыт</b>
+                                    {% endif %}
+                                </p>
+                                <p>Автор: {{ questionnaire.author.get_full_name_reverse }}</p>
+                            </div>
+                        </div> 
+                    </div>
+                    <div class="stretch-flex-right valign-wrapper">
+                        <div>
+                            <p>Создан: {{ questionnaire.create_date }}</p>   
+                            <p>Изменен: {{ questionnaire.modify_date }}</p>  
+                        </div> 
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+
+        <!-- pagination -->
+        {% include 'patterns/pagination.html' with page=page %}
+
+        {% else %}
+        <div class="divider"></div>
+        <div class="center empty-list">Список пуст</div>
+        <div class="divider"></div>
+        {% endif %}
     </div>
 </div>
 {% endblock card-content %}

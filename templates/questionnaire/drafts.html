@@ -36,7 +36,9 @@
                 <div id="add-modal" class="modal">
                     <div class="modal-content">
                         <div class="row">
-                            <h4>Добавление теста</h4>
+                            <div class="col s12">
+                                <h4>Добавление теста</h4>
+                            </div>
                         </div>
                         <div>
                             <form action="{% url 'questionnaire-drafts-page' %}" method="POST" id="add-questionnaire">
@@ -49,8 +51,8 @@
                         </div>
                     </div>
                     <div class="modal-footer right-align">
-                        <a class="modal-close btn-flat waves-effect waves-green">Отмена</a>
-                        <button class="modal-close btn waves-effect waves-green" form="add-questionnaire" type="submit">Добавить</button>
+                        <a class="modal-close btn-flat waves-effect waves-light">Отмена</a>
+                        <button class="modal-close btn waves-effect waves-light" form="add-questionnaire" type="submit">Добавить</button>
                     </div>
                 </div>
             </div>
@@ -61,7 +63,7 @@
 
 {% block card-content %}
 <!-- Поиск -->
-<div class="row valign-wrapper no-padding">
+<div class="row no-padding">
     <div class="col s12">
         <form class="valign-wrapper" style="display: flex;">
             <div class="input-field" style="width: 100%; flex-grow: 1; margin: 0px;">
@@ -95,8 +97,8 @@
                 <div class="stretch-container">
                     <div class="stretch-left">
                         <h6>{{ questionnaire.name }}</h6>
-                        <div class="row" style="margin-bottom: 0;">
-                            <div class="col s6">
+                        <div class="row no-margin">
+                            <div class="col s12">
                                 <p>Автор: {{ questionnaire.author.get_full_name_reverse }}</p>
                             </div>
                         </div> 

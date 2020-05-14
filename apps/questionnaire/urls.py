@@ -13,7 +13,6 @@ urlpatterns = [
     path('survey/<int:questionnaire_id>', views.survey_page, name='questionnaire-survey-page'),
     path('survey/<int:questionnaire_id>/settings', views.survey_setting_page, name='questionnaire-survey-setting-page'),
     path('survey/<int:questionnaire_id>/publication', views.survey_publication_page, name='questionnaire-survey-publication-page'),
-    path('survey/to_publish', views.survey_to_publish, name='questionnaire-survey-to-publish'),
     path('survey/to_draft', views.survey_to_draft, name='questionnaire-survey-to-draft'),
     path('survey/remove', views.survey_remove, name='questionnaire-survey-remove'),
 
@@ -34,4 +33,6 @@ urlpatterns = [
 
     # mytests
     path('mytests', views.mytests_page, name='questionnaire-my-tests-page'),
+    path('mytests/review/<int:questionnaire_id>', views.test_review_page, name='questionnaire-review-page'),
+    path('mytests/passage/<int:questionnaire_id>', views.test_passage_page, name='questionnaire-passage-page')
 ]

@@ -79,12 +79,16 @@
                 </div>
                 <div class="row">
                     <div class="col s12 m4">
-                        Статус теста:
-                        {% if questionnaire.is_draft %}
-                            <b class="orange-text darken-2">Черновик</b>
+                        Статус: 
+                        {% if questionnaire.is_close %}
+                        <b class="red-text">Закрыт</b>
+                        {% elif questionnaire.is_wait %}
+                        <b class="orange-text">Ожидает открытия</b>
+                        {% elif questionnaire.is_open %}
+                        <b class="green-text">Открыт</b>
                         {% else %}
-                            <b class="green-text darken-1">Опубликован</b>
-                        {% endif %} 
+                        <b>не известно</b>
+                        {% endif %}
                     </div>
                     <div class="col s12 m4">
                         Время начала: 
@@ -113,8 +117,16 @@
                     </div>
                 </div>
                 <div class="row no-margin">
-                    <div class="col s12">
-                        Группы: 
+                    <div class="col s12 m4">
+                        Тип теста:
+                        {% if questionnaire.is_draft %}
+                            <b class="orange-text darken-2">Черновик</b>
+                        {% else %}
+                            <b class="green-text darken-1">Опубликован</b>
+                        {% endif %} 
+                    </div>
+                    <div class="col s12 m8">
+                        Список групп: 
                         {% if questionnaire.groups.all %}
                             {% for group in questionnaire.groups.all %}
                                 <a href="{% url 'departament-page' group.id %}">{{ group.name }}</a>
@@ -129,7 +141,12 @@
             <div class="card-action">
                 <div class="stretch-container">
                     <div class="stretch-left">
-                        <a href="{% url 'questionnaire-drafts-page' %}" class=" btn-flat waves-effect waves-light">
+                        <a href="
+                        {% if questionnaire.is_draft %}
+                            {% url 'questionnaire-drafts-page' %}
+                        {% else %}
+                            {% url 'questionnaire-publications-page' %}
+                        {% endif %}" class=" btn-flat waves-effect waves-light">
                             <i class="material-icons left">arrow_back</i>Назад
                         </a>
                     </div>

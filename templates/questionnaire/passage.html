@@ -1,0 +1,95 @@
+{% extends 'workbase.html' %}
+{% load static %}
+
+<!-- header content -->
+{% block title-content %}{{ questionnaire.name }}{% endblock title-content %}
+
+<!-- nav content -->
+{% block questionnaire-nav %}
+<li class="bold active">
+{% endblock questionnaire-nav %}
+
+{% block questionnaire-body-nav %}
+<div class="collapsible-body" style="display: block;">
+{% endblock questionnaire-body-nav %}
+
+                
+<!-- Заголовок -->
+{% block card-title %}
+<div class="row">
+    <div class="col s12">
+        <div class="stretch-container">
+            <div class="stretch-left">
+                <div class="card-title">
+                    {{ questionnaire.name }}
+                </div>
+            </div>
+            <div class="stretch-right valign-wrapper">
+                <p>0/10</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock card-title %}
+
+{% block card-content %}
+<!-- Поиск -->
+<div class="progress">
+    <div class="determinate" style="width: 0%"></div>
+</div>
+<div class="row no-padding">
+    <div class="col s12">
+        <p>
+            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Commodi dolore quo placeat repudiandae dolores voluptates similique, ad nisi illo eligendi ratione molestias ipsa adipisci cupiditate illum. Voluptatum deleniti voluptas iusto!
+        </p>
+    </div>
+</div>
+<div class="row no-padding no-margin">
+    <div class="col s12 right-align">
+        <p class="countdown"></p>
+    </div>
+</div>
+{% endblock card-content %}
+
+{% block card-action %}
+<div class="card-action right-align">
+    <a href="" class="btn">
+        <i class="material-icons left">forward</i>Далее
+    </a>
+</div>
+{% endblock card-action %}
+
+{% block script-page %}
+<script src="{% static '/questionnaire/js/passage.js' %}"></script>
+<script>
+$(document).ready(function() {
+    var countDownDate = new Date('Jan 5, 2021 15:37:25').getTime();
+
+    var x = setInterval(function() {
+        var now = new Date().getTime();
+        var distance = countDownDate - now;
+
+        var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        if (hours   < 10) {
+            hours   = "0" + hours;
+        }
+        if (minutes < 10) {
+            minutes = "0" + minutes;
+        }
+        if (seconds < 10) {
+            seconds = "0" + seconds;
+        }
+
+        $('.countdown').text('Осталось: ' + hours + ':' + minutes + ':' + seconds);
+
+        if (distance < 0) {
+            clearInterval(x);
+            $('.countdown ').text('Время истекло!');
+        }
+    }, 1000);
+});
+</script>
+{% endblock script-page %}

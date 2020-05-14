@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from django.utils import timezone
 from django.core.validators import MinValueValidator
 
 import itertools
@@ -26,7 +27,7 @@ class Questionnaire(models.Model):
 
     open_datetime = models.DateTimeField(null=True)
     close_datetime = models.DateTimeField(null=True)
-    groups = models.ManyToManyField('administration.Departament', blank=True)
+    groups = models.ManyToManyField('administration.Departament', blank=True, related_name='questionnaires')
 
     class Meta:
         managed = True
@@ -43,6 +44,37 @@ class Questionnaire(models.Model):
             list(self.multi_quizzes.all()), 
             list(self.arbitrary_quizzes.all())
         ]), key=lambda x: x.order)
+
+    def is_wait(self):
+        """
+        Возвращает True, если тест ожидает открытия для прохождения, иначе False.
+        Если не инициализированы даты, то None.
+        """
+        if self.open_datetime is not None:
+            return self.open_datetime > timezone.now() 
+
+        return None
+
+    def is_open(self):
+        """
+        Возвращает True, если тест открыт для прохождения, иначе False.
+        Если не инициализированы даты, то None.
+        """
+        if self.open_datetime is not None and self.close_datetime is not None:
+            now = timezone.now()
+            return self.open_datetime < now and now < self.close_datetime
+
+        return None
+
+    def is_close(self):
+        """
+        Возвращает True, если тест закрыт для прохождения, иначе False.
+        Если не инициализированы даты, то None.
+        """
+        if self.close_datetime is not None:
+            return self.close_datetime < timezone.now() 
+
+        return None
 
     def recompute_order(self):
         """
@@ -146,3 +178,29 @@ class ArbitraryQuiz(models.Model):
         Возвращает тип теста.
         """
         return Questionnaire.ARBITRARY_QUIZ
+
+
+class Answer(models.Model):
+    """
+    Ответ пользователя на тест.
+    """ 
+    quiz = models.OneToOneField('Questionnaire', on_delete=models.CASCADE, null=False)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    start_datetime = models.DateTimeField(auto_now_add=True)
+    end_datetime = models.DateTimeField()
+    is_complite = models.BooleanField(default=False)
+
+    class Meta:
+        managed = True
+        verbose_name = 'Answer'
+        verbose_name_plural = 'Answers'
+
+class SingleChooseAnswer(models.Model):
+    """
+    Ответ 
+    """
+
+    class Meta:
+        managed = True
+        verbose_name = 'SingleChooseAnswer'
+        verbose_name_plural = 'SingleChooseAnswers'

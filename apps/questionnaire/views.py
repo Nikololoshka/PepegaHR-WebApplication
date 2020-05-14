@@ -4,17 +4,33 @@ from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods, require_GET, require_POST
 from django.utils.translation import gettext_lazy as _
+from django.contrib.auth import get_user_model
 
 from .forms import SimpleQuestionnaireForm, QuestionnaireEditForm, QuestionnairePublicationForm, \
                    SingleChooseForm, MultiChooseForm, ArbitraryQuizForm
 from .models import Questionnaire, SingleChooseQuiz, MultiChooseQuiz, ArbitraryQuiz
 
+from .permissions import check_ability
+
 from apps.administration.permissions import required_moderator
 
 
 @login_required
+@required_moderator
+@require_GET
 def publications_page(request: WSGIRequest):
-    return render(request, 'questionnaire/publications.html')
+    """
+    Отображает список всех опубликованных тестов.
+    """
+    questionnaires = Questionnaire.objects.filter(is_draft__exact=False)
+    
+    page_num = request.GET.get('page', 1)
+    paginator = Paginator(questionnaires, 30)
+    page = paginator.get_page(page_num)
+
+    return render(request, 'questionnaire/publications.html', {
+        'page': page
+    })
 
 
 @login_required
@@ -38,7 +54,7 @@ def drafts_page(request: WSGIRequest):
     else:
         form = SimpleQuestionnaireForm()
 
-    questionnaires = Questionnaire.objects.all()
+    questionnaires = Questionnaire.objects.filter(is_draft__exact=True)
     
     page_num = request.GET.get('page', 1)
     paginator = Paginator(questionnaires, 30)
@@ -102,6 +118,7 @@ def survey_publication_page(request: WSGIRequest, questionnaire_id: int):
     Настраивает тест для публикации.
     """
     questionnaire = get_object_or_404(Questionnaire, id=questionnaire_id)
+    publish_errors = None
 
     if request.method == 'POST':
         # получение формы
@@ -111,30 +128,28 @@ def survey_publication_page(request: WSGIRequest, questionnaire_id: int):
             form.save()
             form.save_m2m()
 
-            return redirect('questionnaire-survey-page', questionnaire_id=questionnaire_id)
+            if request.POST.get('publish', None) is not None:
+                # сохраняем и публикуем
+                questionnaire = get_object_or_404(Questionnaire, id=questionnaire_id)
+                if questionnaire.open_datetime is not None and questionnaire.close_datetime is not None and questionnaire.groups.exists():
+                    questionnaire.is_draft = False
+                    questionnaire.save()
+
+                    return redirect('questionnaire-survey-page', questionnaire_id=questionnaire_id)
+                else:
+                    publish_errors = [_('Не заполнены все необходимые поля для публикации')]
+
+            else:
+                return redirect('questionnaire-survey-page', questionnaire_id=questionnaire_id)
 
     else:
         form = QuestionnairePublicationForm(instance=questionnaire, user_id=request.user.id)
 
     return render(request, 'questionnaire/survey_publication.html', {
         'form': form,
+        'publish_errors': publish_errors,
         'questionnaire': questionnaire
     })
-
-
-@login_required
-@required_moderator
-@require_POST
-def survey_to_publish(request: WSGIRequest):
-    """
-    Переводит тест в состояние "Опубликован".
-    """
-    questionnaire_id = request.POST.get('questionnaire_id', None)
-    questionnaire = get_object_or_404(Questionnaire, id=questionnaire_id)
-    questionnaire.is_draft = False
-    questionnaire.save()
-
-    return redirect('questionnaire-survey-page', questionnaire_id=questionnaire_id)
 
 
 @login_required
@@ -305,10 +320,49 @@ def arbitrary_remove_page(request: WSGIRequest, questionnaire_id: int):
 
 
 @login_required
+@required_moderator
 def reports_page(request: WSGIRequest):
     return render(request, 'questionnaire/reports.html')
 
 
 @login_required
+@require_GET
 def mytests_page(request: WSGIRequest):
-    return render(request, 'questionnaire/mytests.html')
+    """
+    Отображает список доступных мне тестов.
+    """
+    HRUser = get_user_model()
+    hr_user = get_object_or_404(HRUser, id=request.user.id)
+
+    questionnaires = Questionnaire.objects.filter(is_draft__exact=False, groups__in=hr_user.departaments.all())
+
+    return render(request, 'questionnaire/mytests.html', {
+        'questionnaires': questionnaires
+    })
+
+
+@login_required
+@require_http_methods(['GET', 'POST'])
+def test_review_page(request: WSGIRequest, questionnaire_id: int):
+    """
+    Просмотр теста для пользователя.
+    """
+    hr_user, questionnaire = check_ability(request.user.id, questionnaire_id)
+
+    return render(request, 'questionnaire/review.html', {
+        'questionnaire': questionnaire
+    })
+
+
+@login_required
+@require_http_methods(['GET', 'POST'])
+def test_passage_page(request: WSGIRequest, questionnaire_id: int):
+    """
+    Прохождение теста.
+    """
+    hr_user, questionnaire = check_ability(request.user.id, questionnaire_id)
+
+    return render(request, 'questionnaire/passage.html', {
+        'questionnaire': questionnaire
+    })
+    

@@ -3,6 +3,7 @@ from django.forms import formset_factory, modelformset_factory
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
+from django.utils import timezone
 
 import locale
 from contextlib import contextmanager
@@ -50,9 +51,9 @@ class QuestionnairePublicationForm(forms.ModelForm):
     Форма для публикации теста.
     """
     open_date = forms.CharField(label=_('Дата начала'), required=False)
-    open_time = forms.TimeField(label=_('Время начала'), required=False)
+    open_time = forms.TimeField(label=_('Время начала'), required=False, localize=True)
     close_date = forms.CharField(label=_('Дата конца'), required=False)
-    close_time = forms.TimeField(label=_('Время конца'), required=False)
+    close_time = forms.TimeField(label=_('Время конца'), required=False, localize=True)
 
     user_id = None
 
@@ -85,10 +86,12 @@ class QuestionnairePublicationForm(forms.ModelForm):
                 pattern_time = '%H:%M'
 
                 if open_datetime is not None:
+                    open_datetime = open_datetime.astimezone(timezone.get_current_timezone())
                     self.fields['open_date'].initial = open_datetime.strftime(pattern_date).title()
                     self.fields['open_time'].initial = open_datetime.strftime(pattern_time).title()
 
                 if close_datetime is not None:
+                    close_datetime = close_datetime.astimezone(timezone.get_current_timezone())
                     self.fields['close_date'].initial = close_datetime.strftime(pattern_date).title()
                     self.fields['close_time'].initial = close_datetime.strftime(pattern_time).title()
  
