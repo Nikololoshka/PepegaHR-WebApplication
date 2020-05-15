@@ -5,14 +5,20 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods, require_GET, require_POST
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import get_user_model
+from django.utils import timezone
+
+from datetime import timedelta
+import random
 
 from .forms import SimpleQuestionnaireForm, QuestionnaireEditForm, QuestionnairePublicationForm, \
-                   SingleChooseForm, MultiChooseForm, ArbitraryQuizForm
-from .models import Questionnaire, SingleChooseQuiz, MultiChooseQuiz, ArbitraryQuiz
+                   SingleChooseForm, MultiChooseForm, ArbitraryQuizForm, SingleChooseAnswerForm, \
+                   MultiChooseAnswerForm, ArbitraryAnswerForm
+from .models import Questionnaire, SingleChooseQuiz, MultiChooseQuiz, ArbitraryQuiz, \
+                    Answer, SingleChooseAnswer, MultiChooseAnswer, ArbitraryAnswer
 
 from .permissions import check_ability
 
-from apps.administration.permissions import required_moderator
+from apps.administration.permissions import required_moderator, required_user
 
 
 @login_required
@@ -345,12 +351,69 @@ def mytests_page(request: WSGIRequest):
 @require_http_methods(['GET', 'POST'])
 def test_review_page(request: WSGIRequest, questionnaire_id: int):
     """
-    Просмотр теста для пользователя.
+    GET: Просмотр теста для пользователя.
+    POST: Начало прохождения теста.
     """
     hr_user, questionnaire = check_ability(request.user.id, questionnaire_id)
+    answer = Answer.objects.get(questionnaire=questionnaire, user=hr_user)
+
+    if request.method == 'POST':
+        if answer is not None:
+            return redirect('questionnaire-passage-page', questionnaire_id=questionnaire_id)
+
+        test_time = questionnaire.test_time
+        end_time = None
+
+        if test_time is not None:
+            end_time = timezone.now() + timedelta(hours=test_time.hour, minutes=test_time.minute)
+
+        # создание ответа
+        answer = Answer.objects.create(
+            questionnaire=questionnaire,
+            user=hr_user,
+            end_datetime=end_time
+        )
+
+        quizzes = questionnaire.get_quizzes_list()
+
+        # перемешать вопросы
+        if questionnaire.is_shuffle:
+            random.shuffle(quizzes)
+
+
+        # обрезать кол-во вопросов
+        if questionnaire.max_count is not None:
+            quizzes = quizzes[:questionnaire.max_count]
+
+        # создание ответов на выбранные вопросы
+        for order, quiz in enumerate(quizzes):
+            quiz_type = quiz.get_quiz_type()
+            if quiz_type == Questionnaire.SINGLE_QUIZ:
+                SingleChooseAnswer.objects.create(
+                    quiz=quiz,
+                    answer=answer,
+                    order=order
+                )
+            elif quiz_type == Questionnaire.MULTI_QUIZ:
+                MultiChooseAnswer.objects.create(
+                    quiz=quiz,
+                    answer=answer,
+                    order=order
+                )
+            elif quiz_type == Questionnaire.ARBITRARY_QUIZ:
+                ArbitraryAnswer.objects.create(
+                    quiz=quiz,
+                    answer=answer,
+                    order=order
+                )
+
+        return redirect('questionnaire-passage-page', questionnaire_id=questionnaire_id)
+
+    answer = Answer.objects.get(questionnaire=questionnaire, user=hr_user)
 
     return render(request, 'questionnaire/review.html', {
-        'questionnaire': questionnaire
+        'questionnaire': questionnaire,
+        'answer': answer
     })
 
 
@@ -361,8 +424,71 @@ def test_passage_page(request: WSGIRequest, questionnaire_id: int):
     Прохождение теста.
     """
     hr_user, questionnaire = check_ability(request.user.id, questionnaire_id)
+    answer = Answer.objects.get(questionnaire=questionnaire, user=hr_user)
+
+    # TODO: проверка на время окончание
+    pass
+
+    quizzes = answer.get_quizzes_list()
+    step = answer.step
+
+    # тест пройден
+    if step >= len(quizzes):
+        pass
+
+    quiz = quizzes[step]
+    quiz_type = quiz.root.get_quiz_type()
+    next_quiz = False
+
+    if request.method == 'POST':
+
+        if quiz_type == Questionnaire.SINGLE_QUIZ:
+            form = SingleChooseAnswerForm(request.POST, instance=quiz) 
+
+        elif quiz_type == Questionnaire.MULTI_QUIZ:
+            form = MultiChooseAnswerForm(request.POST, instance=quiz) 
+
+        elif quiz_type == Questionnaire.ARBITRARY_QUIZ:
+            form = ArbitraryAnswerForm(request.POST, instance=quiz) 
+
+        # сохранение результата
+        if form.is_valid():
+            form.save()
+
+            step += 1
+            answer.step = step
+            answer.save()
+
+            # тест пройден
+            if step >= len(quizzes):
+                pass
+
+            quiz = quizzes[step]
+            quiz_type = quiz.root.get_quiz_type()
+            next_quiz = True
+
+    if request.method == 'GET' or next_quiz:
+        # создание формы для вопроса 
+        if quiz_type == Questionnaire.SINGLE_QUIZ:
+            form = SingleChooseAnswerForm(instance=quiz)
+        elif quiz_type == Questionnaire.MULTI_QUIZ:
+            form = MultiChooseAnswerForm(instance=quiz)
+        elif quiz_type == Questionnaire.ARBITRARY_QUIZ:
+            form = ArbitraryAnswerForm(instance=quiz)
+
+    progress = '{0}/{1}'.format(step, len(quizzes))
+    progress_value = int(step / len(quizzes) * 100)
+    end_datetime = answer.end_datetime
 
     return render(request, 'questionnaire/passage.html', {
-        'questionnaire': questionnaire
+        'questionnaire': questionnaire,
+        'form': form,
+        'quiz': quiz,
+        'progress': progress,
+        'progress_value': progress_value,
+        'end_datetime': end_datetime,
+        'SINGLE_QUIZ': Questionnaire.SINGLE_QUIZ,
+        'MULTI_QUIZ': Questionnaire.MULTI_QUIZ,
+        'ARBITRARY_QUIZ': Questionnaire.ARBITRARY_QUIZ
     })
     

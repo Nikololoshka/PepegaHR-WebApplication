@@ -184,10 +184,11 @@ class Answer(models.Model):
     """
     Ответ пользователя на тест.
     """ 
-    quiz = models.OneToOneField('Questionnaire', on_delete=models.CASCADE, null=False)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    questionnaire = models.ForeignKey('Questionnaire', on_delete=models.CASCADE, null=False)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=False)
     start_datetime = models.DateTimeField(auto_now_add=True)
-    end_datetime = models.DateTimeField()
+    end_datetime = models.DateTimeField(null=True)
+    step = models.SmallIntegerField(default=0)
     is_complite = models.BooleanField(default=False)
 
     class Meta:
@@ -195,12 +196,70 @@ class Answer(models.Model):
         verbose_name = 'Answer'
         verbose_name_plural = 'Answers'
 
+    def get_quizzes_list(self) -> list:
+        """
+        Возвращает список вопрос в ответе по порядку.
+        """
+        return sorted(itertools.chain.from_iterable([
+            list(self.single_answers.all()), 
+            list(self.multi_answers.all()), 
+            list(self.arbitrary_answers.all())
+        ]), key=lambda x: x.order)
+
+
 class SingleChooseAnswer(models.Model):
     """
-    Ответ 
+    Ответ на вопрос с одним вариантом ответа.
     """
+    root = models.ForeignKey('SingleChooseQuiz', on_delete=models.CASCADE, null=False)
+    answer = models.ForeignKey('Answer', related_name='single_answers', on_delete=models.CASCADE, null=False)
+    order = models.SmallIntegerField(default=-1)
+    right = models.OneToOneField('SingleChooseVariant', on_delete=models.SET_NULL, null=True)
 
     class Meta:
         managed = True
         verbose_name = 'SingleChooseAnswer'
         verbose_name_plural = 'SingleChooseAnswers'
+
+
+class MultiChooseAnswer(models.Model):
+    """
+    Ответ на вопрос с несколькими вариантами ответа.
+    """
+    root = models.ForeignKey('MultiChooseQuiz', on_delete=models.CASCADE, null=False)
+    answer = models.ForeignKey('Answer', related_name='multi_answers', on_delete=models.CASCADE, null=False)
+    order = models.SmallIntegerField(default=-1)
+
+    class Meta:
+        managed = True
+        verbose_name = 'MultiChooseAnswer'
+        verbose_name_plural = 'MultiChooseAnswers'
+
+
+class MultiChooseAnswerVariant(models.Model):
+    """
+    Один из вариантов ответа на вопрос с несколькими вариантами ответа.
+    """
+    answer = models.ForeignKey('MultiChooseAnswer', related_name='variants', on_delete=models.CASCADE, null=False)
+    right = models.OneToOneField('MultiChooseVariant', on_delete=models.SET_NULL, null=True)
+
+    class Meta:
+        managed = True
+        verbose_name = 'MultiChooseAnswerVariant'
+        verbose_name_plural = 'MultiChooseAnswerVariants'
+
+
+class ArbitraryAnswer(models.Model):
+    """
+    Ответ на вопрос с свободном вариантом ответа.
+    """
+    root = models.ForeignKey('ArbitraryQuiz', on_delete=models.CASCADE, null=False)
+    answer = models.ForeignKey('Answer', related_name='arbitrary_answers', on_delete=models.CASCADE, null=False)
+    order = models.SmallIntegerField(default=-1)
+    right = models.TextField(max_length=512)
+
+    class Meta:
+        managed = True
+        verbose_name = 'ArbitraryAnswer'
+        verbose_name_plural = 'ArbitraryAnswers'
+

@@ -78,10 +78,17 @@
             </a>
         </div>
         <div class="stretch-right">
-            {% if questionnaire.is_open %}
-            <a href="{% url 'questionnaire-passage-page' questionnaire.id %}" class="btn waves-effect waves-light">
-                <i class="material-icons left">forward</i>Начать тестирование
-            </a>
+            {% if answer %}
+                <a href="{% url 'questionnaire-passage-page' questionnaire.id %}" class="btn waves-effect waves-light">
+                    <i class="material-icons left">forward</i>Продолжить
+                </a>
+            {% elif questionnaire.is_open %}
+            <form action="{% url 'questionnaire-review-page' questionnaire.id %}" method="POST">
+                {% csrf_token %}
+                <button class="btn waves-effect waves-light" type="submit">
+                    <i class="material-icons left">forward</i>Начать тестирование
+                </button>
+            </form>
             {% else %}
             <button class="btn disabled">
                 <i class="material-icons left">forward</i>Начать тестирование

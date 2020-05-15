@@ -9,7 +9,9 @@ import locale
 from contextlib import contextmanager
 from datetime import datetime
 
-from .models import Questionnaire, SingleChooseQuiz, SingleChooseVariant, MultiChooseQuiz, MultiChooseVariant, ArbitraryQuiz
+from .models import Questionnaire, SingleChooseQuiz, SingleChooseVariant, \
+                    MultiChooseQuiz, MultiChooseVariant, ArbitraryQuiz, \
+                    SingleChooseAnswer, MultiChooseAnswer, MultiChooseAnswerVariant, ArbitraryAnswer
 
 
 class SimpleQuestionnaireForm(forms.ModelForm):
@@ -527,3 +529,198 @@ class ArbitraryQuizForm(forms.ModelForm):
 
         return quiz
 
+
+class SingleChooseAnswerForm(forms.ModelForm):
+    """
+    Форма для ответа на вопрос с одним вариантом ответа.
+    """
+
+    variants = dict()
+
+    class Meta:
+        model = SingleChooseAnswer
+        fields = []
+
+    def __init__(self, *args, **kwargs):
+        super(SingleChooseAnswerForm, self).__init__(*args, **kwargs)
+
+        answer = self.instance
+        for index, quiz_variant in enumerate(answer.root.variants.all()):
+            right_field_name, variant_name = self._get_fields_name(index)
+            self._add_fields(right_field_name, variant_name, quiz_variant)
+
+    def _add_fields(self, right_field_name: str, variant_name: str, variant):
+        """
+        Добавляет поля на форму.
+        """
+        self.fields[right_field_name] = forms.BooleanField(required=False)
+        self.variants[variant_name] = variant
+
+    def clean(self):
+        """
+        Проверяет форму на правильность.
+        """
+        cleaned_data = super(SingleChooseAnswerForm, self).clean()
+
+        i = 0
+        right_field_name, variant_name = self._get_fields_name(i)
+
+        right = None
+        while self.fields.get(right_field_name) and self.variants.get(variant_name):
+            right_data = cleaned_data.get(right_field_name, None)
+            print(right_data)
+            if right_data is not None and right_data:
+                if right is None:
+                    right = self.variants[variant_name]
+                else:
+                    raise ValidationError(_('Должен быть ровно один ответ'))
+
+            i += 1
+            right_field_name, variant_name = self._get_fields_name(i)
+
+        if right is None:
+            raise ValidationError(_('Должен быть ровно один ответ'))
+
+        self.cleaned_data['right'] = right
+    
+    def save(commit=True):
+        """
+        Сохраняет ответ в БД.
+        """
+        answer = super(SingleChooseAnswerForm, self).save(commit=False)
+        answer.right = self.cleaned_data['right']
+
+        if commit:
+            answer.save()
+
+        return answer
+
+    @staticmethod
+    def _get_fields_name(index: int):
+        """
+        Возвращает кортеж из имен полей соответсвующих переданому индексу.
+        """
+        return f'right-{index}-form', f'variant-{index}'
+
+    @staticmethod
+    def get_type():
+        return 'SINGLE'
+
+    def get_fields(self):
+        """
+        Возвращает список кортежей с полями.
+        """
+        i = 0
+        while True:
+            right_field_name, variant_name = self._get_fields_name(i)
+
+            if self.fields.get(right_field_name) and self.variants.get(variant_name):
+                yield self[right_field_name], self.variants[variant_name].variant
+                i += 1
+            else:
+                break
+
+
+class MultiChooseAnswerForm(forms.ModelForm):
+    """
+    Форма для ответа на вопрос с несколькими вариантами ответа.
+    """
+
+    variants = dict()
+
+    class Meta:
+        model = MultiChooseAnswer
+        fields = []
+
+    def __init__(self, *args, **kwargs):
+        super(MultiChooseAnswerForm, self).__init__(*args, **kwargs)
+
+        answer = self.instance
+        for index, quiz_variant in enumerate(answer.root.variants.all()):
+            right_field_name, variant_name = self._get_fields_name(index)
+            self._add_fields(right_field_name, variant_name, quiz_variant)
+
+    def _add_fields(self, right_field_name: str, variant_name: str, variant):
+        """
+        Добавляет поля на форму.
+        """
+        self.fields[right_field_name] = forms.BooleanField(required=False)
+        self.variants[variant_name] = variant
+
+    def clean(self):
+        """
+        Проверяет форму на правильность.
+        """
+        cleaned_data = super(MultiChooseAnswerForm, self).clean()
+
+        i = 0
+        right_field_name, variant_name = self._get_fields_name(i)
+
+        rights = []
+        while self.fields.get(right_field_name) and self.variants.get(variant_name):
+            right_data = cleaned_data.get(right_field_name, None)
+            
+            if right_data is not None and right_data:
+                rights.append(self.variants[variant_name])
+
+            i += 1
+            right_field_name, variant_name = self._get_fields_name(i)
+
+        if not len(rights):
+            raise ValidationError(_('Должен быть хотя бы один ответ'))
+
+        self.cleaned_data['rights'] = rights
+    
+    def save(commit=True):
+        """
+        Сохраняет ответ в БД.
+        """
+        answer = super(MultiChooseAnswerForm, self).save(commit=False)
+        rights = self.cleaned_data['rights']
+
+        for right in rights:
+            MultiChooseAnswerVariant.objects.create(
+                answer=answer,
+                right=right
+            )
+
+        if commit:
+            answer.save()
+
+        return answer
+
+    @staticmethod
+    def _get_fields_name(index: int):
+        """
+        Возвращает кортеж из имен полей соответсвующих переданому индексу.
+        """
+        return f'right-{index}-form', f'variant-{index}'
+
+    @staticmethod
+    def get_type():
+        return 'MULTI'
+
+    def get_fields(self):
+        """
+        Возвращает список кортежей с полями.
+        """
+        i = 0
+        while True:
+            right_field_name, variant_name = self._get_fields_name(i)
+
+            if self.fields.get(right_field_name) and self.variants.get(variant_name):
+                yield self[right_field_name], self.variants[variant_name].variant
+                i += 1
+            else:
+                break
+
+class ArbitraryAnswerForm(forms.ModelForm):
+    """
+    Форма для ответа на вопрос с свободном ответом.
+    """
+    class Meta:
+        model = ArbitraryAnswer
+        fields = ['right']
+        labels = {
+            'right': _('Ответ')
+        }

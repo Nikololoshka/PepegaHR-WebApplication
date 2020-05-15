@@ -48,7 +48,7 @@ class HRUser(AbstractUser):
         """
         Проверяет, имеет ли пользователь роль пользователя.
         """
-        return self.role == HRUser.USER_ROLE
+        return True
 
     @staticmethod
     def get_departament_model():

@@ -25,7 +25,7 @@
                 </div>
             </div>
             <div class="stretch-right valign-wrapper">
-                <p>0/10</p>
+                <p>{{ progress }}</p>
             </div>
         </div>
     </div>
@@ -33,63 +33,72 @@
 {% endblock card-title %}
 
 {% block card-content %}
-<!-- Поиск -->
 <div class="progress">
-    <div class="determinate" style="width: 0%"></div>
+    <div class="determinate"></div>
+</div>
+<div class="row">
+    <div class="col s12">
+        {% if form.errors %}
+            {% include 'patterns/errors.html' with errors=form.errors.values %}
+        {% endif %}
+    </div>
+</div>  
+<div class="row">
+    <div class="col s12">
+        <b>Вопрос:</b> {{ quiz.root.question }}
+    </div>
 </div>
 <div class="row no-padding">
     <div class="col s12">
-        <p>
-            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Commodi dolore quo placeat repudiandae dolores voluptates similique, ad nisi illo eligendi ratione molestias ipsa adipisci cupiditate illum. Voluptatum deleniti voluptas iusto!
-        </p>
+        <form action="{% url 'questionnaire-passage-page' questionnaire.id %}" method="POST" id="answer-form">
+            {% csrf_token %} 
+            {% if quiz.root.get_quiz_type == SINGLE_QUIZ or quiz.root.get_quiz_type == MULTI_QUIZ %}
+                {% include 'questionnaire/forms/choose_passage.html' with form=form %}
+            {% elif quiz.root.get_quiz_type == ARBITRARY_QUIZ %}
+                {% include 'questionnaire/forms/arbitrary_passage.html' with form=form %}
+            {% endif %}
+        </form>
     </div>
 </div>
 <div class="row no-padding no-margin">
     <div class="col s12 right-align">
-        <p class="countdown"></p>
+        {% if end_datetime %}
+        <p class="countdown">Осталось: --:--:--</p>
+        {% endif %}
     </div>
 </div>
 {% endblock card-content %}
 
 {% block card-action %}
 <div class="card-action right-align">
-    <a href="" class="btn">
+    <button class="btn waves-effect waves-light" type="submit" form="answer-form">
         <i class="material-icons left">forward</i>Далее
-    </a>
+    </button>
 </div>
 {% endblock card-action %}
 
 {% block script-page %}
 <script src="{% static '/questionnaire/js/passage.js' %}"></script>
+
 <script>
 $(document).ready(function() {
-    var countDownDate = new Date('Jan 5, 2021 15:37:25').getTime();
+    $('.determinate').css('width', '{{ progress_value }}%')
+});
+</script>
+
+{% if end_datetime %}
+<script>
+$(document).ready(function() {
+    var countDownDate = new Date('{{ end_datetime.isoformat }}').getTime();
+    update_countdown(countDownDate);
 
     var x = setInterval(function() {
-        var now = new Date().getTime();
-        var distance = countDownDate - now;
-
-        var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-        var seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-        if (hours   < 10) {
-            hours   = "0" + hours;
-        }
-        if (minutes < 10) {
-            minutes = "0" + minutes;
-        }
-        if (seconds < 10) {
-            seconds = "0" + seconds;
-        }
-
-        $('.countdown').text('Осталось: ' + hours + ':' + minutes + ':' + seconds);
-
-        if (distance < 0) {
+        if (!update_countdown(countDownDate)) {
             clearInterval(x);
-            $('.countdown ').text('Время истекло!');
         }
     }, 1000);
 });
 </script>
+{% endif %}
+
 {% endblock script-page %}
