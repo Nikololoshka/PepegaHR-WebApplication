@@ -105,7 +105,7 @@ class QuestionnairePublicationForm(forms.ModelForm):
         """
         saved = locale.setlocale(locale.LC_ALL)
         try:
-            yield locale.setlocale(locale.LC_ALL, 'rus')
+            yield locale.setlocale(locale.LC_ALL, 'ru_RU')
         finally:
             locale.setlocale(locale.LC_ALL, saved)
 
@@ -583,7 +583,7 @@ class SingleChooseAnswerForm(forms.ModelForm):
 
         self.cleaned_data['right'] = right
     
-    def save(commit=True):
+    def save(self, commit=True):
         """
         Сохраняет ответ в БД.
         """
@@ -671,7 +671,7 @@ class MultiChooseAnswerForm(forms.ModelForm):
 
         self.cleaned_data['rights'] = rights
     
-    def save(commit=True):
+    def save(self, commit=True):
         """
         Сохраняет ответ в БД.
         """

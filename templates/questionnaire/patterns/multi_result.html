@@ -1,0 +1,42 @@
+<div class="row">
+    <div class="col s12">
+        <div class="table-content">
+            <b>Вопрос:</b> {{ quiz_answer.root.question }}
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col s12">
+        <table>
+            <thead>
+                <th>Ответ</th>
+                <th>Вариант</th>
+            </thead>
+            <tbody>
+                {% for right, checked, variant in quiz_answer.get_rights %}
+                <tr
+                    {% if right %}
+                        class="light-green lighten-4"
+                    {% elif not right and checked %}
+                        class="red lighten-4"
+                    {% endif %}
+                >
+                    <td style="width: 20%;"> 
+                        <div class="center-align">
+                            <label>
+                                <input type="checkbox" class="filled-in input-disable"
+                                    {% if checked %} checked="checked" {% endif %}
+                                />
+                                <span>&nbsp;</span>
+                            </label>
+                        </div>
+                    </td>
+                    <td>
+                        {{ variant.variant }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -8,6 +8,15 @@
     padding-bottom: 2rem;
 }
 
+.two-lines {
+    display: -webkit-box;
+    line-height: 1.5rem;
+    height: 3rem;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;  
+    overflow: hidden;
+}
+
 .list-body {
     padding: 1rem;
 }

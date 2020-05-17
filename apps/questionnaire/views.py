@@ -6,6 +6,8 @@ from django.views.decorators.http import require_http_methods, require_GET, requ
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import get_user_model
 from django.utils import timezone
+from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Avg, Count
 
 from datetime import timedelta
 import random
@@ -17,6 +19,8 @@ from .models import Questionnaire, SingleChooseQuiz, MultiChooseQuiz, ArbitraryQ
                     Answer, SingleChooseAnswer, MultiChooseAnswer, ArbitraryAnswer
 
 from .permissions import check_ability
+
+from .utilities import timedelta_to_str 
 
 from apps.administration.permissions import required_moderator, required_user
 
@@ -77,13 +81,22 @@ def drafts_page(request: WSGIRequest):
 @require_GET
 def survey_page(request: WSGIRequest, questionnaire_id: int):
     """
-    Отображает текущий черновик теста.
+    Отображает текущий тест.
     """
     questionnaire = get_object_or_404(Questionnaire, id=questionnaire_id)
+    
+    HRUser = get_user_model()
+    user_count = HRUser.objects.filter(departaments__in=questionnaire.groups.all()).count()
+
+    answer_query = Answer.objects.filter(questionnaire=questionnaire) \
+                        .aggregate(avg_evaluation=Avg('evaluation'), answer_count=Count('id'))
+    answer_count, avg_evaluation = answer_query['answer_count'], answer_query['avg_evaluation']
 
     return render(request, 'questionnaire/survey.html', {
         'questionnaire': questionnaire,
         'quizzes': questionnaire.get_quizzes_list(),
+        'passage_status': f'{answer_count}/{user_count}',
+        'avg_evaluation': avg_evaluation if avg_evaluation is not None else '---',
         'SINGLE_QUIZ': Questionnaire.SINGLE_QUIZ,
         'MULTI_QUIZ': Questionnaire.MULTI_QUIZ,
         'ARBITRARY_QUIZ': Questionnaire.ARBITRARY_QUIZ
@@ -340,10 +353,14 @@ def mytests_page(request: WSGIRequest):
     HRUser = get_user_model()
     hr_user = get_object_or_404(HRUser, id=request.user.id)
 
-    questionnaires = Questionnaire.objects.filter(is_draft__exact=False, groups__in=hr_user.departaments.all())
+    questionnaires = Questionnaire.objects.filter(is_draft=False, groups__in=hr_user.departaments.all())
+    questionnaires = questionnaires.exclude(answers__user=hr_user, answers__is_complete=True)
+
+    answers = Answer.objects.filter(user=hr_user, is_complete=True)
 
     return render(request, 'questionnaire/mytests.html', {
-        'questionnaires': questionnaires
+        'questionnaires': questionnaires,
+        'answers': answers
     })
 
 
@@ -355,7 +372,11 @@ def test_review_page(request: WSGIRequest, questionnaire_id: int):
     POST: Начало прохождения теста.
     """
     hr_user, questionnaire = check_ability(request.user.id, questionnaire_id)
-    answer = Answer.objects.get(questionnaire=questionnaire, user=hr_user)
+
+    try:
+        answer = Answer.objects.get(questionnaire=questionnaire, user=hr_user)
+    except ObjectDoesNotExist:
+        answer = None
 
     if request.method == 'POST':
         if answer is not None:
@@ -390,26 +411,24 @@ def test_review_page(request: WSGIRequest, questionnaire_id: int):
             quiz_type = quiz.get_quiz_type()
             if quiz_type == Questionnaire.SINGLE_QUIZ:
                 SingleChooseAnswer.objects.create(
-                    quiz=quiz,
+                    root=quiz,
                     answer=answer,
                     order=order
                 )
             elif quiz_type == Questionnaire.MULTI_QUIZ:
                 MultiChooseAnswer.objects.create(
-                    quiz=quiz,
+                    root=quiz,
                     answer=answer,
                     order=order
                 )
             elif quiz_type == Questionnaire.ARBITRARY_QUIZ:
                 ArbitraryAnswer.objects.create(
-                    quiz=quiz,
+                    root=quiz,
                     answer=answer,
                     order=order
                 )
 
         return redirect('questionnaire-passage-page', questionnaire_id=questionnaire_id)
-
-    answer = Answer.objects.get(questionnaire=questionnaire, user=hr_user)
 
     return render(request, 'questionnaire/review.html', {
         'questionnaire': questionnaire,
@@ -424,17 +443,21 @@ def test_passage_page(request: WSGIRequest, questionnaire_id: int):
     Прохождение теста.
     """
     hr_user, questionnaire = check_ability(request.user.id, questionnaire_id)
-    answer = Answer.objects.get(questionnaire=questionnaire, user=hr_user)
-
-    # TODO: проверка на время окончание
-    pass
+    answer = get_object_or_404(Answer, questionnaire=questionnaire, user=hr_user)
 
     quizzes = answer.get_quizzes_list()
     step = answer.step
 
     # тест пройден
     if step >= len(quizzes):
-        pass
+        return redirect('questionnaire-passage-end-page', questionnaire_id=questionnaire_id)
+
+    # истекло время
+    end_datetime = answer.end_datetime
+    if end_datetime is not None and timezone.now() > end_datetime:
+        answer.is_complete = True
+        answer.save()
+        return redirect('questionnaire-passage-end-page', questionnaire_id=questionnaire_id)
 
     quiz = quizzes[step]
     quiz_type = quiz.root.get_quiz_type()
@@ -457,11 +480,16 @@ def test_passage_page(request: WSGIRequest, questionnaire_id: int):
 
             step += 1
             answer.step = step
-            answer.save()
 
             # тест пройден
             if step >= len(quizzes):
-                pass
+                answer.end_datetime = timezone.now()
+                answer.is_complete = True
+                answer.save()
+
+                return redirect('questionnaire-passage-end-page', questionnaire_id=questionnaire_id)
+
+            answer.save()
 
             quiz = quizzes[step]
             quiz_type = quiz.root.get_quiz_type()
@@ -476,9 +504,8 @@ def test_passage_page(request: WSGIRequest, questionnaire_id: int):
         elif quiz_type == Questionnaire.ARBITRARY_QUIZ:
             form = ArbitraryAnswerForm(instance=quiz)
 
-    progress = '{0}/{1}'.format(step, len(quizzes))
+    progress = '{0}/{1}'.format(step + 1, len(quizzes))
     progress_value = int(step / len(quizzes) * 100)
-    end_datetime = answer.end_datetime
 
     return render(request, 'questionnaire/passage.html', {
         'questionnaire': questionnaire,
@@ -492,3 +519,55 @@ def test_passage_page(request: WSGIRequest, questionnaire_id: int):
         'ARBITRARY_QUIZ': Questionnaire.ARBITRARY_QUIZ
     })
     
+
+@login_required
+@require_GET
+def test_passage_end_page(request: WSGIRequest, questionnaire_id: int):
+    """
+    Страница с завершением теста.
+    """
+    answer = get_object_or_404(Answer, questionnaire__id=questionnaire_id, user__id=request.user.id)
+
+    return render(request, 'questionnaire/passage_end.html', {
+        'answer': answer
+    })
+
+@login_required
+@require_GET
+def test_passage_result_page(request: WSGIRequest, questionnaire_id: int):
+    """
+    Результат прохождения теста пользователем.
+    """
+    user_id = request.GET.get('user_id', None)
+    if user_id is not None and request.user.is_moderator:
+        answer = get_object_or_404(Answer, questionnaire__id=questionnaire_id, user__id=user_id)
+    else:
+        answer = get_object_or_404(Answer, questionnaire__id=questionnaire_id, user__id=request.user.id)
+
+    answer_time = answer.end_datetime - answer.start_datetime
+    test_time = timedelta_to_str(answer_time)
+
+    return render(request, 'questionnaire/passage_result.html', {
+        'answer': answer,
+        'test_time': test_time,
+        'my_result': user_id is None,
+        'SINGLE_QUIZ': Questionnaire.SINGLE_QUIZ,
+        'MULTI_QUIZ': Questionnaire.MULTI_QUIZ,
+        'ARBITRARY_QUIZ': Questionnaire.ARBITRARY_QUIZ
+    })
+
+
+@login_required
+@required_moderator
+@require_GET
+def survey_result_page(request: WSGIRequest, questionnaire_id: int):
+    """
+    Отображает список результотов теста
+    """
+    questionnaire = get_object_or_404(Questionnaire, id=questionnaire_id)
+    answers = Answer.objects.filter(questionnaire=questionnaire)
+
+    return render(request, 'questionnaire/survey_result.html', {
+        'questionnaire': questionnaire,
+        'answers': answers
+    })

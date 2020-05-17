@@ -27,20 +27,9 @@
     </div>
 </div>
 
-<div class="row" style="margin-left: -0.75rem; margin-right: -0.75rem; display: flex;">
-    <div class="col s12 l6">
-        <div class="card hoverable" style="height: 100%;">
-            <a href="{% url 'my-profile' %}" class="black-text">
-                <div class="card-image">
-                    <img src="{% static 'home/img/profile.jpg' %}" alt="">
-                </div>
-                <div class="card-content">
-                    <span class="card-title truncate">Профиль</span>
-                    <p>Просмотр, редактирование профиля пользователя (смена пароля, почты)</p>
-                </div>
-            </a>
-        </div>
-    </div>
+<div class="row" style="margin-left: -0.75rem; margin-right: -0.75rem;">
+    
+    {% if user.is_admin %}
     <div class="col s12 l6">
         <div class="card hoverable" style="height: 100%;">
             <a href="{% url 'admin-information-page' %}" class="black-text">
@@ -49,7 +38,49 @@
                 </div>
                 <div class="card-content">
                     <span class="card-title truncate">Администрирование</span>
-                    <p>Создание, редактирование, удаление пользователей и отделов</p>
+                    <p class="two-lines">Создание, редактирование, удаление пользователей и отделов c пользователями</p>
+                </div>
+            </a>
+        </div>
+    </div>
+    {% endif %}
+    {% if user.is_moderator %}
+    <div class="col s12 l6">
+        <div class="card hoverable" style="height: 100%;">
+            <a href="{% url 'questionnaire-drafts-page' %}" class="black-text">
+                <div class="card-image">
+                    <img src="{% static 'home/img/drafts.jpg' %}" alt="">
+                </div>
+                <div class="card-content">
+                    <span class="card-title truncate">Управление тестированием</span>
+                    <p class="two-lines">Создание, редактирование, удаление тестов</p>
+                </div>
+            </a>
+        </div>
+    </div>
+    {% endif %}
+    <div class="col s12 l6">
+        <div class="card hoverable" style="height: 100%;">
+            <a href="{% url 'my-profile' %}" class="black-text">
+                <div class="card-image">
+                    <img src="{% static 'home/img/profile.jpg' %}" alt="">
+                </div>
+                <div class="card-content">
+                    <span class="card-title truncate">Профиль</span>
+                    <p class="two-lines">Просмотр, редактирование профиля пользователя (смена пароля, почты)</p>
+                </div>
+            </a>
+        </div>
+    </div>
+    <div class="col s12 l6">
+        <div class="card hoverable" style="height: 100%;">
+            <a href="{% url 'questionnaire-my-tests-page' %}" class="black-text">
+                <div class="card-image">
+                    <img src="{% static 'home/img/passage.jpg' %}" alt="">
+                </div>
+                <div class="card-content">
+                    <span class="card-title truncate">Тестирование</span>
+                    <p class="two-lines">Прохождение тестов</p>
                 </div>
             </a>
         </div>

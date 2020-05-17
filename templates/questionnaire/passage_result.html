@@ -1,0 +1,75 @@
+{% extends 'workbase.html' %}
+{% load static %}
+
+<!-- header content -->
+{% block title-content %}Результат теста: {{ answer.questionnaire.name }}{% endblock title-content %}
+
+<!-- nav content -->
+{% block questionnaire-nav %}
+<li class="bold active">
+{% endblock questionnaire-nav %}
+
+{% block questionnaire-body-nav %}
+<div class="collapsible-body" style="display: block;">
+{% endblock questionnaire-body-nav %}
+
+    
+<!-- Заголовок -->
+{% block card-title %}
+<div class="row">
+    <div class="col s12">
+        <div class="card-title">
+            Результат теста: {{ answer.questionnaire.name }}
+        </div>
+    </div>
+</div>
+{% endblock card-title %}
+
+{% block card-content %}
+<div class="row no-padding">
+    <div class="col s12 m4">
+        <h6>Тест пройден: <b>{{ answer.end_datetime }}</b></h6>
+    </div>
+    <div class="col s12 m4">
+        <h6>Время прохождения: <b>{{ test_time }}</b></h6>
+    </div>
+    <div class="col s12 m4">
+        <h6>Результат: <b>{{ answer.get_evaluation }}</b></h6>
+    </div>
+</div>
+<div class="row no-padding">
+    <div class="col s12">
+        <div class="collection">
+            {% for quiz_answer in answer.get_quizzes_list %}
+            <div class="collection-item">
+                {% if quiz_answer.root.get_quiz_type == SINGLE_QUIZ %}
+                    {% include 'questionnaire/patterns/single_result.html' with quiz_answer=quiz_answer %}
+                {% elif quiz_answer.root.get_quiz_type == MULTI_QUIZ %}
+                    {% include 'questionnaire/patterns/multi_result.html' with quiz_answer=quiz_answer %}
+                {% elif quiz_answer.root.get_quiz_type == ARBITRARY_QUIZ %}
+                    {% include 'questionnaire/patterns/arbitrary_result.html' with quiz_answer=quiz_answer %}
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock card-content %}
+
+{% block card-action %}
+<div class="card-action">
+    <a href="
+    {% if my_result %}
+        {% url 'questionnaire-my-tests-page' %}
+    {% else %}
+        {% url 'questionnaire-survey-result-page' answer.questionnaire.id %}
+    {% endif %}
+    " class="btn-flat waves-effect waves-light">
+        <i class="material-icons left">arrow_back</i>Назад
+    </a>
+</div>
+{% endblock card-action %}
+
+{% block script-page %}
+<script src="{% static '/questionnaire/js/passage_result.js' %}"></script>
+{% endblock script-page %}

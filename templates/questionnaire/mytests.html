@@ -17,51 +17,100 @@
 <li class="active">
 {% endblock questionnaire-mytests-nav %}
 
-                
-<!-- Заголовок -->
-{% block card-title %}
-<div class="row">
-    <div class="col s12">
-        <div class="card-title">
-            Мои тесты
-        </div>
-    </div>
-</div>
-{% endblock card-title %}
 
-{% block card-content %}
-<!-- Поиск -->
-<div class="row no-padding">
-    <div class="col s12">
-        {% if questionnaires %}
-        <div class="collection">
-            {% for questionnaire in questionnaires %}
-            <a href="{% url 'questionnaire-review-page' questionnaire.id %}"
-                class="collection-item black-text waves-effect">
-                <h6>{{ questionnaire.name }}</h6>
-                <div class="row no-margin">
+{% block main-content %}
+<div class="row">
+    <div class="col s12 no-padding">
+        <div class="card">
+            <div class="card-content">
+                <div class="row">
                     <div class="col s12">
-                        <p>
-                            Статус: 
-                            {% if questionnaire.is_wait %}
-                            <b class="orange-text">Ожидает открытия</b>
-                            {% elif questionnaire.is_close %}
-                            <b class="red-text">Закрыт</b>
-                            {% else %}
-                            <b class="green-text">Открыт</b>
-                            {% endif %}
-                        </p>
-                        <p>Автор: {{ questionnaire.author.get_full_name_reverse }}</p>
+                        <div class="card-title">
+                            Доступные тесты
+                        </div>
                     </div>
                 </div>
-            </a>
-            {% endfor %}
+
+                <div class="row no-padding">
+                    <div class="col s12">
+                        {% if questionnaires %}
+                        <div class="collection">
+                            {% for questionnaire in questionnaires %}
+                            <a href="{% url 'questionnaire-review-page' questionnaire.id %}"
+                                class="collection-item black-text waves-effect">
+                                <h6>{{ questionnaire.name }}</h6>
+                                <div class="row no-margin">
+                                    <div class="col s12">
+                                        <p>
+                                            Статус: 
+                                            {% if questionnaire.is_wait %}
+                                            <b class="orange-text">Ожидает открытия</b>
+                                            {% elif questionnaire.is_close %}
+                                            <b class="red-text">Закрыт</b>
+                                            {% else %}
+                                            <b class="green-text">Открыт</b>
+                                            {% endif %}
+                                        </p>
+                                        <p>Автор: {{ questionnaire.author.get_full_name_reverse }}</p>
+                                    </div>
+                                </div>
+                            </a>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="divider"></div>
+                        <div class="center empty-list">Список пуст</div>
+                        <div class="divider"></div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
         </div>
-        {% else %}
-        <div class="divider"></div>
-        <div class="center empty-list">Список пуст</div>
-        <div class="divider"></div>
-        {% endif %}
     </div>
 </div>
-{% endblock card-content %}
+
+<div class="row">
+    <div class="col s12 no-padding">
+        <div class="card">
+            <div class="card-content">
+                <div class="row">
+                    <div class="col s12">
+                        <div class="card-title">
+                            Пройденные тесты
+                        </div>
+                    </div>
+                </div>
+                <div class="row no-padding">
+                    <div class="col s12">
+                        {% if answers %}
+                        <div class="collection">
+                            {% for answer in answers %}
+                            <a href="{% url 'questionnaire-passage-result-page' answer.questionnaire.id %}"
+                                class="collection-item black-text waves-effect">
+                                <h6>{{ answer.questionnaire.name }}</h6>
+                                <div class="row no-margin">
+                                    <div class="col s12">
+                                        <p>
+                                            Пройден: {{ answer.end_datetime }}
+                                        </p>
+                                        <p>
+                                            Оценка: {{ answer.get_evaluation }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </a>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="divider"></div>
+                        <div class="center empty-list">Список пуст</div>
+                        <div class="divider"></div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock main-content %}

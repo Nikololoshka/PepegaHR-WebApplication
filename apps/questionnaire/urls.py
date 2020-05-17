@@ -15,6 +15,7 @@ urlpatterns = [
     path('survey/<int:questionnaire_id>/publication', views.survey_publication_page, name='questionnaire-survey-publication-page'),
     path('survey/to_draft', views.survey_to_draft, name='questionnaire-survey-to-draft'),
     path('survey/remove', views.survey_remove, name='questionnaire-survey-remove'),
+    path('survey/result/<int:questionnaire_id>', views.survey_result_page, name='questionnaire-survey-result-page'),
 
     path('survey/<int:questionnaire_id>/single_choose', views.single_choose_page, name='questionnaire-single-choose-create'),
     path('survey/<int:questionnaire_id>/single_choose/<int:quiz_id>', views.single_choose_page, name='questionnaire-single-choose-edit'),
@@ -34,5 +35,7 @@ urlpatterns = [
     # mytests
     path('mytests', views.mytests_page, name='questionnaire-my-tests-page'),
     path('mytests/review/<int:questionnaire_id>', views.test_review_page, name='questionnaire-review-page'),
-    path('mytests/passage/<int:questionnaire_id>', views.test_passage_page, name='questionnaire-passage-page')
+    path('mytests/passage/<int:questionnaire_id>', views.test_passage_page, name='questionnaire-passage-page'),
+    path('mytests/passage_end/<int:questionnaire_id>', views.test_passage_end_page, name='questionnaire-passage-end-page'),
+    path('mytests/passage_result/<int:questionnaire_id>', views.test_passage_result_page, name='questionnaire-passage-result-page')
 ]

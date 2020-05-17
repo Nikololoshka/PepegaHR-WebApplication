@@ -184,12 +184,14 @@ class Answer(models.Model):
     """
     Ответ пользователя на тест.
     """ 
-    questionnaire = models.ForeignKey('Questionnaire', on_delete=models.CASCADE, null=False)
+    questionnaire = models.ForeignKey('Questionnaire', related_name='answers', on_delete=models.CASCADE, null=False)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=False)
     start_datetime = models.DateTimeField(auto_now_add=True)
     end_datetime = models.DateTimeField(null=True)
     step = models.SmallIntegerField(default=0)
-    is_complite = models.BooleanField(default=False)
+    is_complete = models.BooleanField(default=False)
+    evaluation = models.SmallIntegerField(null=True)
+    max_evaluation = models.SmallIntegerField(null=True)
 
     class Meta:
         managed = True
@@ -206,6 +208,37 @@ class Answer(models.Model):
             list(self.arbitrary_answers.all())
         ]), key=lambda x: x.order)
 
+    def get_evaluation(self):
+        """
+        Возвращает оценку за тест.
+        """
+        if self.evaluation is not None and self.max_evaluation is not None:
+            return f'{self.evaluation}/{self.max_evaluation}'
+
+        current_evaluation = 0
+        max_evaluation = 0
+
+        answers = self.get_quizzes_list()
+        for answer in answers:
+            quiz_type = answer.root.get_quiz_type()
+
+            if quiz_type == Questionnaire.SINGLE_QUIZ:
+                if answer.root.right == answer.right:
+                    current_evaluation += 1
+                
+                max_evaluation += 1
+                
+            elif quiz_type == Questionnaire.MULTI_QUIZ:
+                rights = answer.root.variants.filter(right=True)
+                current_evaluation += (rights & MultiChooseVariant.objects.filter(id__in=answer.variants.values('right'))).count()
+                max_evaluation += rights.count()
+
+        self.evaluation = current_evaluation 
+        self.max_evaluation = max_evaluation
+        self.save()
+
+        return f'{self.evaluation}/{self.max_evaluation}'
+
 
 class SingleChooseAnswer(models.Model):
     """
@@ -214,7 +247,7 @@ class SingleChooseAnswer(models.Model):
     root = models.ForeignKey('SingleChooseQuiz', on_delete=models.CASCADE, null=False)
     answer = models.ForeignKey('Answer', related_name='single_answers', on_delete=models.CASCADE, null=False)
     order = models.SmallIntegerField(default=-1)
-    right = models.OneToOneField('SingleChooseVariant', on_delete=models.SET_NULL, null=True)
+    right = models.ForeignKey('SingleChooseVariant', on_delete=models.SET_NULL, null=True)
 
     class Meta:
         managed = True
@@ -235,13 +268,32 @@ class MultiChooseAnswer(models.Model):
         verbose_name = 'MultiChooseAnswer'
         verbose_name_plural = 'MultiChooseAnswers'
 
+    def get_rights(self):
+        result = []
+        
+        variants = self.root.variants.all()
+        my_answers = self.variants.values_list('right', flat=True)
+
+        for variant in variants:
+            if variant.right:
+                if variant.id in my_answers:
+                    result.append([True, True, variant])
+                else:
+                    result.append([True, False, variant])
+            else:
+                if variant.id in my_answers:
+                    result.append([False, True, variant])
+                else:
+                    result.append([False, False, variant])
+
+        return result
 
 class MultiChooseAnswerVariant(models.Model):
     """
     Один из вариантов ответа на вопрос с несколькими вариантами ответа.
     """
     answer = models.ForeignKey('MultiChooseAnswer', related_name='variants', on_delete=models.CASCADE, null=False)
-    right = models.OneToOneField('MultiChooseVariant', on_delete=models.SET_NULL, null=True)
+    right = models.ForeignKey('MultiChooseVariant', on_delete=models.SET_NULL, null=True)
 
     class Meta:
         managed = True

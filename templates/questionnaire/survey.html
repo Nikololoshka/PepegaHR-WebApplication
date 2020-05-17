@@ -43,12 +43,14 @@
                 </div>
                 <div class="row">
                     <div class="col s12 m4">
-                        <label>
-                            <input type="checkbox" class="filled-in input-disable"
-                                {% if questionnaire.is_shuffle %} checked='checked' {% endif %}
-                            />
-                            <span>Перемешавать вопросы</span>
-                        </label>
+                        Перемешивание вопросов:
+                        <b>
+                        {% if questionnaire.is_shuffle %} 
+                            включено
+                        {% else %}
+                            отключено
+                        {% endif %}
+                        </b>
                     </div>
                     <div class="col s12 m4">
                         Максимум вопросов в тесте: 
@@ -165,6 +167,34 @@
     </div>
 </div>
 
+<div class="row">
+    <div class="col s12 no-padding">
+        <div class="card">
+            <div class="card-content">
+                <div class="card-title">
+                    Результаты
+                </div>
+                <div class="row"></div>
+                <div class="row no-padding">
+                    <div class="col s12 m6">
+                        Пользователей, прошедших тестов: <b>{{ passage_status }}</b>
+                    </div>
+                    <div class="col s12 m6">
+                        Средняя оценка: <b>{{ avg_evaluation }}</b>
+                    </div>
+                </div>
+            </div>
+            <div class="card-action">
+                <div class="right-align">
+                    <a href="{% url 'questionnaire-survey-result-page' questionnaire.id %}" class="btn">
+                        <i class="material-icons left">assessment</i>Посмотреть результаты
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Список с вопросами -->
 <div class="row">
     <div class="col s12 no-padding">
@@ -191,7 +221,7 @@
                                 <ul id='create_quiz' class='dropdown-content'>
                                     <li>
                                         <a href="{% url 'questionnaire-single-choose-create' questionnaire.id %}">
-                                            <i class="material-icons">radio_button_checked</i>Одим вариант
+                                            <i class="material-icons">radio_button_checked</i>Один вариант
                                         </a>
                                     </li>
                                     <li>

@@ -29,12 +29,12 @@
     {% if page.has_next %}
     <li class="waves-effect">
         <a href="?page={{ page.next_page_number }}">
-            <i class="material-icons">chevron_right</i>
+            {{ page.next_page_number }}
         </a>
     </li>
     <li class="waves-effect">
         <a href="?page={{ page.next_page_number }}">
-            {{ page.next_page_number }}
+            <i class="material-icons">chevron_right</i>
         </a>
     </li>
     {% else %}
