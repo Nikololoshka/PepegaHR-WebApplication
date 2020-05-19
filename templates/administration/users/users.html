@@ -19,40 +19,35 @@
 
 
 {% block card-title %}
-<div class="stretch-container">
-    <div class="stretch-left">
-        <div class="card-title">
-            Список пользователей
+<div class="row">
+    <div class="col s12">
+        <div class="stretch-container">
+            <div class="stretch-left">
+                <div class="card-title">
+                    Список пользователей
+                </div>
+            </div>
+            <div class="stretch-right">
+                <a href="{% url 'admin-user-create' %}" class="btn waves-effect waves-light truncate">
+                    <i class="material-icons left">add</i>Добавить пользователя
+                </a>
+            </div>
         </div>
     </div>
-    <div class="stretch-right">
-        <a href="{% url 'admin-user-create' %}" class="btn waves-effect waves-light truncate">
-            <i class="material-icons left">add</i>Добавить пользователя
-        </a>
-    </div>
 </div>
+
 {% endblock card-title %}
 
 {% block card-content %}
-<div class="row">
+<div class="row valign-wrapper no-padding">
     <div class="col s12">
-        <form class="valign-wrapper" style="display: flex;">
+        <form action="{% url 'admin-users-page' %}" method="GET" class="valign-wrapper" style="display: flex;" id="search-form">
             <div class="input-field" style="width: 100%; flex-grow: 1; margin: 0px;">
-                <input  disabled type="text" placeholder="Поиск">
+                <input name="q" type="text" placeholder="Поиск пользователя" value="{{ search_q }}">
             </div>
-            <button class="btn-flat waves-effect waves-light disabled" type="submit">
+            <button class="btn-flat waves-effect waves-light" type="submit">
                 <i class="material-icons">search</i>
             </button>
-            <!-- dropdown trigger -->
-            <a href="#" class="dropdown-trigger btn waves-effect waves-light disabled" style="min-width: 10rem;" data-target="dropdownfilter">
-                <i class="material-icons left">filter_list</i>Фильтр
-            </a>
-            <!-- dropdown structure -->
-            <ul id='dropdownfilter' class='dropdown-content'>
-                <li><a href="#!">one</a></li>
-                <li><a href="#!">two</a></li>
-                <li class="divider" tabindex="-1"></li>
-            </ul>
         </form>
     </div>
 </div>
@@ -64,25 +59,29 @@
             {% for hr_user in page.object_list %}
             <li>
                 <div class="collapsible-header waves-effect row" style="margin: 0;">
-                    <div class="col s10 m11 valign-wrapper no-padding">          
-                        <div style="display: inline-block; margin-right: 1rem;">
-                            <img src="{{ hr_user.photo.url }}" alt="" class="circle" style="max-width: 48px;">
-                        </div>
-                        <div style="display: inline-block;">
-                            <p style="font-size: large;">{{ hr_user.get_full_name_reverse }}</p>
-                            <p>{{ hr_user.get_role_display }}</p>
-                        </div>
-                    </div>   
-                    <div class="col s2 m1 valign-wrapper">
-                        {% if hr_user.is_admin %}
-                        <i class="material-icons amber-text right tooltipped" 
-                        data-position="bottom" data-tooltip="Администратор">stars</i>
-                        {% elif hr_user.is_moderator %}
-                        <i class="material-icons grey-text right tooltipped" 
-                        data-position="bottom" data-tooltip="Модератор">stars</i>
-                        {% else %}                        
-                        {% endif %}
-                    </div>
+                    <div class="col s12">    
+                        <div class="stretch-container">
+                            <div class="stretch-left valign-wrapper">
+                                <div style="display: inline-block; margin-right: 1rem;">
+                                    <img src="{{ hr_user.photo.url }}" alt="" class="circle" style="max-width: 48px;">
+                                </div>
+                                <div style="display: inline-block;">
+                                    <p style="font-size: large;">{{ hr_user.get_full_name_reverse }}</p>
+                                    <p>{{ hr_user.get_role_display }}</p>
+                                </div>
+                            </div>
+                            <div class="stretch-right valign-wrapper">
+                                {% if hr_user.is_admin %}
+                                <i class="material-icons amber-text right tooltipped" 
+                                    data-position="bottom" data-tooltip="Администратор">stars</i>
+                                {% elif hr_user.is_moderator %}
+                                <i class="material-icons grey-text right tooltipped" 
+                                    data-position="bottom" data-tooltip="Модератор">stars</i>
+                                {% else %}                        
+                                {% endif %}
+                            </div>
+                        </div>     
+                    </div> 
                 </div>
                 <div class="collapsible-body list-body">
                     <div class="row">
@@ -136,11 +135,17 @@
         </ul>
 
         <!-- pagination -->
-        {% include 'patterns/pagination.html' with page=page %}
+        {% include 'patterns/pagination_search.html' with page=page %}
 
     {% else %}
         <div class="divider"></div>
-        <div class="center empty-list">Список пуст</div>
+        <div class="center empty-list">
+            {% if search_q %}
+                По запросу <b>{{ search_q }}</b> ничего не найдено
+            {% else %}
+                Список пуст
+            {% endif %}
+        </div>
         <div class="divider"></div>
     {% endif %}
     </div>

@@ -6,34 +6,39 @@
 
 {% block main-content %}
 <div class="row">
-    <div class="col s12 l6 offset-l3">
+    <div class="col s12 offset-m2 m8 l6 offset-l3">
         <div class="card">
-            <form method="POST" action="{% url 'login' %}" class="card-content" id="login-form">
-                {% csrf_token %}
-
+            <div class="card-content">
                 <div class="card-title">Вход в систему</div>
-                <div class="row">
-                    <div class="input-field col s12">
-                        <i class="material-icons prefix">account_circle</i>
-                        <input name="username" type="text" id="id_username" class="validate" autocapitalize="none" autocomplete="username" maxlength="150">
-                        <label for="id_username">Имя пользователя</label>
+                <form method="POST" action="{% url 'login' %}" id="login-form">
+                    {% csrf_token %}
+                    <div class="row no-margin">
+                        <div class="input-field col s12">
+                            <i class="material-icons prefix">account_circle</i>
+                            {{ form.username }}
+                            <label for="{{ form.username.auto_id }}">Имя пользователя</label>
+                        </div>
+                        <div class="input-field col s12">
+                            <i class="material-icons prefix">lock</i>
+                            {{ form.password }}
+                            <label for="{{ form.password.auto_id }}">Пароль</label>
+                        </div>
                     </div>
-                    <div class="input-field col s12">
-                        <i class="material-icons prefix">lock</i>
-                        <input name="password" type="password" id="id_password" class="validate" autocomplete="current-password" maxlength="254">
-                        <label for="id_password">Пароль</label>
-                        {% if form.errors %}
+                    {% for hidden in form.hidden_fields %}
+                        {{ hidden }}
+                    {% endfor %}
+                </form>
+                {% if form.errors %}
+                <div class="row">
+                    <div class="col s12">
                         <p class="red-text">Неправильный логин или пароль!</p>
-                        {% endif %}
                     </div>
                 </div>
-
-
-            </form>
+                {% endif %}  
+            </div>
 
             <div class="card-action">
                 <button form="login-form" class="btn waves-effect waves-light" type="submit">Войти</button>
-                <input form="login-form" type="hidden" name="next" value="{{ next }}" />
                 <a href="{% url 'password_reset' %}" class="btn-flat waves-effect waves-light">Забыли пароль?</a>
             </div>
         </div>

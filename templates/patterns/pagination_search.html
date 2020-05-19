@@ -1,0 +1,48 @@
+<ul class="pagination right-align">
+    <!-- Есть предыдущая страница -->
+    {% if page.has_previous %}
+    <li class="waves-effect">
+        <button form="search-form" name="page" value="{{ page.previous_page_number }}" type="submit" class="pagination-arrow">
+            <i class="material-icons">chevron_left</i>
+        </button>
+    </li>
+    <li class="waves-effect">
+        <button form="search-form" name="page" value="{{ page.previous_page_number }}" type="submit" class="pagination-button">
+            {{ page.previous_page_number }}
+        </button>
+    </li>
+    {% else %}
+    <!-- Нет предыдущей -->
+    <li class="disabled">
+        <a href="#!">
+            <i class="material-icons">chevron_left</i>
+        </a>
+    </li>
+    {% endif %}
+
+    <!-- Текущая страница -->
+    <li class="waves-effect active">
+        <button form="search-form" name="page" value="{{ page.number }}" type="submit" class="pagination-button">
+            {{ page.number }}
+        </button>
+    </li>
+
+    <!-- Есть следущая страница -->
+    {% if page.has_next %}
+    <li class="waves-effect">
+        <button form="search-form" name="page" value="{{ page.next_page_number }}" type="submit" class="pagination-button">
+            {{ page.next_page_number }}
+        </button>
+    </li>
+    <li class="waves-effect">
+        <button form="search-form" name="page" value="{{ page.next_page_number }}" type="submit" class="pagination-arrow">
+            <i class="material-icons">chevron_right</i>
+        </button>
+    </li>
+    {% else %}
+    <!-- Нет следущей страницы -->
+    <li class="disabled">
+        <a href="#!"><i class="material-icons">chevron_right</i></a>
+    </li>
+    {% endif %}
+</ul>

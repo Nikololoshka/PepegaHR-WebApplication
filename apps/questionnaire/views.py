@@ -34,12 +34,17 @@ def publications_page(request: WSGIRequest):
     """
     questionnaires = Questionnaire.objects.filter(is_draft__exact=False)
     
+    search_q = request.GET.get('q', '')
+    if search_q:
+        questionnaires = questionnaires.filter(name__icontains=search_q)
+
     page_num = request.GET.get('page', 1)
     paginator = Paginator(questionnaires, 30)
     page = paginator.get_page(page_num)
 
     return render(request, 'questionnaire/publications.html', {
-        'page': page
+        'page': page,
+        'search_q': search_q
     })
 
 
@@ -66,13 +71,18 @@ def drafts_page(request: WSGIRequest):
 
     questionnaires = Questionnaire.objects.filter(is_draft__exact=True)
     
+    search_q = request.GET.get('q', '')
+    if search_q:
+        questionnaires = questionnaires.filter(name__icontains=search_q)
+
     page_num = request.GET.get('page', 1)
     paginator = Paginator(questionnaires, 30)
     page = paginator.get_page(page_num)
 
     return render(request, 'questionnaire/drafts.html', {
         'questionnaire_form': form,
-        'page': page
+        'page': page,
+        'search_q': search_q
     })
 
 
@@ -81,7 +91,7 @@ def drafts_page(request: WSGIRequest):
 @require_GET
 def survey_page(request: WSGIRequest, questionnaire_id: int):
     """
-    Отображает текущий тест.
+    GET: Отображает текущий тест.
     """
     questionnaire = get_object_or_404(Questionnaire, id=questionnaire_id)
     

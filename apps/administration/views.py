@@ -5,6 +5,8 @@ from django.core.handlers.wsgi import WSGIRequest
 from django.core.paginator import Paginator
 from django.views.decorators.http import require_http_methods, require_GET, require_POST
 from django.utils.translation import gettext_lazy as _
+from django.db.models import Q
+
 
 from .models import HRUser, Departament
 from .forms import HRUserForm, DepartamentForm
@@ -20,12 +22,17 @@ def users_page(request: WSGIRequest):
     """
     hr_users = HRUser.objects.all()
 
+    search_q = request.GET.get('q', '')
+    if search_q:
+        hr_users = hr_users.filter(Q(first_name__icontains=search_q) | Q(last_name__icontains=search_q))
+
     page_num = request.GET.get('page', 1)
     paginator = Paginator(hr_users, 30)
     page = paginator.get_page(page_num)
 
     return render(request, 'administration/users/users.html', {
-        'page': page
+        'page': page,
+        'search_q': search_q
     })
 
 
@@ -110,13 +117,18 @@ def departaments_page(request: WSGIRequest):
 
     departaments = Departament.objects.all()
 
+    search_q = request.GET.get('q', '')
+    if search_q:
+        departaments = departaments.filter(name__icontains=search_q)
+
     page_num = request.GET.get('page', 1)
     paginator = Paginator(departaments, 30)
     page = paginator.get_page(page_num)
 
     return render(request, 'administration/departaments/departaments.html', {
         'departament_form': form,
-        'page': page
+        'page': page,
+        'search_q': search_q
     })
 
 

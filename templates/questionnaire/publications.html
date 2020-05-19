@@ -36,22 +36,11 @@
     <div class="col s12">
         <form class="valign-wrapper" style="display: flex;">
             <div class="input-field" style="width: 100%; flex-grow: 1; margin: 0px;">
-                <input disabled type="text" placeholder="Поиск">
+                <input type="text" placeholder="Поиск публикаций" name="q" value="{{ search_q }}">
             </div>
-            <button class="btn-flat waves-effect waves-light disabled" type="submit">
+            <button class="btn-flat waves-effect waves-light" type="submit">
                 <i class="material-icons">search</i>
             </button>
-            <!-- dropdown trigger -->
-            <a href="#" class="dropdown-trigger btn waves-effect waves-light disabled"
-                style="min-width: 10rem;" data-target="dropdownfilter">
-                <i class="material-icons left">filter_list</i>Фильтр
-            </a>
-            <!-- dropdown structure -->
-            <ul id='dropdownfilter' class='dropdown-content'>
-                <li><a href="#!">one</a></li>
-                <li><a href="#!">two</a></li>
-                <li class="divider" tabindex="-1"></li>
-            </ul>
         </form>
     </div>
 </div>
@@ -94,11 +83,17 @@
         </div>
 
         <!-- pagination -->
-        {% include 'patterns/pagination.html' with page=page %}
+        {% include 'patterns/pagination_search.html' with page=page %}
 
         {% else %}
         <div class="divider"></div>
-        <div class="center empty-list">Список пуст</div>
+        <div class="center empty-list">
+            {% if search_q %}
+                По запросу <b>{{ search_q }}</b> ничего не найдено
+            {% else %}
+                Список пуст
+            {% endif %}
+        </div>
         <div class="divider"></div>
         {% endif %}
     </div>

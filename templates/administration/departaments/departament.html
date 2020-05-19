@@ -1,5 +1,6 @@
 {% extends 'workbase.html' %}
 {% load static %}
+{% load widget_tweaks %}
 
 <!-- header content -->
 {% block title-content %}{{ departament.name }}{% endblock title-content %}
@@ -47,7 +48,7 @@
                         <div class="col s12">
                             <p>Участники 
                                 {% if page.object_list %}
-                                {{ page.object_list.all.count }}
+                                    {{ page.object_list.all.count }}
                                 {% endif %}
                             </p>
                         </div>

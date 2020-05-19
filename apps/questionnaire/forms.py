@@ -73,10 +73,10 @@ class QuestionnairePublicationForm(forms.ModelForm):
         super(QuestionnairePublicationForm, self).__init__(*args, **kwargs)
         
         # инициализация списка групп
-        if self.user_id is not None:
-            HRUser = get_user_model()
-            hr_user = HRUser.objects.get(id=self.user_id)
-            self.fields['groups'].queryset = hr_user.departaments.all()
+        # if self.user_id is not None:
+        #    HRUser = get_user_model()
+        #    hr_user = HRUser.objects.get(id=self.user_id)
+        #    self.fields['groups'].queryset = hr_user.departaments.all()
 
         # инициализация даты и времени
         if self.instance:
