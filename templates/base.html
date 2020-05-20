@@ -8,10 +8,8 @@
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
         <link type="text/css" rel="stylesheet" href="{% static '/material/css/materialize.min.css' %}"  media="screen, projection"/>
         <link type="text/css" rel="stylesheet" href="{% static 'style.css' %}"  media="screen, projection"/>
+        <link type="text/css" rel="stylesheet" href="{% static '/DataTables/datatable.css' %}" />
         <script type="text/javascript" src="{% static '/jquery/jquery-3.4.1.min.js' %}"></script>
-
-
-        <script type="text/javascript" src="{% static '/DataTables/datatables.min.js' %}"></script>
 
 
         <meta charset="utf-8">
@@ -26,6 +24,9 @@
     {% endblock body-content %}
 
     <script type="text/javascript" src="{% static '/material/js/materialize.min.js' %}"></script>
+    <script type="text/javascript" src="{% static '/DataTables/datatables.min.js' %}"></script>
+    <script type="text/javascript" src="{% static '/moment/moment-with-locales.js' %}"></script>
+    <script type="text/javascript" src="{% static '/DataTables/datatable.js' %}"></script>
     {% block script-content %}
     {% endblock script-content %}
 

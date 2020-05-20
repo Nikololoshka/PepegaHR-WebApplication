@@ -17,6 +17,10 @@
     overflow: hidden;
 }
 
+.clickable-row {
+    cursor: pointer;
+}
+
 .list-body {
     padding: 1rem;
 }

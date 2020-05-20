@@ -29,8 +29,9 @@ urlpatterns = [
     path('survey/<int:questionnaire_id>/arbitrary/<int:quiz_id>', views.arbitrary_page, name='questionnaire-arbitrary-edit'),
     path('survey/<int:questionnaire_id>/arbitrary/remove', views.arbitrary_remove_page, name='questionnaire-arbitrary-remove'),
 
-    # reports
-    path('reports', views.reports_page, name='questionnaire-reports-page'),
+    # users
+    path('users', views.users_page, name='questionnaire-users-page'),
+    path('user_results/<int:user_id>', views.user_results_page, name='questionnaire-user-results-page'),
 
     # mytests
     path('mytests', views.mytests_page, name='questionnaire-my-tests-page'),

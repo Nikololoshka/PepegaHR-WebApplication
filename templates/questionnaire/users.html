@@ -2,7 +2,7 @@
 {% load static %}
 
 <!-- header content -->
-{% block title-content %}Результаты: {{ questionnaire.name }}{% endblock title-content %}
+{% block title-content %}Пользователи{% endblock title-content %}
 
 <!-- nav content -->
 {% block questionnaire-nav %}
@@ -13,13 +13,17 @@
 <div class="collapsible-body" style="display: block;">
 {% endblock questionnaire-body-nav %}
 
+{% block questionnaire-users-nav %}
+<li class="active">
+{% endblock questionnaire-users-nav %}
+
                 
 <!-- Заголовок -->
 {% block card-title %}
 <div class="row">
     <div class="col s12">
         <div class="card-title">
-            Результаты: {{ questionnaire.name }}
+            Пользователи
         </div>
     </div>
 </div>
@@ -31,35 +35,17 @@
         <div class="material-table">
             <table id="datatable">
                 <thead>
-                    <th>
-                        Имя
-                    </th>
-                    <th>
-                        Фамилия
-                    </th>
-                    <th>
-                        Дата прохождения
-                    </th>
-                    <th>
-                        Результат
-                    </th>
+                    <tr>
+                        <th>Имя</th>
+                        <th>Фамилия</th>
+                        <th>Тестов пройдено</th>
+                    </tr>
                 </thead>
-                <tbody>
-                </tbody>
             </table>
         </div>
     </div>
 </div>
-
 {% endblock card-content %}
-
-{% block card-action %}
-<div class="card-action">
-    <a href="{% url 'questionnaire-survey-page' questionnaire.id %}" class="btn-flat waves-effect waves-light">
-        <i class="material-icons left">arrow_back</i>Назад
-    </a>
-</div>
-{% endblock card-action %}
 
 {% block script-page %}
 <script>
@@ -71,7 +57,7 @@ $(document).ready(function() {
             'search': '',
             'searchPlaceholder': 'Поиск',
             'info': '_PAGE_ из _PAGES_',
-            'infoEmpty': '<div class="empty-list center-align">Список пуст</div>',
+            'infoEmpty': '<div class="empty-list center-align">Список пуст </div>',
             'infoFiltered': '',
             'sEmptyTable': '<div class="empty-list center-align">Ничего не найдено</div>',
             'sZeroRecords': `
@@ -94,30 +80,23 @@ $(document).ready(function() {
             oSettings.oLanguage.sZeroRecords = '<div class="empty-list center-align">Ничего не найдено</div>'
         },
         'ajax': {
-            'url': '{% url "questionnaire-survey-result-page" questionnaire.id %}',
+            'url': '{% url "questionnaire-users-page" %}',
         },
         'bAutoWidth': false,
         'bLengthChange': false,
         'columns': [
-            { 'width': '15%', 'data': 'first_name' },
-            { 'width': '25%', 'data': 'last_name' },
-            { 'width': '40%', 'data': 'end_datetime'},
-            { 'width': '20%', 'data': 'evaluation' },
+            { 'width': '20%', 'data': 'first_name' },
+            { 'width': '40%', 'data': 'last_name' },
+            { 'data': 'answers' },
         ],
         'createdRow': function(row, data, dataIndex ) {
-            $(row).addClass('clickable-row').attr('data-id', data['u_id']);
-        },
-        'columnDefs': [ {
-            'targets': 2,
-            'render': function ( data, type, row ) {
-                return moment.utc(data).local().locale('ru').format('LLL');
-            }
-        } ]
+            $(row).addClass('clickable-row').attr('data-id', data['id']);
+        }
     });
     $('#datatable tbody').on('click', 'tr', function(e) {
-        var url = '{% url "questionnaire-passage-result-page" questionnaire.id %}';
+        var url = '{% url "questionnaire-user-results-page" 0 %}';
         var id = $(this).data("id");
-        window.location = url + '?user_id=' + id;
+        window.location = url.replace('0', id);
     });
 });
 </script>

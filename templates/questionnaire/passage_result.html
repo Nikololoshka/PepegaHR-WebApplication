@@ -27,6 +27,13 @@
 
 {% block card-content %}
 <div class="row no-padding">
+    <div class="col s12">
+        <h6>Пользователь: 
+            <a href="{% url 'profile-page' hr_user.id %}">{{ hr_user.get_full_name_reverse }}</a>
+        </h6>
+    </div>
+</div>
+<div class="row no-padding">
     <div class="col s12 m4">
         <h6>Тест пройден: <b>{{ answer.end_datetime }}</b></h6>
     </div>
@@ -58,15 +65,24 @@
 
 {% block card-action %}
 <div class="card-action">
-    <a href="
-    {% if my_result %}
-        {% url 'questionnaire-my-tests-page' %}
-    {% else %}
-        {% url 'questionnaire-survey-result-page' answer.questionnaire.id %}
-    {% endif %}
-    " class="btn-flat waves-effect waves-light">
+    {% if not hr_user %}
+    <a href="{% url 'questionnaire-my-tests-page' %}" class="btn-flat waves-effect waves-light">
         <i class="material-icons left">arrow_back</i>Назад
     </a>
+    {% else %}
+    <div class="stretch-container">
+        <div class="stretch-left">
+            <a href="{% url 'questionnaire-survey-result-page' answer.questionnaire.id %}" class="btn waves-effect waves-light">
+                <i class="material-icons left">assignment</i>К результатам теста 
+            </a>
+        </div>
+        <div class="stretch-right">
+            <a href="{% url 'questionnaire-user-results-page' hr_user.id %}" class="btn waves-effect waves-light">
+                <i class="material-icons left">assignment_ind</i>К тестам пользователя
+            </a>
+        </div>
+    </div>
+    {% endif %}
 </div>
 {% endblock card-action %}
 

@@ -2,6 +2,7 @@ from django.db import models
 from django.conf import settings
 from django.utils import timezone
 from django.core.validators import MinValueValidator
+from django.utils.translation import gettext_lazy as _
 
 import itertools
 
@@ -112,6 +113,7 @@ class SingleChooseVariant(models.Model):
     Вариант вопроса с одним вариантом ответа.
     """  
     quiz = models.ForeignKey('SingleChooseQuiz', related_name='variants', on_delete=models.CASCADE)
+    value = models.SmallIntegerField(default=0, null=False)
     variant = models.TextField(max_length=256, blank=False)
     order = models.SmallIntegerField(default=-1, db_index=True)
 
@@ -126,8 +128,18 @@ class MultiChooseQuiz(models.Model):
     """
     Модель вопроса с множеством вариантов ответа.
     """  
+    SUM_METHOD = 'sum'
+    SCALE_METHOD = 'scl'
+
+    METHODS = (
+        (SUM_METHOD, _('Суммирование')),
+        (SCALE_METHOD, _('Масштабирование'))
+    )
+
     questionnaire = models.ForeignKey('Questionnaire', related_name='multi_quizzes', on_delete=models.CASCADE)
     question = models.TextField(max_length=512)
+    method = models.CharField(default=SUM_METHOD, max_length=3, choices=METHODS, null=False)
+    scale_value = models.SmallIntegerField(default=1, validators=[MinValueValidator(1)], null=False)
     order = models.SmallIntegerField(default=-1)
 
     class Meta:
@@ -148,6 +160,7 @@ class MultiChooseVariant(models.Model):
     Вариант вопроса с множеством вариантов ответа.
     """  
     quiz = models.ForeignKey('MultiChooseQuiz', related_name='variants', on_delete=models.CASCADE)
+    value = models.SmallIntegerField(default=0, null=False)
     variant = models.CharField(max_length=128)
     order = models.SmallIntegerField(default=-1, db_index=True)
     right = models.BooleanField(default=False)

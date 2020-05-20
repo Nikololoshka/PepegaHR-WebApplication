@@ -7,7 +7,8 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Avg, Count
+from django.db.models import Avg, Count, F
+from django.http.response import JsonResponse
 
 from datetime import timedelta
 import random
@@ -550,8 +551,13 @@ def test_passage_result_page(request: WSGIRequest, questionnaire_id: int):
     """
     user_id = request.GET.get('user_id', None)
     if user_id is not None and request.user.is_moderator:
-        answer = get_object_or_404(Answer, questionnaire__id=questionnaire_id, user__id=user_id)
+        HRUser = get_user_model()
+
+        hr_user = get_object_or_404(HRUser, id=user_id)
+        answer = get_object_or_404(Answer, questionnaire__id=questionnaire_id, user=hr_user)
+        
     else:
+        hr_user = None
         answer = get_object_or_404(Answer, questionnaire__id=questionnaire_id, user__id=request.user.id)
 
     answer_time = answer.end_datetime - answer.start_datetime
@@ -560,7 +566,7 @@ def test_passage_result_page(request: WSGIRequest, questionnaire_id: int):
     return render(request, 'questionnaire/passage_result.html', {
         'answer': answer,
         'test_time': test_time,
-        'my_result': user_id is None,
+        'hr_user': hr_user,
         'SINGLE_QUIZ': Questionnaire.SINGLE_QUIZ,
         'MULTI_QUIZ': Questionnaire.MULTI_QUIZ,
         'ARBITRARY_QUIZ': Questionnaire.ARBITRARY_QUIZ
@@ -575,9 +581,51 @@ def survey_result_page(request: WSGIRequest, questionnaire_id: int):
     Отображает список результотов теста
     """
     questionnaire = get_object_or_404(Questionnaire, id=questionnaire_id)
-    answers = Answer.objects.filter(questionnaire=questionnaire)
+    if request.is_ajax():
+        answers = Answer.objects.filter(questionnaire=questionnaire) \
+            .values('end_datetime', 'evaluation', first_name=F('user__first_name'),
+                        last_name=F('user__last_name'), u_id=F('user__id'))
+
+        return JsonResponse({'data': list(answers)}, safe=False)
 
     return render(request, 'questionnaire/survey_result.html', {
-        'questionnaire': questionnaire,
-        'answers': answers
+        'questionnaire': questionnaire
+    })
+
+
+@login_required
+@required_moderator
+@require_GET
+def users_page(request: WSGIRequest):
+    """
+    Страница с пользователями, проходящих тесты
+    """
+    if request.is_ajax():
+        HRUser = get_user_model()
+        hr_users = HRUser.objects.filter(role__exact=HRUser.USER_ROLE) \
+                    .values('id', 'first_name', 'last_name') \
+                    .annotate(answers=Count('answer'))
+    
+        return JsonResponse({'data': list(hr_users)}, safe=False)
+
+    return render(request, 'questionnaire/users.html')
+
+@login_required
+@required_moderator
+@require_GET
+def user_results_page(request: WSGIRequest, user_id: int):
+    """
+    Отображает тесты, пройденные пользователем.
+    """
+    HRUser = get_user_model()
+    hr_user = get_object_or_404(HRUser, id=user_id)
+
+    if request.is_ajax():
+        answers = Answer.objects.filter(user=hr_user) \
+                    .values('end_datetime', 'evaluation', name=F('questionnaire__name'), q_id=F('questionnaire__id'))
+
+        return JsonResponse({'data': list(answers)}, safe=False)
+
+    return render(request, 'questionnaire/user_results.html', {
+        'hr_user': hr_user
     })
