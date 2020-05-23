@@ -28,6 +28,7 @@ class Questionnaire(models.Model):
 
     open_datetime = models.DateTimeField(null=True)
     close_datetime = models.DateTimeField(null=True)
+    show_result = models.BooleanField(default=True)
     groups = models.ManyToManyField('administration.Departament', blank=True, related_name='questionnaires')
 
     class Meta:
@@ -35,6 +36,13 @@ class Questionnaire(models.Model):
         verbose_name = 'Questionnaire'
         verbose_name_plural = 'Questionnaires'
         ordering = ['name', 'desciption']
+
+    def modify(self):
+        """
+        Вызывается, когда тест был обновлен.
+        """
+        self.modify_date = timezone.now() 
+        self.save()
 
     def get_quizzes_list(self) -> list:
         """
@@ -114,8 +122,8 @@ class SingleChooseVariant(models.Model):
     """  
     quiz = models.ForeignKey('SingleChooseQuiz', related_name='variants', on_delete=models.CASCADE)
     value = models.SmallIntegerField(default=0, null=False)
-    variant = models.TextField(max_length=256, blank=False)
-    order = models.SmallIntegerField(default=-1, db_index=True)
+    variant = models.TextField(max_length=256, default='', blank=False)
+    order = models.SmallIntegerField(db_index=True)
 
     class Meta:
         managed = True
@@ -128,18 +136,18 @@ class MultiChooseQuiz(models.Model):
     """
     Модель вопроса с множеством вариантов ответа.
     """  
-    SUM_METHOD = 'sum'
-    SCALE_METHOD = 'scl'
+    # SUM_METHOD = 'sum'
+    # SCALE_METHOD = 'scl'
 
-    METHODS = (
-        (SUM_METHOD, _('Суммирование')),
-        (SCALE_METHOD, _('Масштабирование'))
-    )
+    # METHODS = (
+    #     (SUM_METHOD, _('Суммирование')),
+    #     (SCALE_METHOD, _('Масштабирование'))
+    # )
 
     questionnaire = models.ForeignKey('Questionnaire', related_name='multi_quizzes', on_delete=models.CASCADE)
     question = models.TextField(max_length=512)
-    method = models.CharField(default=SUM_METHOD, max_length=3, choices=METHODS, null=False)
-    scale_value = models.SmallIntegerField(default=1, validators=[MinValueValidator(1)], null=False)
+    # method = models.CharField(default=SUM_METHOD, max_length=3, choices=METHODS, null=False)
+    # scale_value = models.SmallIntegerField(default=1, validators=[MinValueValidator(1)], null=False)
     order = models.SmallIntegerField(default=-1)
 
     class Meta:
@@ -161,8 +169,8 @@ class MultiChooseVariant(models.Model):
     """  
     quiz = models.ForeignKey('MultiChooseQuiz', related_name='variants', on_delete=models.CASCADE)
     value = models.SmallIntegerField(default=0, null=False)
-    variant = models.CharField(max_length=128)
-    order = models.SmallIntegerField(default=-1, db_index=True)
+    variant = models.TextField(max_length=256, default='', blank=False)
+    order = models.SmallIntegerField(db_index=True)
     right = models.BooleanField(default=False)
 
     class Meta:
@@ -203,7 +211,8 @@ class Answer(models.Model):
     end_datetime = models.DateTimeField(null=True)
     step = models.SmallIntegerField(default=0)
     is_complete = models.BooleanField(default=False)
-    evaluation = models.SmallIntegerField(null=True)
+
+    evaluation = models.DecimalField(max_digits=8, decimal_places=2, null=True)
     max_evaluation = models.SmallIntegerField(null=True)
 
     class Meta:
@@ -221,11 +230,11 @@ class Answer(models.Model):
             list(self.arbitrary_answers.all())
         ]), key=lambda x: x.order)
 
-    def get_evaluation(self):
+    def get_evaluation(self, force=False):
         """
         Возвращает оценку за тест.
         """
-        if self.evaluation is not None and self.max_evaluation is not None:
+        if self.evaluation is not None and self.max_evaluation is not None and not force:
             return f'{self.evaluation}/{self.max_evaluation}'
 
         current_evaluation = 0
@@ -242,9 +251,13 @@ class Answer(models.Model):
                 max_evaluation += 1
                 
             elif quiz_type == Questionnaire.MULTI_QUIZ:
-                rights = answer.root.variants.filter(right=True)
-                current_evaluation += (rights & MultiChooseVariant.objects.filter(id__in=answer.variants.values('right'))).count()
-                max_evaluation += rights.count()
+                results = answer.get_rights()
+                ########
+                for right_answer, right_my, _ in results:
+                    if right_answer:
+                         max_evaluation += 1
+                         if right_my:
+                             current_evaluation += 1
 
         self.evaluation = current_evaluation 
         self.max_evaluation = max_evaluation

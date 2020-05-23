@@ -48,8 +48,8 @@
                 <div class="row">
                     <div class="col s12">
                         <ul class="collection black-text">
-                            <a href="{% url 'admin-user-create' %}" class="collection-item black-text">
-                                Создание пользователя
+                            <a href="{% url 'admin-users-page' %}" class="collection-item black-text">
+                                Список пользователей
                                 <i class="material-icons right">send</i>
                             </a>
                         </ul>
@@ -95,10 +95,10 @@
                     <div class="col s12">
                         <ul class="collection">
                             {% for hr_user in last_users %}
-                                <li class="collection-item ">
+                                <a href="{% url 'profile-page' hr_user.id %}" class="collection-item black-text">
                                     <p>{{ hr_user.get_full_name }}</p>
                                     <p>{{ hr_user.last_visit }}</p>
-                                </li>
+                                </a>
                             {% endfor %}
                         </ul>
                     </div>

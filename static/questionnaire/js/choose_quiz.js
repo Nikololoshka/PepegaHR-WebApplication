@@ -42,7 +42,9 @@ function addForm(selector, prefix) {
                             .replace('-' + (total - 1) + '-', '-' + total + '-');
 
         var id = 'id_' + name;
+
         $(this).attr({'name': name, 'id': id})
+                .val('0')
                 .prop('checked', false);
     });
     // для textarea

@@ -5,9 +5,9 @@
 
         /* Set the defaults for DataTables initialisation */
         $.extend(true, DataTable.defaults, {
-            dom: "<'top'f>" +
+            dom: "<'top'f'>" +
                  "tr" +
-                 "<'table-footer'lip'>",
+                 "<'table-footer'Blip'>",
             renderer: 'material'
         });
 

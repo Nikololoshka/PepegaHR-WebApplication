@@ -26,6 +26,7 @@
 {% endblock card-title %}
 
 {% block card-content %}
+{% if hr_user %}
 <div class="row no-padding">
     <div class="col s12">
         <h6>Пользователь: 
@@ -33,6 +34,7 @@
         </h6>
     </div>
 </div>
+{% endif %}
 <div class="row no-padding">
     <div class="col s12 m4">
         <h6>Тест пройден: <b>{{ answer.end_datetime }}</b></h6>
@@ -46,6 +48,7 @@
 </div>
 <div class="row no-padding">
     <div class="col s12">
+        {% if show_result %}
         <div class="collection">
             {% for quiz_answer in answer.get_quizzes_list %}
             <div class="collection-item">
@@ -59,6 +62,13 @@
             </div>
             {% endfor %}
         </div>
+        {% else %}
+        <div class="divider"></div>
+        <div class="center empty-list">
+            Просмотр результатов не доступен
+        </div>
+        <div class="divider"></div>
+        {% endif %}
     </div>
 </div>
 {% endblock card-content %}

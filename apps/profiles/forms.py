@@ -1,6 +1,8 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import get_user_model
+from django.contrib.auth.password_validation import UserAttributeSimilarityValidator, MinimumLengthValidator, \
+                                                    CommonPasswordValidator, NumericPasswordValidator
 
 
 class ProfileEditForm(forms.ModelForm):
@@ -8,7 +10,11 @@ class ProfileEditForm(forms.ModelForm):
     Форма для редактирования пользователя.
     """
     password = forms.CharField(widget=forms.PasswordInput(), \
-         label=_('Новый пароль'), required=False)
+         label=_('Новый пароль'), required=False, validators=[
+                UserAttributeSimilarityValidator(), MinimumLengthValidator(),
+                CommonPasswordValidator(), NumericPasswordValidator()
+             ])
+
     password_confirm = forms.CharField(widget=forms.PasswordInput(), \
          label=_('Подтвердите новый пароль'), required=False)
 

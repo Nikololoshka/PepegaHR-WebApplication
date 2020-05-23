@@ -103,6 +103,7 @@ div.material-table .table-footer .select-wrapper {
 div.material-table .table-footer .dataTables_info,
 div.material-table .table-footer .dataTables_length {
 	margin-right: 32px;
+	margin-left: 32px;
 }
 
 div.material-table .table-footer .material-pagination {

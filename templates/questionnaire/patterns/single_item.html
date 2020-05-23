@@ -21,13 +21,14 @@
                     <thead>
                         <tr>
                             <th>Ответ</th>
+                            <th>Вес</th>
                             <th>Вариант</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for variant in quiz.variants.all %}
                         <tr>
-                            <td style="width: 20%;"> 
+                            <td style="width: 10%;"> 
                                 <div class="center-align">
                                     <label>
                                         <input type="radio" class="with-gap input-disable"
@@ -36,6 +37,9 @@
                                         <span>&nbsp;</span>
                                     </label>
                                 </div>
+                            </td>
+                            <td style="width: 10%;">
+                                {{ variant.value }}
                             </td>
                             <td>
                                 {{ variant.variant }}

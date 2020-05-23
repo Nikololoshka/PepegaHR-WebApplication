@@ -52,6 +52,13 @@
 $(document).ready(function() {
     var table = $('#datatable').dataTable({
         'pageLength': 50,
+        'buttons': [
+            {
+                'extend': 'excel',
+                'text': '<i class="material-icons left">file_download</i>Excel',
+                'className': 'btn-flat'
+            }
+        ],
         'language': {   
             'stripClasses': '',
             'search': '',

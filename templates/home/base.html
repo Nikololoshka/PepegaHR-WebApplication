@@ -17,11 +17,30 @@
         <div class="card">
             <div class="card-content">
                 <span class="card-title">Уведомления</span>
-                <div>
-                    <div class="divider"></div>
-                    <p class="center" style="padding: 2rem;">Нет новых уведомлений</p>
-                    <div class="divider"></div>
+                {% if questionnaires %}
+                <div class="collection">
+                    {% for questionnaire in questionnaires %}
+                    <a href="{% url 'questionnaire-review-page' questionnaire.id %}" class="collection-item black-text">
+                        <h6>Новый тест: <b>{{ questionnaire.name }}</b></h6>
+                        <p>
+                            {% if questionnaire.is_wait %}
+                            <b class="orange-text">Скоро откроется</b>
+                            {% elif questionnaire.is_close %}
+                            <b class="red-text">Закрыт</b>
+                            {% else %}
+                            <b class="green-text">Доступен</b>
+                            {% endif %}
+                        </p>
+                    </a>
+                    {% endfor %}
                 </div>
+                {% else %}
+                <div class="divider"></div>
+                <div class="center empty-list">
+                    Нет новых уведомлений
+                </div>
+                <div class="divider"></div>
+                {% endif %}
             </div>
         </div>
     </div>

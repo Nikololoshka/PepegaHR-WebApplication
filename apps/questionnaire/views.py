@@ -555,16 +555,19 @@ def test_passage_result_page(request: WSGIRequest, questionnaire_id: int):
 
         hr_user = get_object_or_404(HRUser, id=user_id)
         answer = get_object_or_404(Answer, questionnaire__id=questionnaire_id, user=hr_user)
+        show_result = True
         
     else:
         hr_user = None
         answer = get_object_or_404(Answer, questionnaire__id=questionnaire_id, user__id=request.user.id)
-
+        show_result = answer.questionnaire.show_result
+        
     answer_time = answer.end_datetime - answer.start_datetime
     test_time = timedelta_to_str(answer_time)
 
     return render(request, 'questionnaire/passage_result.html', {
         'answer': answer,
+        'show_result': show_result,
         'test_time': test_time,
         'hr_user': hr_user,
         'SINGLE_QUIZ': Questionnaire.SINGLE_QUIZ,
@@ -575,7 +578,7 @@ def test_passage_result_page(request: WSGIRequest, questionnaire_id: int):
 
 @login_required
 @required_moderator
-@require_GET
+@require_http_methods(['GET', 'POST'])
 def survey_result_page(request: WSGIRequest, questionnaire_id: int):
     """
     Отображает список результотов теста
@@ -587,6 +590,11 @@ def survey_result_page(request: WSGIRequest, questionnaire_id: int):
                         last_name=F('user__last_name'), u_id=F('user__id'))
 
         return JsonResponse({'data': list(answers)}, safe=False)
+
+    if request.method == 'POST':
+        answers = Answer.objects.filter(questionnaire=questionnaire)
+        for answer in answers:
+            answer.get_evaluation(force=True)
 
     return render(request, 'questionnaire/survey_result.html', {
         'questionnaire': questionnaire

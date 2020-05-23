@@ -55,9 +55,45 @@
 
 {% block card-action %}
 <div class="card-action">
-    <a href="{% url 'questionnaire-survey-page' questionnaire.id %}" class="btn-flat waves-effect waves-light">
-        <i class="material-icons left">arrow_back</i>Назад
-    </a>
+    <div class="stretch-container">
+        <div class="stretch-left">
+            <a href="{% url 'questionnaire-survey-page' questionnaire.id %}" class="btn-flat waves-effect waves-light">
+                <i class="material-icons left">arrow_back</i>Назад
+            </a>
+        </div>
+        <div class="stretch-right">
+            <a href="#recompute-modal" class="btn waves-effect waves-light modal-trigger">
+                <i class="material-icons left">sync</i>Пересчет результатов
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- recompute  modal window -->
+<div id="recompute-modal" class="modal">
+    <div class="modal-content">
+        <div class="row">
+            <div class="col s12">
+                <h4>Пересчет результатов</h4>
+            </div>
+        </div>
+        <div>
+            <form action="{% url 'questionnaire-survey-result-page' questionnaire.id %}" method="POST" id="recompute">
+                {% csrf_token %}
+                <p>
+                    По нажатию кнопки <b>обновить</b> будет произведен пересчет всех результатов теста.
+                    Это может быть необходимо, если тест был отредактирован после того, как его прошли пользователи.
+                </p>
+                <p>
+                    Операция может занять несколько секунд или минут, в зависимости от количества ответов на тест.
+                </p>
+            </form>
+        </div>
+    </div>
+    <div class="modal-footer right-align">
+        <a class="modal-close btn-flat waves-effect waves-light">Отмена</a>
+        <button class="modal-close btn waves-effect waves-light" form="recompute" type="submit">Обновить</button>
+    </div>
 </div>
 {% endblock card-action %}
 
@@ -66,6 +102,13 @@
 $(document).ready(function() {
     var table = $('#datatable').dataTable({
         'pageLength': 50,
+        'buttons': [
+            {
+                'extend': 'excel',
+                'text': '<i class="material-icons left">file_download</i>Excel',
+                'className': 'btn-flat'
+            }
+        ],
         'language': {   
             'stripClasses': '',
             'search': '',
@@ -119,6 +162,7 @@ $(document).ready(function() {
         var id = $(this).data("id");
         window.location = url + '?user_id=' + id;
     });
+    $('.modal').modal();
 });
 </script>
 {% endblock script-page %}

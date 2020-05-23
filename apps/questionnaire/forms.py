@@ -61,9 +61,10 @@ class QuestionnairePublicationForm(forms.ModelForm):
 
     class Meta:
         model = Questionnaire
-        fields = ['groups']
+        fields = ['groups', 'show_result']
         labels = {
-            'groups': _('Группы')
+            'groups': _('Группы'),
+            'show_result': _('Показать результат пользователю')
         }
 
     def __init__(self, *args, **kwargs):
@@ -214,17 +215,18 @@ class SingleChooseForm(forms.ModelForm):
         # если форма из POST запроса
         if request:
             i = 0
-            right_field_name, variant_field_name = self.get_fields_name(i)
+            right_field_name, value_field_name, variant_field_name = self.get_fields_name(i)
 
             while request.get(variant_field_name):
                 right = request.get(right_field_name, None)
                 right = (right is not None)
 
                 variant = request[variant_field_name]
-                self._add_fields(right_field_name, right, variant_field_name, variant)
+                value = request.get(value_field_name, 0)
+                self._add_fields(right_field_name, right, value_field_name, value, variant_field_name, variant)
 
                 i += 1
-                right_field_name, variant_field_name = self.get_fields_name(i)
+                right_field_name, value_field_name, variant_field_name = self.get_fields_name(i)
         else:
             # получения вариантов вопроса
             variants = SingleChooseVariant.objects.filter(
@@ -237,24 +239,29 @@ class SingleChooseForm(forms.ModelForm):
                 right = self.instance.right
                 
                 for i in range(len(variants)):
-                    right_field_name, variant_field_name = self.get_fields_name(i)
+                    right_field_name, value_field_name, variant_field_name = self.get_fields_name(i)
 
-                    self._add_fields(right_field_name, variants[i] == right, variant_field_name, variants[i].variant)
+                    self._add_fields(right_field_name, variants[i] == right, 
+                                     value_field_name, variants[i].value,
+                                     variant_field_name, variants[i].variant)
             else:
                 # extra форма
                 self.fields['forms_count'].initial = 1
 
-                right_field_name, variant_field_name = self.get_fields_name(0)
+                right_field_name, value_field_name, variant_field_name = self.get_fields_name(0)
 
-                self._add_fields(right_field_name, False, variant_field_name, '')
+                self._add_fields(right_field_name, False, value_field_name, 0, variant_field_name, '')
 
-    def _add_fields(self, right_field_name: str, right: bool, variant_field_name: str, variant: str):
+    def _add_fields(self, right_field_name: str, right: bool, value_field_name: str, value: int, variant_field_name: str, variant: str):
         """
         Добавляет поля на форму.
         """
         self.fields[right_field_name] = forms.BooleanField(required=False)
         self.initial[right_field_name] = 'on' if right else ''
         
+        self.fields[value_field_name] = forms.IntegerField(required=True, min_value=0)
+        self.initial[value_field_name] = value
+
         self.fields[variant_field_name] = forms.CharField(widget=forms.Textarea(), required=True)
         self.initial[variant_field_name] = variant
 
@@ -266,14 +273,16 @@ class SingleChooseForm(forms.ModelForm):
         cleaned_data = super(SingleChooseForm, self).clean()
 
         rights = list()
+        values = list()
         variants = list()
 
         i = 0
-        right_field_name, variant_field_name = self.get_fields_name(i)
+        right_field_name, value_field_name, variant_field_name = self.get_fields_name(i)
 
 
         while cleaned_data.get(variant_field_name):
             right = cleaned_data.get(right_field_name, None)
+            value = cleaned_data.get(value_field_name, 0)
 
             variant = cleaned_data[variant_field_name]
 
@@ -281,15 +290,20 @@ class SingleChooseForm(forms.ModelForm):
                 raise forms.ValidationError(_('Есть одинаковые поля'))
             else:
                 rights.append(right)
+                values.append(value)
                 variants.append(variant)
 
             i += 1
-            right_field_name, variant_field_name = self.get_fields_name(i)
+            right_field_name, value_field_name, variant_field_name = self.get_fields_name(i)
 
         if sum(rights) != 1:
             raise ValidationError(_('Должен быть ровно один правильный ответ'))
 
+        if sum(values) < 1:
+            raise ValidationError(_('За вопрос нужно получить хотя бы одни балл'))
+
         self.cleaned_data['rights'] = rights
+        self.cleaned_data['values'] = values
         self.cleaned_data['variants'] = variants
 
     def save(self):
@@ -297,28 +311,43 @@ class SingleChooseForm(forms.ModelForm):
         Сохраняет вопрос в БД.
         """
         quiz = super(SingleChooseForm, self).save(commit=False)
+        questionnaire = Questionnaire.objects.get(id=self.questionnaire_id)
 
         if not hasattr(quiz, 'questionnaire'):
-            questionnaire = Questionnaire.objects.get(id=self.questionnaire_id)
             quiz.questionnaire = questionnaire
             quiz.order = len(questionnaire.get_quizzes_list())
         else:
-            quiz.variants.all().delete()
             quiz.right = None
 
         quiz.save()
+        count = quiz.variants.all().count()
+        current_count = 0
 
-        for index, (right, variant) in enumerate(zip(self.cleaned_data['rights'], self.cleaned_data['variants'])):
-           single_variant = SingleChooseVariant.objects.create(
-               quiz=quiz,
-               variant=variant,
-               order=index
-           )
-           if right:
+        for index, (right, value, variant) in enumerate(zip(self.cleaned_data['rights'], \
+                                            self.cleaned_data['values'], self.cleaned_data['variants'])):
+            single_variant, _ = SingleChooseVariant.objects.update_or_create(
+                quiz=quiz,
+                order=index,
+                defaults={
+                    'variant': variant,
+                    'value': value
+                }
+            )
+
+            if right:
                 quiz.right = single_variant
+
+            current_count += 1
+
+        while current_count < count:
+            single_variant = SingleChooseVariant.objects.get(quiz=quiz, order=current_count)
+            single_variant.delete()
+
+            current_count += 1
 
         quiz.save()
 
+        questionnaire.modify()
         return quiz
 
     @staticmethod
@@ -326,7 +355,7 @@ class SingleChooseForm(forms.ModelForm):
         """
         Возвращает кортеж из имен полей соответсвующих переданому индексу.
         """
-        return f'right-{index}-form', f'variant-{index}-form'
+        return f'right-{index}-form', f'value-{index}-form', f'variant-{index}-form'
 
     def get_fields(self):
         """
@@ -334,11 +363,12 @@ class SingleChooseForm(forms.ModelForm):
         """
         i = 0
         while True:
-            right_field_name = f'right-{i}-form'
-            variant_field_name = f'variant-{i}-form'
+            right_field_name, value_field_name, variant_field_name = self.get_fields_name(i)
 
-            if self.fields.get(right_field_name) and self.fields.get(variant_field_name):
-                yield self[right_field_name], self[variant_field_name]
+            if self.fields.get(right_field_name) and self.fields.get(variant_field_name) \
+                    and self.fields.get(value_field_name):
+
+                yield self[right_field_name], self[value_field_name], self[variant_field_name]
                 i += 1
             else:
                 break
@@ -369,17 +399,18 @@ class MultiChooseForm(forms.ModelForm):
         # если форма из POST запроса
         if request:
             i = 0
-            right_field_name, variant_field_name = self.get_fields_name(i)
+            right_field_name, value_field_name, variant_field_name = self.get_fields_name(i)
 
             while request.get(variant_field_name):
                 right = request.get(right_field_name, None)
                 right = (right is not None)
 
                 variant = request[variant_field_name]
-                self._add_fields(right_field_name, right, variant_field_name, variant)
+                value = request.get(value_field_name, 0)
+                self._add_fields(right_field_name, right, value_field_name, value, variant_field_name, variant)
 
                 i += 1
-                right_field_name, variant_field_name = self.get_fields_name(i)
+                right_field_name, value_field_name, variant_field_name = self.get_fields_name(i)
         else:
             # получения вариантов вопроса
             variants = MultiChooseVariant.objects.filter(
@@ -391,23 +422,28 @@ class MultiChooseForm(forms.ModelForm):
                 self.fields['forms_count'].initial = len(variants) 
                 
                 for i in range(len(variants)):
-                    right_field_name, variant_field_name = self.get_fields_name(i)
+                    right_field_name, value_field_name, variant_field_name = self.get_fields_name(i)
 
-                    self._add_fields(right_field_name, variants[i].right, variant_field_name, variants[i].variant)
+                    self._add_fields(right_field_name, variants[i].right, 
+                                     value_field_name, variants[i].value,
+                                     variant_field_name, variants[i].variant)
             else:
                 # extra форма
                 self.fields['forms_count'].initial = 1
-                right_field_name, variant_field_name = self.get_fields_name(0)
+                right_field_name, value_field_name, variant_field_name = self.get_fields_name(0)
 
-                self._add_fields(right_field_name, False, variant_field_name, '')
+                self._add_fields(right_field_name, False, value_field_name, 0, variant_field_name, '')
 
-    def _add_fields(self, right_field_name: str, right: bool, variant_field_name: str, variant: str):
+    def _add_fields(self, right_field_name: str, right: bool, value_field_name: str, value: int, variant_field_name: str, variant: str):
         """
         Добавляет поля на форму.
         """
         self.fields[right_field_name] = forms.BooleanField(required=False)
         self.initial[right_field_name] = 'on' if right else ''
         
+        self.fields[value_field_name] = forms.IntegerField(required=True, min_value=0)
+        self.initial[value_field_name] = value
+
         self.fields[variant_field_name] = forms.CharField(widget=forms.Textarea(), required=True)
         self.initial[variant_field_name] = variant
 
@@ -419,14 +455,16 @@ class MultiChooseForm(forms.ModelForm):
         cleaned_data = super(MultiChooseForm, self).clean()
 
         rights = list()
+        values = list()
         variants = list()
 
         i = 0
-        right_field_name, variant_field_name = self.get_fields_name(i)
+        right_field_name, value_field_name, variant_field_name = self.get_fields_name(i)
 
 
         while cleaned_data.get(variant_field_name):
             right = cleaned_data.get(right_field_name, None)
+            value = cleaned_data.get(value_field_name, 0)
 
             variant = cleaned_data[variant_field_name]
 
@@ -434,16 +472,21 @@ class MultiChooseForm(forms.ModelForm):
                 raise forms.ValidationError(_('Есть одинаковые поля'))
             else:
                 rights.append(right)
+                values.append(value)
                 variants.append(variant)
 
             i += 1
-            right_field_name, variant_field_name = self.get_fields_name(i)
+            right_field_name, value_field_name, variant_field_name = self.get_fields_name(i)
 
 
         if sum(rights) <= 0:
             raise ValidationError(_('Должен быть хотя бы один правильный ответ'))
 
+        if sum(values) < 1:
+            raise ValidationError(_('За вопрос нужно получить хотя бы одни балл'))
+
         self.cleaned_data['rights'] = rights
+        self.cleaned_data['values'] = values
         self.cleaned_data['variants'] = variants
 
     def save(self):
@@ -451,24 +494,37 @@ class MultiChooseForm(forms.ModelForm):
         Сохраняет вопрос в БД.
         """
         quiz = super(MultiChooseForm, self).save(commit=False)
+        questionnaire = Questionnaire.objects.get(id=self.questionnaire_id)
 
         if not hasattr(quiz, 'questionnaire'):
-            questionnaire = Questionnaire.objects.get(id=self.questionnaire_id)
             quiz.questionnaire = questionnaire
             quiz.order = len(questionnaire.get_quizzes_list())
-        else:
-            quiz.variants.all().delete()
 
         quiz.save()
+        count = quiz.variants.all().count()
+        current_count = 0
 
-        for index, (right, variant) in enumerate(zip(self.cleaned_data['rights'], self.cleaned_data['variants'])):
-           single_variant = MultiChooseVariant.objects.create(
-               quiz=quiz,
-               variant=variant,
-               order=index, 
-               right=right
-           )
+        for index, (right, value, variant) in enumerate(zip(self.cleaned_data['rights'], \
+                                    self.cleaned_data['values'], self.cleaned_data['variants'])):
+            MultiChooseVariant.objects.update_or_create(
+                quiz=quiz,
+                order=index, 
+                defaults={
+                    'variant': variant,
+                    'value': value,
+                    'right': right
+                }
+            )
 
+            current_count += 1
+
+        while current_count < count:
+            multi_variant = MultiChooseVariant.objects.get(quiz=quiz, order=current_count)
+            multi_variant.delete()
+
+            current_count += 1
+
+        questionnaire.modify()
         return quiz
 
     @staticmethod
@@ -476,7 +532,7 @@ class MultiChooseForm(forms.ModelForm):
         """
         Возвращает кортеж из имен полей соответсвующих переданому индексу.
         """
-        return f'right-{index}-form', f'variant-{index}-form'
+        return f'right-{index}-form', f'value-{index}-form', f'variant-{index}-form'
 
     def get_fields(self):
         """
@@ -484,11 +540,12 @@ class MultiChooseForm(forms.ModelForm):
         """
         i = 0
         while True:
-            right_field_name = f'right-{i}-form'
-            variant_field_name = f'variant-{i}-form'
+            right_field_name, value_field_name, variant_field_name = self.get_fields_name(i)
 
-            if self.fields.get(right_field_name) and self.fields.get(variant_field_name):
-                yield self[right_field_name], self[variant_field_name]
+            if self.fields.get(right_field_name) and self.fields.get(variant_field_name) \
+                    and self.fields.get(value_field_name):
+                    
+                yield self[right_field_name], self[value_field_name], self[variant_field_name]
                 i += 1
             else:
                 break
@@ -518,15 +575,16 @@ class ArbitraryQuizForm(forms.ModelForm):
         Сохраняет вопрос в БД.
         """
         quiz = super(ArbitraryQuizForm, self).save(commit=False)
+        questionnaire = Questionnaire.objects.get(id=self.questionnaire_id)
 
         if not hasattr(quiz, 'questionnaire'):
-            questionnaire = Questionnaire.objects.get(id=self.questionnaire_id)
             quiz.questionnaire = questionnaire
             quiz.order = len(questionnaire.get_quizzes_list())
         
         if commit:
             quiz.save()
 
+        questionnaire.modify()
         return quiz
 
 
