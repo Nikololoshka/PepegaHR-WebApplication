@@ -26,7 +26,7 @@
                     <a href="#" data-target="nav-mobile" class="top-nav sidenav-trigger full hide-on-large-only">
                         <i class="material-icons">menu</i>
                     </a>
-                    <a href="{% url 'home-page' %}" class="workbase-header">PepegaHR</a>
+                    <a href="{% url 'home-page' %}" class="workbase-header">{% get_project_name %}</a>
 
                 </div>
             </nav>
@@ -147,7 +147,7 @@
                                     {% block help-quick-nav %}
                                     <li>
                                     {% endblock help-quick-nav %}
-                                        <a href="{% url 'help-quick-page' %}">Quick start</a>
+                                        <a href="{% url 'help-quick-page' %}">Начало работы</a>
                                     </li>
                                 </ul>
                             </div>

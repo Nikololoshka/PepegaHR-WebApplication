@@ -3,6 +3,7 @@ from django.conf import settings
 from django.utils import timezone
 from django.core.validators import MinValueValidator
 from django.utils.translation import gettext_lazy as _
+from django.db.models import Max
 
 import itertools
 
@@ -246,18 +247,18 @@ class Answer(models.Model):
 
             if quiz_type == Questionnaire.SINGLE_QUIZ:
                 if answer.root.right == answer.right:
-                    current_evaluation += 1
+                    current_evaluation += answer.root.right.value
                 
-                max_evaluation += 1
+                max_evaluation += answer.root.variants.aggregate(max=Max('value'))['max']
                 
             elif quiz_type == Questionnaire.MULTI_QUIZ:
                 results = answer.get_rights()
                 ########
-                for right_answer, right_my, _ in results:
+                for right_answer, right_my, variant in results:
                     if right_answer:
-                         max_evaluation += 1
+                         max_evaluation += variant.value
                          if right_my:
-                             current_evaluation += 1
+                             current_evaluation += variant.value
 
         self.evaluation = current_evaluation 
         self.max_evaluation = max_evaluation

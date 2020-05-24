@@ -1,8 +1,9 @@
 {% extends 'workbase.html' %}
 {% load static %}
+{% load brand %}
 
 <!-- header content -->
-{% block title-content %}Quick start{% endblock title-content %}
+{% block title-content %}Начало работы в {% get_project_name %}{% endblock title-content %}
 
 <!-- nav content -->
 {% block help-nav %}
@@ -22,7 +23,7 @@
 <div class="card-title">
     <div class="row">
         <div class="col s12">
-            Quick start
+            <b>Начало работы в {% get_project_name %}</b>
         </div>
     </div>
 </div>
@@ -32,31 +33,103 @@
 {% block card-content %}
 <div class="row no-padding">
     <div class="col s12 m9 l8 xl10">
-        <div id="quick_start" class="scetion scrollspy" style="height: 100px;">
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Corporis ex amet excepturi error, culpa, eius perferendis saepe quam beatae rem architecto laborum mollitia aspernatur cumque veritatis odio! Dolor, est laborum.</p>
+        <div id="quick_start" class="section scrollspy">
+            <p>
+                <b>{% get_project_name %}</b> веб-приложения для прохождения тестирований пользователями.
+                </br></br>
+            </p>
+            <p>
+                HR-система автоматизирует процесс оценки кандидата. Предполагая, что организации хотят 
+                видеть определенные компетенции соискателей до первого личного собеседования, система 
+                предложит HR-сотруднику отправить подходящему кандидату приглашение на прохождение 
+                профессионального тестирования в той или иной области.
+                </br></br>
+            </p>
+            <p>
+                Необходимость оценки действующего персонала. По прохождении личностных 
+                тестирований HR-система даёт возможность управлять метриками и отслеживать 
+                наиболее/наименее эффективных работников. Также позволяет отобразить 
+                ключевые показатели для любого из действующих сотрудников организации.
+            </p>
         </div>
         <div class="divider"></div>
-        <div id="introduction" class="section scrollspy" style="height: 1000px;">
-            <h5>Introduction </h5>
-            <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Similique laudantium sit sapiente ad ipsum, natus nobis. Nam quidem beatae quaerat, quod fuga saepe tempora qui repudiandae placeat in nemo facere?</p>
+        <div id="basic" class="section scrollspy">
+            <h5>Основы</h5>
+            <p>
+                В приложении существует 3 группы пользователей, которые обладают разным уравнем прав в системе. 
+                Возможности суммируются, т.е. самая высокая роль имеет все предыдущие возможности.
+                Так образом, самые высокие права у <b>Администратора</b>, так как он имеет все возможности модератора и пользователя.
+                </br></br>
+            </p>
+
+            <table>
+                <thead>
+                    <th style="width: 25%;">Роль</th>
+                    <th>Возможности</th>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            Администратор
+                        </td>
+                        <td>
+                            Может добавлять, редактировать или удалять профили пользователей и группы.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Модератор
+                        </td>
+                        <td>
+                            Создание, редактирование и удаление тестов и вопросов в них. 
+                            Так же может управлять временем публикации тестов. Смотреть результаты тестов.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Пользователь
+                        </td>
+                        <td>
+                            Прохождение тестов, просмотр результатов, профилей и групп. Редактирование своего профиля.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p>
+                </br></br>
+                В зависимости от роли пользователя у него отображается соответсвующие кнопки и разделы на страницах.
+                Например, для администратора, модератора и пользователя навигация выглядит так:
+                </br></br>
+            </p>
+            <img class="materialboxed responsive-img" data-caption="Навигация для: администратора, модератора и пользователя (слева-направа)"
+                width="640" src="{% static 'help/img/navigation.png' %}">
+            <p>
+                </br></br>
+                При явном переходе на недоступную страницу будет показана  соответсвующая страница о недостатке прав.
+                </br></br>
+            </p>
         </div>
         <div class="divider"></div>
-        <div id="structure" class="section scrollspy" style="height: 1000px;">
-            <h5>Structure </h5>
-            <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Sunt rerum repellat quod repudiandae a. Beatae accusamus corrupti similique sequi natus libero hic! Molestias esse sunt libero reprehenderit nisi eveniet illum?</p>
-        </div>
-        <div class="divider"></div>
-        <div id="initialization" class="section scrollspy" style="height: 1000px;">
-            <h5>Initialization </h5>
-            <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Numquam nostrum sed, autem eum doloremque modi, enim nobis optio debitis repellendus reiciendis, commodi minus veniam rerum officia itaque esse maiores quasi.</p>
+        <div id="profile" class="section scrollspy">
+            <h5>Профиль</h5>
+            <p>
+                Профиль - это место, где отображается информация текущего пользователя.
+                </br>
+                В нем можно увидеть свою роль, группы в которых состоит пользователь и личную информацию.
+            </p>
+            <img class="materialboxed responsive-img" data-caption="Пример профиля пользователя"
+                width="640" src="{% static 'help/img/profile.png' %}">
+            <p>
+
+            </p>
         </div>
     </div>
     <div class="col hide-on-small-only m3 l4 xl2">
         <ul class="section table-of-contents" style="position: fixed;">
-            <li><a href="#quick_start">Quick start</a></li>
-            <li><a href="#introduction">Introduction</a></li>
-            <li><a href="#structure">Structure</a></li>
-            <li><a href="#initialization">Intialization</a></li>
+            <li><a href="#quick_start">Начало работы</a></li>
+            <li><a href="#basic">Основы</a></li>
+            <li><a href="#profile">Профиль</a></li>
         </ul>
     </div>
 </div>
@@ -66,6 +139,7 @@
 <script>
 $(document).ready(function(){
     $('.scrollspy').scrollSpy();
+    $('.materialboxed').materialbox();
 });
 </script>
 {% endblock script-page %}

@@ -7,4 +7,4 @@ def get_project_name():
     """
     Возвращает название проекта.
     """
-    return 'PepegaHR'
+    return 'MiromiroHR'

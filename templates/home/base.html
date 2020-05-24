@@ -24,7 +24,7 @@
                         <h6>Новый тест: <b>{{ questionnaire.name }}</b></h6>
                         <p>
                             {% if questionnaire.is_wait %}
-                            <b class="orange-text">Скоро откроется</b>
+                            <b class="orange-text">Откроется {{ questionnaire.open_datetime }}</b>
                             {% elif questionnaire.is_close %}
                             <b class="red-text">Закрыт</b>
                             {% else %}
