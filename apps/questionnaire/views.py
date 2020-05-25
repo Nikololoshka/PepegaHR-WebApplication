@@ -7,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Avg, Count, F
+from django.db.models import Avg, Count, F, Max
 from django.http.response import JsonResponse
 
 from datetime import timedelta
@@ -100,14 +100,19 @@ def survey_page(request: WSGIRequest, questionnaire_id: int):
     user_count = HRUser.objects.filter(departaments__in=questionnaire.groups.all()).count()
 
     answer_query = Answer.objects.filter(questionnaire=questionnaire) \
-                        .aggregate(avg_evaluation=Avg('evaluation'), answer_count=Count('id'))
-    answer_count, avg_evaluation = answer_query['answer_count'], answer_query['avg_evaluation']
+                        .aggregate(avg_evaluation=Avg('evaluation'),
+                                   max_evaluation=Max('max_evaluation'),
+                                   answer_count=Count('id'))
+
+    answer_count = answer_query['answer_count']
+    avg_evaluation = answer_query['avg_evaluation']
+    max_evaluation = answer_query['max_evaluation']
 
     return render(request, 'questionnaire/survey.html', {
         'questionnaire': questionnaire,
         'quizzes': questionnaire.get_quizzes_list(),
         'passage_status': f'{answer_count}/{user_count}',
-        'avg_evaluation': avg_evaluation if avg_evaluation is not None else '---',
+        'avg_evaluation': f'{avg_evaluation}/{max_evaluation}' if avg_evaluation is not None else '---',
         'SINGLE_QUIZ': Questionnaire.SINGLE_QUIZ,
         'MULTI_QUIZ': Questionnaire.MULTI_QUIZ,
         'ARBITRARY_QUIZ': Questionnaire.ARBITRARY_QUIZ
@@ -235,7 +240,7 @@ def single_choose_page(request: WSGIRequest, questionnaire_id: int, quiz_id: int
         'form': form,
         'quiz_id': quiz_id,
         'questionnaire_id': questionnaire_id,
-        'action': _('Добавить') if instance is None else _('Изменить'),
+        'action': _('Добавить') if instance is None else _('Сохранить изменения'),
         'title_action': _('Создание') if instance is None else _('Редактирование')
     })
 
@@ -281,7 +286,7 @@ def multi_choose_page(request: WSGIRequest, questionnaire_id: int, quiz_id: int 
         'form': form,
         'quiz_id': quiz_id,
         'questionnaire_id': questionnaire_id,
-        'action': _('Добавить') if instance is None else _('Изменить'),
+        'action': _('Добавить') if instance is None else _('Сохранить изменения'),
         'title_action': _('Создание') if instance is None else _('Редактирование')
     })
 
@@ -327,7 +332,7 @@ def arbitrary_page(request: WSGIRequest, questionnaire_id: int, quiz_id: int = N
         'form': form,
         'quiz_id': quiz_id,
         'questionnaire_id': questionnaire_id,
-        'action': _('Добавить') if instance is None else _('Изменить'),
+        'action': _('Добавить') if instance is None else _('Сохранить изменения'),
         'title_action': _('Создание') if instance is None else _('Редактирование')
     })
 
@@ -365,7 +370,7 @@ def mytests_page(request: WSGIRequest):
     hr_user = get_object_or_404(HRUser, id=request.user.id)
 
     questionnaires = Questionnaire.objects.filter(is_draft=False, groups__in=hr_user.departaments.all())
-    questionnaires = questionnaires.exclude(answers__user=hr_user, answers__is_complete=True)
+    questionnaires = questionnaires.exclude(answers__user=hr_user, answers__is_complete=True).distinct()
 
     answers = Answer.objects.filter(user=hr_user, is_complete=True)
 
@@ -586,7 +591,7 @@ def survey_result_page(request: WSGIRequest, questionnaire_id: int):
     questionnaire = get_object_or_404(Questionnaire, id=questionnaire_id)
     if request.is_ajax():
         answers = Answer.objects.filter(questionnaire=questionnaire) \
-            .values('end_datetime', 'evaluation', first_name=F('user__first_name'),
+            .values('end_datetime', 'evaluation', 'max_evaluation', first_name=F('user__first_name'),
                         last_name=F('user__last_name'), u_id=F('user__id'))
 
         return JsonResponse({'data': list(answers)}, safe=False)
@@ -630,7 +635,8 @@ def user_results_page(request: WSGIRequest, user_id: int):
 
     if request.is_ajax():
         answers = Answer.objects.filter(user=hr_user) \
-                    .values('end_datetime', 'evaluation', name=F('questionnaire__name'), q_id=F('questionnaire__id'))
+                    .values('end_datetime', 'evaluation', 'max_evaluation', \
+                            name=F('questionnaire__name'), q_id=F('questionnaire__id'))
 
         return JsonResponse({'data': list(answers)}, safe=False)
 

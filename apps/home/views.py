@@ -18,7 +18,7 @@ def home(request: WSGIRequest):
     hr_user = get_object_or_404(HRUser, id=request.user.id)
 
     questionnaires = Questionnaire.objects.filter(is_draft=False, groups__in=hr_user.departaments.all())
-    questionnaires = questionnaires.exclude(answers__user=hr_user, answers__is_complete=True)
+    questionnaires = questionnaires.exclude(answers__user=hr_user, answers__is_complete=True).distinct()
 
     return render(request, 'home/base.html', {
         'questionnaires': questionnaires

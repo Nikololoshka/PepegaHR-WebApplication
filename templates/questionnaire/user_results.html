@@ -90,17 +90,25 @@ $(document).ready(function() {
         'columns': [
             { 'width': '40%', 'data': 'name' },
             { 'width': '40%', 'data': 'end_datetime'},
-            { 'width': '20%', 'data': 'evaluation' },
+            { 'width': '20%' },
         ],
         'createdRow': function(row, data, dataIndex ) {
             $(row).addClass('clickable-row').attr('data-id', data['q_id']);
         },
-        'columnDefs': [ {
-            'targets': 1,
-            'render': function ( data, type, row ) {
-                return moment.utc(data).local().locale('ru').format('LLL');
+        'columnDefs': [ 
+            {
+                'targets': 1,
+                'render': function ( data, type, row ) {
+                    return moment.utc(data).local().locale('ru').format('LLL');
+                }
+            },
+            {
+                'targets': 2,
+                'render': function ( data, type, row ) {
+                    return row['evaluation'] + '/' + row['max_evaluation'];
+                }
             }
-        } ]
+        ]
     });
     $('#datatable tbody').on('click', 'tr', function(e) {
         var url = '{% url "questionnaire-passage-result-page" 0 %}';

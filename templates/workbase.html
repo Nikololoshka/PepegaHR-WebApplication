@@ -156,7 +156,7 @@
                 </li>
 
                 <li class="bold">
-                    <a href="{% url 'logout' %}" class="collapsible-header waves-effect">
+                    <a href="#exit-modal" class="collapsible-header waves-effect modal-trigger">
                         <i class="material-icons">exit_to_app</i>Выйти из системы
                     </a>
                 </li>
@@ -186,6 +186,22 @@
     </main>
 
 </body>
+
+
+<div id="exit-modal" class="modal">
+    <div class="modal-content">
+        <h4>Выход из системы</h4>
+        <div>
+            <p>
+                Вы уверены, что хотите выйти из системы?
+            </p>
+        </div>
+    </div>
+    <div class="modal-footer right-align">
+        <a class="modal-close btn-flat waves-effect waves-light">Отмена</a>
+        <a href="{% url 'logout' %}" class="modal-close btn-flat red-text waves-effect waves-light">Выйти</a>
+    </div>
+</div>
 {% endblock body-content %}
 
 <!-- script content -->
@@ -194,6 +210,7 @@
     $(document).ready(function () {
         $('.sidenav').sidenav();
         $('.collapsible').collapsible();
+        $('.modal').modal();
     });
 </script>
 

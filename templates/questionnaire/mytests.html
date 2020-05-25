@@ -44,7 +44,7 @@
                                         <p>
                                             Статус: 
                                             {% if questionnaire.is_wait %}
-                                            <b class="orange-text">Ожидает открытия</b>
+                                            <b class="orange-text">Откроется {{ questionnaire.open_datetime }}</b>
                                             {% elif questionnaire.is_close %}
                                             <b class="red-text">Закрыт</b>
                                             {% else %}

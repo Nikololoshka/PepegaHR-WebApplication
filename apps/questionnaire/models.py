@@ -246,9 +246,7 @@ class Answer(models.Model):
             quiz_type = answer.root.get_quiz_type()
 
             if quiz_type == Questionnaire.SINGLE_QUIZ:
-                if answer.root.right == answer.right:
-                    current_evaluation += answer.root.right.value
-                
+                current_evaluation += answer.right.value
                 max_evaluation += answer.root.variants.aggregate(max=Max('value'))['max']
                 
             elif quiz_type == Questionnaire.MULTI_QUIZ:
