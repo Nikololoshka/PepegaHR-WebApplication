@@ -97,7 +97,7 @@ def survey_page(request: WSGIRequest, questionnaire_id: int):
     questionnaire = get_object_or_404(Questionnaire, id=questionnaire_id)
     
     HRUser = get_user_model()
-    user_count = HRUser.objects.filter(departaments__in=questionnaire.groups.all()).count()
+    user_count = HRUser.objects.filter(departaments__in=questionnaire.groups.all()).distinct().count()
 
     answer_query = Answer.objects.filter(questionnaire=questionnaire) \
                         .aggregate(avg_evaluation=Avg('evaluation'),

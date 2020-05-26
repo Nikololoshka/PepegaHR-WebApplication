@@ -1,0 +1,85 @@
+{% extends 'workbase.html' %}
+{% load static %}
+{% load brand %}
+
+<!-- header content -->
+{% block title-content %}Тестирование в {% get_project_name %}{% endblock title-content %}
+
+<!-- nav content -->
+{% block help-nav %}
+<li class="bold active">
+{% endblock help-nav %}
+
+{% block help-body-nav %}
+<div class="collapsible-body" style="display: block;">
+{% endblock help-body-nav %}
+
+{% block help-questionnaire-nav %}
+<li class="active">
+{% endblock help-questionnaire-nav %}
+
+<!-- Заголовок -->
+{% block card-title %}
+<div class="card-title">
+    <div class="row">
+        <div class="col s12">
+            <b>Тестирование в {% get_project_name %}</b>
+        </div>
+    </div>
+</div>
+{% endblock card-title %}
+
+<!-- Контент -->
+{% block card-content %}
+<div class="row no-padding">
+    <div class="col s12 m9 l8 xl9">
+        <div id="questionnaire" class="section scrollspy">
+            <p>
+                Общая схема тестирования в системе следующая:</br>
+                1) Создание черновика теста.</br>
+                2) Настройка теста.</br>
+                3) Добавление вопросов.</br>
+                4) Настройка публикации теста.</br>
+                5) Публикация.</br>
+                </br>
+                Когда тест только создан, он находится на вкладке <b>Черновики</b> и имеет статут <b>черновика</b>. 
+                После публикации теста он переходит в вкладку <b>Публикации</b> и теперь становится видет пользователям.
+                </br></br>
+                Если у опубликованого теста изменить статус на черновик, то он перестанет виден пользователям.
+                Однако, пользователи, которые уже прошли этот тест, будут видет свои результаты.
+            </p>
+        </div>
+        <div class="divider"></div>
+        <div id="survey-page" class="section scrollspy">
+            <h5>Обзор теста</h5>
+            <p>
+                </br>
+                Страница с тестом состоит из 3-х частей: </br>
+                1) Общая информация о тесте. Название, описание т.д.</br>
+                2) Результаты теста. Кто и как прошел данный тест.</br>
+                3) Вопросы в тесте. </br>
+            </p>
+            <img class="materialboxed responsive-img" data-caption="Просмотр теста"
+                width="640" src="{% static 'help/img/survey-page.png' %}">
+            <p>
+                Помимо просмотра здесь можно изменять настройки теста и публикации. Добавлять вопросы.
+            </p>
+        </div>
+    </div>
+    <div class="col hide-on-small-only m3 l4 xl3">
+        <ul class="section table-of-contents" style="position: fixed;">
+            <li><a href="#questionnaire">Тестирование</a></li>
+            <li><a href="#survey-page">Обзор теста</a></li>
+        </ul>
+    </div>
+</div>
+{% endblock card-content %}
+
+{% block script-page %}
+<script>
+$(document).ready(function(){
+    $('.scrollspy').scrollSpy();
+    $('.materialboxed').materialbox();
+});
+</script>
+{% endblock script-page %}

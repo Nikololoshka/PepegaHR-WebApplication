@@ -1,0 +1,130 @@
+{% extends 'workbase.html' %}
+{% load static %}
+{% load brand %}
+
+<!-- header content -->
+{% block title-content %}Администрирование в {% get_project_name %}{% endblock title-content %}
+
+<!-- nav content -->
+{% block help-nav %}
+<li class="bold active">
+{% endblock help-nav %}
+
+{% block help-body-nav %}
+<div class="collapsible-body" style="display: block;">
+{% endblock help-body-nav %}
+
+{% block help-administration-nav %}
+<li class="active">
+{% endblock help-administration-nav %}
+
+<!-- Заголовок -->
+{% block card-title %}
+<div class="card-title">
+    <div class="row">
+        <div class="col s12">
+            <b>Администрирование в {% get_project_name %}</b>
+        </div>
+    </div>
+</div>
+{% endblock card-title %}
+
+<!-- Контент -->
+{% block card-content %}
+<div class="row no-padding">
+    <div class="col s12 m9 l8 xl9">
+        <div id="admin" class="section scrollspy">
+            <p>
+                Для администраторов доступна вкладка <b>Администрирование</b> в {% get_project_name %}, где
+                можно управлять пользователями и группами.
+                </br></br>
+                Существует 3 подраздела в ней:</br>
+                1) Сведения. Здесь можно посмотреть общую информацию. Например, последняя активность на сайте.</br>
+                2) Список групп. Представляет из себя список всех групп в системе. Группы можно создавать,
+                редактировать, удалять и просматривать.</br>
+                3) Список пользователей. Коллекция всех пользователей в приложении. Здесть пользователей можно создавать,
+                редактировать, удалять.</br>
+            </p>
+        </div>
+        <div class="divider"></div>
+        <div id="create-user" class="section scrollspy">
+            <h5>Создание пользователя</h5>
+            <p>
+                </br>
+                В вкладке <b>Список пользователей</b> по нажатию кнопки <b>Добавить пользователя</b> 
+                можно перейти к созданию новой учетной записи.
+                </br></br>
+            </p>
+            <img class="materialboxed responsive-img" data-caption="Интерфейс создания пользователя"
+                width="640" src="{% static 'help/img/create-user.png' %}">
+            <p>
+                Для создания нового пользователя <b>необходимо</b> заполнить поля:</br>
+                1) Имя пользователя.</br>
+                2) Фамилия пользователя.</br>
+                3) Имя пользователя для входа (Username).</br>
+                4) Адресс электронной почты.</br>
+                5) Пароль.</br>
+                6) Подтверждение пароля.</br>
+                7) Роль. Определяет права в системе.</br>
+                </br>
+                <b>Необязательными</b> полями являются:</br>
+                1) Фотография пользователя. Квадратного размера.</br>
+                2) Группы пользователя. Например, администратору необязательно иметь группу 
+                    и он все равно может пользоваться всеми воможностями.</br>
+                </br>
+                После нажатия кнопки <b>Добавить</b> пользователь будет создан в системе 
+                и его можно будет найти в <b>Списке пользователей</b>.
+            </p>
+        </div>
+        <div class="divider"></div>
+        <div id="edit-remove-user" class="section scrollspy">
+            <h5>Редактирование / удаление пользователя</h5>
+            <p>
+                </br>
+                В <b>Списке пользователей</b> по нажатию на пользователя будет раскрыто меню,
+                где можно отредактировать учетную запись или удалить.</br></br>
+            </p>
+            <img class="materialboxed responsive-img" data-caption="Редактирование/удаление пользователя"
+                width="640" src="{% static 'help/img/edit-remove-user.png' %}">
+            <p>
+                Интерфейс редактирования пользователя эквивалентен <b>Созданию пользователя</b>.
+            </p>
+        </div>
+        <div class="divider"></div>
+        <div id="groups" class="section scrollspy">
+            <h5>Группы</h5>
+            <p>
+                </br>
+                В <b>Списке групп</b> отображаются все группы системы. 
+                По нажатию на <b>Добавить группу</b> можно создать новую группу.</br></br>
+            </p>
+            <img class="materialboxed responsive-img" data-caption="Создание группы"
+                width="640" src="{% static 'help/img/create-group.png' %}">
+            <p>
+                Группы необходимы для логической группировки пользователей, чтобы 
+                затем можно было открывать тесты для пользователей определенных групп.</br></br>
+                Пользователь может находится в нескольких группах одновременно.</br></br>
+            </p>
+            <img class="materialboxed responsive-img" data-caption="Страница группы"
+                width="640" src="{% static 'help/img/group.png' %}">
+        </div>
+    </div>
+    <div class="col hide-on-small-only m3 l4 xl3">
+        <ul class="section table-of-contents" style="position: fixed;">
+            <li><a href="#admin">Администрирование</a></li>
+            <li><a href="#create-user">Создание пользователя</a></li>
+            <li><a href="#edit-remove-user">Редактирование / удаление </br> пользователя</a></li>
+            <li><a href="#groups">Группы</a></li>
+        </ul>
+    </div>
+</div>
+{% endblock card-content %}
+
+{% block script-page %}
+<script>
+$(document).ready(function(){
+    $('.scrollspy').scrollSpy();
+    $('.materialboxed').materialbox();
+});
+</script>
+{% endblock script-page %}

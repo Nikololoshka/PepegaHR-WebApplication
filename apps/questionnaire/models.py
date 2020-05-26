@@ -246,12 +246,14 @@ class Answer(models.Model):
             quiz_type = answer.root.get_quiz_type()
 
             if quiz_type == Questionnaire.SINGLE_QUIZ:
-                current_evaluation += answer.right.value
+                if answer.right is not None:
+                    current_evaluation += answer.right.value
+
                 max_evaluation += answer.root.variants.aggregate(max=Max('value'))['max']
                 
             elif quiz_type == Questionnaire.MULTI_QUIZ:
                 results = answer.get_rights()
-                ########
+                
                 for right_answer, right_my, variant in results:
                     if right_answer:
                          max_evaluation += variant.value

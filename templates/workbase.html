@@ -149,6 +149,16 @@
                                     {% endblock help-quick-nav %}
                                         <a href="{% url 'help-quick-page' %}">Начало работы</a>
                                     </li>
+                                    {% block help-administration-nav %}
+                                    <li>
+                                    {% endblock help-administration-nav %}
+                                        <a href="{% url 'help-administration-page' %}">Администрирование</a>
+                                    </li>
+                                    {% block help-questionnaire-nav %}
+                                    <li>
+                                    {% endblock help-questionnaire-nav %}
+                                        <a href="{% url 'help-questionnaire-page' %}">Тестирование</a>
+                                    </li>
                                 </ul>
                             </div>
                         </li>
